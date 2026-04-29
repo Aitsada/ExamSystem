@@ -6,6 +6,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: db_exam
+      TZ: Asia/Bangkok
     ports:
       - "3307:3306"
     volumes:
@@ -20,6 +21,7 @@ services:
       PMA_PORT: 3306
       PMA_USER: root
       PMA_PASSWORD: root
+      TZ: Asia/Bangkok
     ports:
       - "8080:80"
     depends_on:

@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+import "dotenv/config";
 
 const db = mysql.createPool({
   host: process.env.DB_HOST,
@@ -6,9 +7,8 @@ const db = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_DATABASE,
+  timezone: "+07:00", // เวลาไทย
 });
 
-const [rows, field] = await db.query('SELECT * FROM Applicant');
-console.log(field);
 
 export default db;
