@@ -1,0 +1,184 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS `SeatMapping`;
+DROP TABLE IF EXISTS `Seat`;
+DROP TABLE IF EXISTS `SeatRow`;
+DROP TABLE IF EXISTS `Applicant`;
+DROP TABLE IF EXISTS `Room`;
+DROP TABLE IF EXISTS `Position`;
+DROP TABLE IF EXISTS `Floor`;
+DROP TABLE IF EXISTS `Building`;
+DROP TABLE IF EXISTS `CalendarItem`;
+DROP TABLE IF EXISTS `Exam`;
+DROP TABLE IF EXISTS `Facility`;
+DROP TABLE IF EXISTS `Organization`;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE `Organization` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `Name` VARCHAR(200) NOT NULL,
+  `Description` VARCHAR(2000) NULL,
+  `Logo` LONGBLOB NULL,
+  CONSTRAINT `PK_Organization` PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `Facility` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `Name` VARCHAR(200) NOT NULL,
+  `Description` VARCHAR(2000) NULL,
+  `DisplayName` VARCHAR(200) NOT NULL DEFAULT '',
+  `IsActive` BOOLEAN NOT NULL DEFAULT TRUE,
+  CONSTRAINT `PK_Facility` PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `Exam` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `OrganizationID` BIGINT NOT NULL,
+  `Name` VARCHAR(200) NOT NULL,
+  `StatusID` INT NOT NULL,
+  `StartDateTime` TIMESTAMP NOT NULL,
+  `EndDateTime` TIMESTAMP NOT NULL,
+  CONSTRAINT `PK_Exam` PRIMARY KEY (`ID`),
+  CONSTRAINT `FK_Exam_Organization` FOREIGN KEY (`OrganizationID`)
+    REFERENCES `Organization` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `Building` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `FacilityID` BIGINT NOT NULL,
+  `Name` VARCHAR(200) NOT NULL,
+  `Alias` VARCHAR(50) NOT NULL DEFAULT '',
+  `Description` VARCHAR(2000) NULL,
+  `IsActive` BOOLEAN NOT NULL DEFAULT TRUE,
+  CONSTRAINT `PK_Building` PRIMARY KEY (`ID`),
+  CONSTRAINT `FK_Building_Facility` FOREIGN KEY (`FacilityID`)
+    REFERENCES `Facility` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `Floor` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `BuildingID` BIGINT NOT NULL,
+  `Number` INT NOT NULL,
+  `Name` VARCHAR(200) NOT NULL,
+  `Description` VARCHAR(2000) NULL,
+  `IsActive` BOOLEAN NOT NULL DEFAULT TRUE,
+  CONSTRAINT `PK_Floor` PRIMARY KEY (`ID`),
+  CONSTRAINT `FK_Floor_Building` FOREIGN KEY (`BuildingID`)
+    REFERENCES `Building` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `Position` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `ExamID` BIGINT NOT NULL,
+  `Number` INT NOT NULL,
+  `Name` VARCHAR(200) NOT NULL,
+  `Description` VARCHAR(2000) NULL,
+  CONSTRAINT `PK_Position` PRIMARY KEY (`ID`),
+  CONSTRAINT `FK_Position_Exam` FOREIGN KEY (`ExamID`)
+    REFERENCES `Exam` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `Room` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `FloorID` BIGINT NOT NULL,
+  `No` INT NOT NULL,
+  `Name` VARCHAR(200) NOT NULL,
+  `Description` VARCHAR(2000) NULL,
+  `Rows` INT NOT NULL,
+  `Columns` INT NOT NULL,
+  `TemplateID` INT NOT NULL,
+  `IsActive` BOOLEAN NOT NULL DEFAULT TRUE,
+  CONSTRAINT `PK_Room` PRIMARY KEY (`ID`),
+  CONSTRAINT `FK_Room_Floor` FOREIGN KEY (`FloorID`)
+    REFERENCES `Floor` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `Applicant` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `PositionID` BIGINT NOT NULL,
+  `Prefix` VARCHAR(25) NOT NULL,
+  `FirstName` VARCHAR(100) NOT NULL,
+  `LastName` VARCHAR(100) NOT NULL,
+  `ApplicantNumber` VARCHAR(25) NOT NULL,
+  `CitizenNumber` VARCHAR(50) NOT NULL,
+  `SeatRow` INT NULL,
+  CONSTRAINT `PK_Applicant` PRIMARY KEY (`ID`),
+  CONSTRAINT `FK_Applicant_Position` FOREIGN KEY (`PositionID`)
+    REFERENCES `Position` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `SeatRow` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `RoomID` BIGINT NOT NULL,
+  `Name` VARCHAR(200) NOT NULL,
+  `Description` VARCHAR(2000) NULL,
+  CONSTRAINT `PK_SeatRow` PRIMARY KEY (`ID`),
+  CONSTRAINT `FK_SeatRow_Room` FOREIGN KEY (`RoomID`)
+    REFERENCES `Room` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `Seat` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `SeatRowID` BIGINT NOT NULL,
+  `Name` VARCHAR(200) NOT NULL,
+  `Description` VARCHAR(2000) NULL,
+  CONSTRAINT `PK_Seat` PRIMARY KEY (`ID`),
+  CONSTRAINT `FK_Seat_SeatRow` FOREIGN KEY (`SeatRowID`)
+    REFERENCES `SeatRow` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `SeatMapping` (
+  `ID` BIGINT NOT NULL AUTO_INCREMENT,
+  `CreatedDateTime` TIMESTAMP NULL,
+  `CreatedBy` VARCHAR(50) NULL,
+  `LastModifiedDateTime` TIMESTAMP NULL,
+  `LastModifiedBy` VARCHAR(50) NULL,
+  `SeatID` BIGINT NOT NULL,
+  `ApplicantID` BIGINT NOT NULL,
+  CONSTRAINT `PK_SeatMapping` PRIMARY KEY (`ID`),
+  CONSTRAINT `FK_SeatMapping_Seat` FOREIGN KEY (`SeatID`)
+    REFERENCES `Seat` (`ID`),
+  CONSTRAINT `FK_SeatMapping_Applicant` FOREIGN KEY (`ApplicantID`)
+    REFERENCES `Applicant` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
