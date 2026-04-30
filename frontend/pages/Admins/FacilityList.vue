@@ -1,6 +1,6 @@
 <template>
   <main>
-    <v-container class="px-10 py-5 rounded-xl" style="width:70%; padding-top: 20px; background-color: #bfbfbf;">
+    <v-container class="px-10 py-5 rounded-xl" style="max-width: 1000px; padding-top: 20px;">
       <v-row style="text-align: center;">
         <v-col>
           <h1 style="font-size: 16px;">
