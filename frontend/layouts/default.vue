@@ -1,19 +1,39 @@
 <template>
-  <v-app dark>
+  <v-app class="app-shell">
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant="miniVariant"
-      :clipped="clipped"
+      :width="260"
+      mini-variant-width="72"
       fixed
       app
+      class="app-sidebar"
     >
-      <v-list>
+      <div class="sidebar-header">
+        <v-btn icon class="sidebar-menu-btn" @click.stop="miniVariant = !miniVariant">
+          <v-icon>{{ miniVariant ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
+        </v-btn>
+        <div v-if="!miniVariant" class="sidebar-title">
+          <div class="sidebar-title-main">
+            {{ title }}
+          </div>
+          <div class="sidebar-title-sub">
+            ระบบจัดการสอบ
+          </div>
+        </div>
+      </div>
+
+      <v-divider />
+
+      <v-list nav dense class="sidebar-list">
         <v-list-item
           v-for="(item, i) in items"
           :key="i"
           :to="item.to"
           router
           exact
+          active-class="sidebar-item-active"
+          class="sidebar-item"
         >
           <v-list-item-action>
             <v-icon>{{ item.icon }}</v-icon>
@@ -24,42 +44,28 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar :clipped-left="clipped" fixed app style="background-color: #494949;">
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-btn icon @click.stop="miniVariant = !miniVariant">
-        <v-icon>mdi-{{ `chevron-${miniVariant ? "right" : "left"}` }}</v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="clipped = !clipped">
-        <v-icon>mdi-application</v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="fixed = !fixed">
-        <v-icon>mdi-minus</v-icon>
-      </v-btn>
-      <v-toolbar-title v-text="title" />
+
+    <v-app-bar
+      fixed
+      app
+      flat
+      height="64"
+      color="white"
+      class="app-topbar"
+    >
+      <v-toolbar-title class="topbar-title" v-text="pageTitle" />
       <v-spacer />
-      <v-btn icon @click.stop="rightDrawer = !rightDrawer">
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
+      <span class="topbar-caption">Admin workspace</span>
     </v-app-bar>
-    <v-main>
-      <v-container>
+
+    <v-main class="app-main">
+      <v-container fluid class="page-container">
         <Nuxt />
       </v-container>
     </v-main>
-    <v-navigation-drawer v-model="rightDrawer" :right="right" temporary fixed>
-      <v-list>
-        <v-list-item @click.native="right = !right">
-          <v-list-item-action>
-            <v-icon light>
-              mdi-repeat
-            </v-icon>
-          </v-list-item-action>
-          <v-list-item-title>Switch drawer (click me)</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-    <v-footer :absolute="!fixed" app>
-      <span>&copy; {{ new Date().getFullYear() }}</span>
+
+    <v-footer app inset height="40" class="app-footer">
+      <span>&copy; {{ new Date().getFullYear() }} Tock3yrs</span>
     </v-footer>
   </v-app>
 </template>
@@ -68,40 +74,129 @@
 export default {
   data () {
     return {
-      clipped: false,
-      drawer: false,
-      fixed: false,
+      drawer: true,
       items: [
         {
-          icon: 'mdi-apps',
+          icon: 'mdi-view-dashboard-outline',
           title: 'Welcome',
           to: '/'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-home-outline',
           title: 'หน้าหลัก',
           to: '/Home'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-seat-outline',
           title: 'จัดห้องสอบ',
           to: '/ExamSelect'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-history',
           title: 'ประวัติการจัดสอบ',
           to: '/ExamHistory'
         },
         {
-          icon: 'mdi-chart-bubble',
+          icon: 'mdi-cog-outline',
           title: 'จัดการหลังบ้าน',
           to: '/Admin'
         }
       ],
       miniVariant: false,
-      right: true,
-      rightDrawer: false
+      title: 'Tock3yrs'
+    }
+  },
+  computed: {
+    pageTitle () {
+      const currentItem = this.items.find(item => item.to === this.$route.path)
+      return currentItem ? currentItem.title : this.title
     }
   }
 }
 </script>
+
+<style scoped>
+.app-shell {
+  background: #F5F7FB !important;
+}
+
+.app-sidebar {
+  border-right: 1px solid #E3E8F0 !important;
+  background: #FFFFFF !important;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  min-height: 72px;
+  padding: 12px 14px;
+}
+
+.sidebar-menu-btn {
+  color: #1A237E !important;
+}
+
+.sidebar-title {
+  min-width: 0;
+  margin-left: 10px;
+}
+
+.sidebar-title-main {
+  color: #1A237E;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.sidebar-title-sub {
+  color: #607D8B;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.sidebar-list {
+  padding: 10px 8px !important;
+}
+
+.sidebar-item {
+  min-height: 44px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  color: #455A64 !important;
+}
+
+.sidebar-item-active {
+  background: #E8EAF6 !important;
+  color: #1A237E !important;
+}
+
+.app-topbar {
+  border-bottom: 1px solid #E3E8F0 !important;
+}
+
+.topbar-title {
+  color: #263238;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.topbar-caption {
+  color: #78909C;
+  font-size: 12px;
+}
+
+.app-main {
+  background: #F5F7FB;
+}
+
+.page-container {
+  padding: 24px;
+}
+
+.app-footer {
+  border-top: 1px solid #E3E8F0 !important;
+  background: #FFFFFF !important;
+  color: #78909C;
+  font-size: 12px;
+}
+</style>

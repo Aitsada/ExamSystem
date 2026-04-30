@@ -6,7 +6,7 @@ export default {
 
   server: {
     port: 3005,
-    host: '0.0.0.0' // (optional) ให้เข้าจาก network ได้
+    host: '::' // รองรับทั้ง localhost (::1) และ IP ในวง LAN
   },
 
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -29,10 +29,13 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: [
+    '~/plugins/api-url.js',
+    { src: '~/plugins/sweetalert.js', mode: 'client' }
+  ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
-  components: true,
+  components: false,
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
@@ -49,10 +52,13 @@ export default {
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {},
+  axios: {
+    timeout: 8000
+  },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
+    treeShake: false,
     customVariables: ['~/assets/variables.scss'],
     theme: {
       dark: false,

@@ -118,7 +118,7 @@ export default {
   methods: {
     async loadFacilities () {
       try {
-        this.facilities = await this.$axios.$get('http://localhost:8005/api')
+        this.facilities = await this.$axios.$get(this.$apiUrl('/api'))
       } catch (err) {
         this.facilityError = true
         this.facilityMessage = this.getErrorMessage(err, 'โหลดข้อมูลสถานที่สอบไม่สำเร็จ')
@@ -145,7 +145,7 @@ export default {
       this.savingFacility = true
 
       try {
-        await this.$axios.$post('http://localhost:8005/api/create', {
+        await this.$axios.$post(this.$apiUrl('/api/create'), {
           ...this.facility,
           Description: this.facility.Description || null
         })
