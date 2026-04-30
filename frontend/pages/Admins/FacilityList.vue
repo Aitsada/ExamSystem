@@ -85,23 +85,11 @@
             color="error"
             class="btn-action"
             prepend-icon="mdi-delete-outline"
-            @click="testBtn(item)"
-          >
-            ลบ
-          </v-btn>
-        </template>
-        <!-- <template #[`item.delete`]="{ item }">
-          <v-btn
-            size="small"
-            variant="outlined"
-            color="error"
-            class="btn-action"
-            prepend-icon="mdi-delete-outline"
             @click="confirmDelete(item)"
           >
             ลบ
           </v-btn>
-        </template> -->
+        </template>
       </v-data-table>
     </v-card>
   </v-container>
