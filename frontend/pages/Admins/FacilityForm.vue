@@ -37,18 +37,6 @@
 
     <!-- Form Card -->
     <v-card elevation="0" rounded="lg" border color="white">
-      <!-- Section: ข้อมูลทั่วไป -->
-      <v-card-item class="px-5 pt-4 pb-2">
-        <v-card-title class="text-body-2 font-weight-bold pa-0" style="color: #1A237E;">
-          <v-icon size="16" color="primary" class="mr-1">
-            mdi-information-outline
-          </v-icon>
-          ข้อมูลทั่วไป
-        </v-card-title>
-      </v-card-item>
-
-      <v-divider />
-
       <v-card-text class="px-5 py-4">
         <v-form ref="form">
           <!-- ชื่อสถานที่สอบ -->
@@ -56,17 +44,6 @@
             <v-col cols="4">
               <v-row align="center" no-gutters>
                 <v-col cols="auto">
-                  <v-chip
-                    size="x-small"
-                    color="error"
-                    variant="flat"
-                    class="mr-1"
-                    style="height: 16px; font-size: 10px; padding: 0 4px;"
-                  >
-                    จำเป็น
-                  </v-chip>
-                </v-col>
-                <v-col>
                   <span class="text-body-2 font-weight-medium" style="color:#333;">
                     ชื่อสถานที่สอบ
                   </span>
@@ -82,6 +59,7 @@
                 hide-details="auto"
                 :rules="[v => !!v || 'กรุณากรอกชื่อสถานที่สอบ']"
                 class="form-field"
+                outlined
               />
             </v-col>
           </v-row>
@@ -90,17 +68,6 @@
           <v-row align="center" class="mb-3" no-gutters>
             <v-col cols="4">
               <v-row align="center" no-gutters>
-                <v-col cols="auto">
-                  <v-chip
-                    size="x-small"
-                    color="error"
-                    variant="flat"
-                    class="mr-1"
-                    style="height: 16px; font-size: 10px; padding: 0 4px;"
-                  >
-                    จำเป็น
-                  </v-chip>
-                </v-col>
                 <v-col>
                   <span class="text-body-2 font-weight-medium" style="color:#333;">
                     ชื่อแสดง
@@ -117,6 +84,7 @@
                 hide-details="auto"
                 :rules="[v => !!v || 'กรุณากรอกชื่อแสดง']"
                 class="form-field"
+                outlined
               />
             </v-col>
           </v-row>
@@ -141,26 +109,12 @@
                 rows="3"
                 auto-grow
                 class="form-field"
+                outlined
               />
             </v-col>
           </v-row>
         </v-form>
       </v-card-text>
-
-      <v-divider />
-
-      <!-- Section: เอกสารแนบ -->
-      <v-card-item class="px-5 pt-4 pb-2">
-        <v-card-title class="text-body-2 font-weight-bold pa-0" style="color: #1A237E;">
-          <v-icon size="16" color="primary" class="mr-1">
-            mdi-paperclip
-          </v-icon>
-          เอกสารแนบ
-        </v-card-title>
-      </v-card-item>
-
-      <v-divider />
-
       <v-card-text class="px-5 py-4">
         <v-row align="start" no-gutters>
           <v-col cols="4" class="pt-2">
@@ -184,6 +138,7 @@
               prepend-icon=""
               prepend-inner-icon="mdi-upload-outline"
               class="form-field"
+              outlined
             />
             <p class="text-caption text-medium-emphasis mt-1 mb-0">
               รองรับไฟล์ .pdf, .jpg, .png ขนาดไม่เกิน 10MB

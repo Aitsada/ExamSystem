@@ -63,14 +63,17 @@
 
         <!-- Edit -->
         <!-- eslint-disable-next-line vue/valid-v-slot -->
-        <template #[`item.edit`]>
+        <template #[`item.edit`]="{ item }">
           <v-btn
             size="small"
             variant="outlined"
             color="white"
             class="btn-action"
             prepend-icon="mdi-pencil-outline"
-            @click="showEditUnavailable"
+            :to="{
+              path: '/Admins/FacilityForm',
+              query: { ID: item.ID}
+            }"
           >
             แก้ไข
           </v-btn>
