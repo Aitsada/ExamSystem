@@ -34,7 +34,9 @@
         </v-btn>
       </v-col>
     </v-row>
-
+    <v-btn @click="testBtn">
+      TEsT
+    </v-btn>
     <v-card elevation="0" rounded="lg" border color="white" class="mb-4">
       <v-card-text class="px-5 py-4">
         <v-form ref="form">
@@ -353,6 +355,9 @@ export default {
         this.buildingLoading = false
       }
     },
+    testBtn () {
+      console.log(this.facility.Name, this.facility.DisplayName)
+    },
     backBtn () {
       this.$router.back()
     },
@@ -385,7 +390,9 @@ export default {
         if (this.isEditMode) {
           res = await this.$axios.$patch(this.$apiUrl(`/api/update/${this.facility.ID}`), this.buildFacilityFormData())
         } else {
-          res = await this.$axios.$post(this.$apiUrl('/api/create'), this.buildFacilityFormData())
+          console.log('Create Facility Response:', this.buildFacilityFormData())
+          res = await this.$axios.$post(this.$apiUrl('/api/create'), this.facility)
+          console.log('Create Facility Response:', this.facility)
           this.facility.ID = res.id
           this.isEditMode = true
           this.breadcrumbs[2].text = 'แก้ไขสถานที่สอบ'

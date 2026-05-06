@@ -1,8 +1,6 @@
-import buildingModel from "./building.model.js";
-
-const model = new buildingModel();
+import * as buildingModel from "../models/building.model.js";
 
 export async function getAll() {
     console.log("service : ", "ok");
-    return model.findAll();
+    return buildingModel.findAll();
 }
