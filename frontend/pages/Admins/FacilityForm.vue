@@ -147,7 +147,7 @@
             outlined
             class="btn-action"
             prepend-icon="mdi-pencil-outline"
-            @click="openBuildingDialog(item)"
+            :to="{ path: '/Admins/BuildingForm', query: { FacilityID: facility.ID, BuildingID: item.ID }}"
           >
             แก้ไข
           </v-btn>
@@ -208,48 +208,6 @@
         </v-row>
       </v-card-text>
     </v-card>
-
-    <v-dialog v-model="buildingDialog" max-width="520">
-      <v-card>
-        <v-card-title class="text-subtitle-1 font-weight-bold">
-          แก้ไขข้อมูลอาคาร
-        </v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model.trim="editingBuilding.Name"
-            label="ชื่ออาคาร"
-            dense
-            outlined
-            hide-details="auto"
-            class="mb-3"
-          />
-          <v-text-field
-            v-model.trim="editingBuilding.Alias"
-            label="ชื่อย่อ"
-            dense
-            outlined
-            hide-details
-            class="mb-3"
-          />
-          <v-text-field
-            v-model.trim="editingBuilding.Description"
-            label="รายละเอียด"
-            dense
-            outlined
-            hide-details
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text class="btn-cancel" @click="buildingDialog = false">
-            ยกเลิก
-          </v-btn>
-          <v-btn color="primary" class="btn-save" :loading="buildingSaving" @click="saveBuildingEdit">
-            บันทึก
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
@@ -416,15 +374,6 @@ export default {
       } finally {
         this.loading = false
       }
-    },
-    openBuildingDialog (item) {
-      this.editingBuilding = {
-        ID: item.ID,
-        Name: item.Name || '',
-        Alias: item.Alias || '',
-        Description: item.Description || ''
-      }
-      this.buildingDialog = true
     },
     async saveBuildingEdit () {
       if (!this.editingBuilding.Name) {
