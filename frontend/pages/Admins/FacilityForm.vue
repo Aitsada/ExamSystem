@@ -29,7 +29,7 @@
             ระบบจัดการสถานที่สอบ
           </p>
           <p class="text-h6 font-weight-bold mb-0" style="color: #1A237E; letter-spacing: 0.02em;">
-            เพิ่มสถานที่สอบ
+            {{ pageTitle }}
           </p>
         </v-col>
       </v-row>
@@ -45,7 +45,7 @@
               <v-row align="center" no-gutters>
                 <v-col cols="auto">
                   <span class="text-body-2 font-weight-medium" style="color:#333;">
-                    ชื่อสถานที่สอบ
+                    ชื่อสถานที่สอบ :
                   </span>
                 </v-col>
               </v-row>
@@ -70,7 +70,7 @@
               <v-row align="center" no-gutters>
                 <v-col>
                   <span class="text-body-2 font-weight-medium" style="color:#333;">
-                    ชื่อแสดง
+                    ชื่อแสดง :
                   </span>
                 </v-col>
               </v-row>
@@ -93,15 +93,11 @@
           <v-row align="start" class="mb-1" no-gutters>
             <v-col cols="4" class="pt-2">
               <span class="text-body-2 font-weight-medium" style="color:#333;">
-                รายละเอียด
+                รายละเอียด :
               </span>
-              <p class="text-caption text-medium-emphasis mb-0">
-                (ไม่บังคับ)
-              </p>
             </v-col>
             <v-col cols="8">
               <v-textarea
-                v-model.trim="facility.Description"
                 placeholder="อธิบายสถานที่สอบเพิ่มเติม..."
                 variant="outlined"
                 density="compact"
@@ -119,11 +115,34 @@
         <v-row align="start" no-gutters>
           <v-col cols="4" class="pt-2">
             <span class="text-body-2 font-weight-medium" style="color:#333;">
-              ไฟล์แนบ
+              ผังห้อง :
             </span>
-            <p class="text-caption text-medium-emphasis mb-0">
-              (ไม่บังคับ)
+          </v-col>
+          <v-col cols="8">
+            <v-file-input
+              v-model="attachedFiles"
+              show-size
+              counter
+              multiple
+              variant="outlined"
+              density="compact"
+              hide-details
+              placeholder="เลือกไฟล์..."
+              prepend-icon=""
+              prepend-inner-icon="mdi-upload-outline"
+              class="form-field"
+              outlined
+            />
+            <p class="text-caption text-medium-emphasis mt-1 mb-0">
+              รองรับไฟล์ .pdf, .jpg, .png ขนาดไม่เกิน 10MB
             </p>
+          </v-col>
+        </v-row>
+        <v-row align="start" no-gutters>
+          <v-col cols="4" class="pt-2">
+            <span class="text-body-2 font-weight-medium" style="color:#333;">
+              อาคาร :
+            </span>
           </v-col>
           <v-col cols="8">
             <v-file-input
@@ -174,7 +193,7 @@
               prepend-icon="mdi-content-save-outline"
               @click="saveFacility"
             >
-              บันทึกข้อมูล
+              {{ isEditMode ? 'บันทึกการแก้ไข' : 'บันทึกข้อมูล' }}
             </v-btn>
           </v-col>
         </v-row>
@@ -191,6 +210,7 @@ export default {
       loading: false,
       attachedFiles: [],
       facility: {
+        ID: null,
         Name: '',
         DisplayName: '',
         Description: '',
@@ -200,10 +220,59 @@ export default {
         { text: 'หน้าหลัก', href: '/Admin', disabled: false },
         { text: 'สถานที่สอบ', href: '/Admins/FacilityList', disabled: false },
         { text: 'เพิ่มสถานที่สอบ', disabled: true }
-      ]
+      ],
+      isEditMode: false
+    }
+  },
+  computed: {
+    pageTitle () {
+      return this.isEditMode ? 'แก้ไขสถานที่สอบ' : 'เพิ่มสถานที่สอบ'
+    }
+  },
+  mounted () {
+    const id = this.$route.query.ID
+    if (id) {
+      this.isEditMode = true
+      this.breadcrumbs[2].text = 'แก้ไขสถานที่สอบ'
+      this.fetchFacilityById(id)
     }
   },
   methods: {
+    async fetchFacilityById (id) {
+      this.loading = true
+      try {
+        const res = await this.$axios.$get(this.$apiUrl('/api'))
+        const facility = (res.data || []).find(item => String(item.ID) === String(id))
+
+        if (!facility) {
+          this.$swal.fire({
+            icon: 'warning',
+            title: 'ไม่พบข้อมูล',
+            text: 'ไม่พบข้อมูลสถานที่สอบที่ต้องการแก้ไข',
+            confirmButtonText: 'ตกลง'
+          })
+          this.$router.push('/Admins/FacilityList')
+          return
+        }
+
+        this.facility = {
+          ID: facility.ID,
+          Name: facility.Name || '',
+          DisplayName: facility.DisplayName || '',
+          Description: facility.Description || '',
+          CreatedBy: facility.CreatedBy || 'Admin'
+        }
+      } catch (error) {
+        this.$swal.fire({
+          icon: 'error',
+          title: 'โหลดข้อมูลไม่สำเร็จ',
+          text: 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง',
+          confirmButtonText: 'ตกลง'
+        })
+      } finally {
+        this.loading = false
+      }
+    },
     backBtn () {
       this.$router.back()
     },
@@ -213,16 +282,26 @@ export default {
 
       this.loading = true
       try {
-        await this.$axios.$post(this.$apiUrl('/api/create'), { ...this.facility })
+        if (this.isEditMode) {
+          await this.$axios.$patch(this.$apiUrl(`/api/update/${this.facility.ID}`), { ...this.facility })
+        } else {
+          await this.$axios.$post(this.$apiUrl('/api/create'), { ...this.facility })
+        }
+
         this.$swal.fire({
           icon: 'success',
           title: 'บันทึกข้อมูลสำเร็จ',
-          text: 'บันทึกข้อมูลสถานที่สอบสำเร็จ',
+          text: this.isEditMode ? 'แก้ไขข้อมูลสถานที่สอบสำเร็จ' : 'บันทึกข้อมูลสถานที่สอบสำเร็จ',
           confirmButtonText: 'ตกลง'
         })
-        this.facility = { Name: '', DisplayName: '', Description: '', CreatedBy: 'Admin' }
-        this.attachedFiles = []
-        this.$refs.form.resetValidation()
+
+        if (this.isEditMode) {
+          this.$router.push('/Admins/FacilityList')
+        } else {
+          this.facility = { ID: null, Name: '', DisplayName: '', Description: '', CreatedBy: 'Admin' }
+          this.attachedFiles = []
+          this.$refs.form.resetValidation()
+        }
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
