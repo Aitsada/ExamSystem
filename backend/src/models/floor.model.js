@@ -5,6 +5,11 @@ export async function findAll() {
   return result;
 }
 
+export async function findById(BuildingID) {
+  const [result] = await db.query("SELECT * FROM Floor WHERE BuildingID = ?", [BuildingID])
+  return result
+}
+
 export async function create(data) {
   const [result] = await db.query(
     "INSERT INTO Floor (CreatedBy, BuildingID, Number, Name, Description) VALUES (?,?,?,?,?)",

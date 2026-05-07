@@ -1,12 +1,11 @@
 import * as facilityModel from "../models/facility.model.js";
 
-
-
 export async function getAll() {
-  console.log("service : ", "ok");
   return facilityModel.findAll();
 }
-
+export async function findById(id) {
+  return await facilityModel.findById(id);
+}
 export async function createData(data) {
   return facilityModel.create(data);
 }

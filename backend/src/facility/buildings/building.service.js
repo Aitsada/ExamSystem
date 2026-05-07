@@ -4,8 +4,12 @@ export async function getAll() {
   return buildingModel.findAll();
 }
 
-export async function findById(FacilityID) {
-  return buildingModel.findById(FacilityID);
+export async function findById(id) {
+  return buildingModel.findById(id);
+}
+
+export async function findByFacilityID(FacilityID) {
+  return buildingModel.findByFacilityID(FacilityID);
 }
 
 export async function create(data) {

@@ -272,7 +272,6 @@ export default {
       try {
         const res = await this.$axios.$get(this.$apiUrl('/api'))
         const facility = (res.data || []).find(item => String(item.ID) === String(id))
-
         if (!facility) {
           this.$swal.fire({
             icon: 'warning',
@@ -297,15 +296,15 @@ export default {
         this.loading = false
       }
     },
-    async fetchBuildings (facilityId = this.facility.ID) {
-      if (!facilityId) {
+    async fetchBuildings (FacilityID = this.facility.ID) {
+      if (!FacilityID) {
         this.buildings = []
         return
       }
 
       this.buildingLoading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/${facilityId}/buildings`))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/${FacilityID}/buildings`))
         this.buildings = res.data || []
       } catch (error) {
         this.showError('โหลดข้อมูลอาคารไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลอาคารได้ กรุณาลองใหม่อีกครั้ง')

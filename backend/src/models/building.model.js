@@ -1,12 +1,15 @@
 import db from "../config/db.js";
 
 export async function findAll() {
-  console.log("model: ", "ok");
   const [result] = await db.query("SELECT * FROM Building");
   return result;
 }
 
-export async function findById(FacilityID) {
+export async function findById(id) {
+  const [result] = await db.query("SELECT * FROM Building WHERE ID = ?", [id])
+  return result[0]
+}
+export async function findByFacilityID(FacilityID) {
   const [result] = await db.query(
     "SELECT * FROM Building WHERE FacilityID = ?",
     [FacilityID],

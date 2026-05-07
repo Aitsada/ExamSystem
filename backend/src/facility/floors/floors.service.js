@@ -1,7 +1,11 @@
 import * as floorModel from "../../models/floor.model.js";
 
 export async function test() {
-  return floorModel.test();
+  return await floorModel.findAll();
+}
+
+export async function findById(BuildingID) {
+  return await floorModel.findById(BuildingID);
 }
 
 export async function create(data) {

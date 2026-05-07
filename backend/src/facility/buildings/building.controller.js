@@ -4,7 +4,6 @@ export async function getAll(req, res) {
   try {
     const data = await buildingService.getAll();
     res.status(200).json({ data: data, message: "get all buildings" });
-    console.log("data: ", data);
   } catch (err) {
     res.status(500).json({ err: err.message });
   }
@@ -12,8 +11,23 @@ export async function getAll(req, res) {
 
 export async function findById(req, res) {
   try {
+    const { id } = req.params;
+    const data = await buildingService.findById(id);
+    if (!data) {
+      res.status(404).json({ status: "fail" });
+    }
+    res.status(200).json({ data: data, message: "get building by FacilityID" });
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+}
+export async function findByFacilityID(req, res) {
+  try {
     const { FacilityID } = req.params;
-    const data = await buildingService.findById(FacilityID);
+    const data = await buildingService.findByFacilityID(FacilityID);
+    if (!data) {
+      res.status(404).json({ status: "fail" });
+    }
     res.status(200).json({ data: data, message: "get building by FacilityID" });
   } catch (err) {
     res.status(500).json({ err: err.message });
@@ -25,7 +39,6 @@ export async function Create(req, res) {
     const { FacilityID } = req.params;
 
     const result = await buildingService.create({ ...req.body, FacilityID });
-    console.log("controller create result: ", result);
     res.status(201).json({
       status: "success",
       result,
