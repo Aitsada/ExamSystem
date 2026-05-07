@@ -14,5 +14,6 @@ export async function deleteData(id) {
 }
 
 export async function updateData(id, data) {
+  console.log("sv");
   return facilityModel.update(id, data);
 }

@@ -57,12 +57,13 @@ export async function Delete(req, res) {
 }
 
 export async function Update(req, res) {
+  console.log("ctrl : ", req.body, req.params.id)
   try {
     const id = req.params.id;
     const data = {
       ...req.body,
       LastModifiedDateTime: new Date(),
-      LastModifiedBy: "Ait0102",
+      LastModifiedBy: "Ait07",
     };
 
     const result = await facilityService.updateData(id, data);

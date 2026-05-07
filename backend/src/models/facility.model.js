@@ -27,6 +27,7 @@ export async function deleteById(id) {
 }
 
 export async function update(id, data) {
+    console.log("md")
   const [result] = await db.query(
     "UPDATE Facility SET Name = ?, DisplayName = ?, Description = ?, LastModifiedBy = ? WHERE id = ?",
     [data.Name, data.DisplayName, data.Description, data.LastModifiedBy, id],

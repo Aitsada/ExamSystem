@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1>Building Form</h1>
+    <h1>Floor Form</h1>
     <v-row>
       <v-col cols="6">
         <p>สถานที่สอบ :</p>
@@ -11,11 +11,19 @@
     </v-row>
     <v-row>
       <v-col cols="6">
-        <p>ชื่ออาคารสอบ :</p>
+        <p>อาคารสอบ :</p>
+      </v-col>
+      <v-col cols="4">
+        <p>{{ building.Name }}</p>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="6">
+        <p>เลขชั้นสอบ :</p>
       </v-col>
       <v-col cols="4">
         <v-text-field
-          v-model.trim="building.Name"
+          v-model.trim="floor.Number"
           label="Outlined"
           outlined
           dense
@@ -24,11 +32,11 @@
     </v-row>
     <v-row>
       <v-col cols="6">
-        <p>ชื่อย่อ :</p>
+        <p>ชื่อชั้นสอบ :</p>
       </v-col>
       <v-col cols="4">
         <v-text-field
-          v-model.trim="building.Alias"
+          v-model.trim="building.Description"
           label="Outlined"
           outlined
           dense
@@ -72,7 +80,7 @@
           <tr v-for="item in floors" :key="item.ID">
             <td>{{ item.Number }}</td>
             <td>
-              <v-btn small :to=" {path: '/Admins/FloorForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: item.ID}}">
+              <v-btn small @click="testBtn(item.ID)">
                 แก้ไข
               </v-btn>
             </td>
@@ -89,7 +97,7 @@
 </template>
 <script>
 export default {
-  name: 'BuildingForm',
+  name: 'FloorForm',
   data () {
     return {
       loading: false,
@@ -106,7 +114,12 @@ export default {
         Alias: '',
         Description: ''
       },
-      floors: [],
+      floor: {
+        ID: null,
+        Number: '',
+        Name: '',
+        Description: ''
+      },
       desserts: [
         { name: 'Frozen Yogurt', calories: 159 },
         { name: 'Ice cream sandwich', calories: 237 },
