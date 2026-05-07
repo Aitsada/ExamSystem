@@ -1,20 +1,18 @@
-import { findAll, create, deleteById, update } from "../models/facility.model.js";
+import * as facilityModel from "../models/facility.model.js";
 
 export async function getAll() {
-  console.log("service : ", "ok");
-
-  return findAll();
+  return facilityModel.findAll();
 }
-
+export async function findById(id) {
+  return await facilityModel.findById(id);
+}
 export async function createData(data) {
-  
-  return create(data);
+  return facilityModel.create(data);
 }
-
 export async function deleteData(id) {
-  return deleteById(id);
+  return facilityModel.deleteById(id);
 }
 
 export async function updateData(id, data) {
-  return update(id, data);
+  return facilityModel.update(id, data);
 }

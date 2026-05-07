@@ -1,12 +1,14 @@
 import db from "../config/db.js";
 
 export async function findAll() {
-  console.log("model: ", "ok");
-
   const [rows] = await db.query("SELECT * FROM Facility WHERE IsActive = 1");
   return rows;
 }
 
+export async function findById(id) {
+  const [rows] = await db.query("SELECT * FROM Facility WHERE ID = ?", [id]);
+  return rows[0] || null;
+}
 export async function create(data) {
   const [result] = await db.query(
     "INSERT INTO Facility (CreatedBy, Name, Description, DisplayName) VALUES (?,?,?,?)",
