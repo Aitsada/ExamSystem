@@ -24,7 +24,7 @@
       <v-col cols="4">
         <v-text-field
           v-model.trim="floor.Number"
-          label="Outlined"
+          label=""
           outlined
           dense
         />
@@ -36,8 +36,8 @@
       </v-col>
       <v-col cols="4">
         <v-text-field
-          v-model.trim="building.Description"
-          label="Outlined"
+          v-model.trim="floor.Name"
+          label=""
           outlined
           dense
         />
@@ -49,8 +49,8 @@
       </v-col>
       <v-col cols="4">
         <v-text-field
-          v-model.trim="building.Description"
-          label="Outlined"
+          v-model.trim="floor.Description"
+          label=""
           outlined
           dense
         />
@@ -96,7 +96,7 @@
             <td>{{ item.Columns }}</td>
             <td>{{ item.TemplateID }}</td>
             <td>
-              <v-btn small @click="testBtn(item.ID)">
+              <v-btn small :to="{ path:'/Admins/RoomForm', query:{ FacilityID: facility.ID, BuildingID: building.ID, FloorID: floor.ID, RoomID: item.ID }}">
                 แก้ไข
               </v-btn>
             </td>
@@ -146,11 +146,10 @@ export default {
     this.building.ID = buildingId || null
     const floorId = this.$route.query.FloorID
     this.floor = floorId || null
-    console.log('FloorID : ', floorId)
     this.fetchFactilityData(facilityId)
     this.fetchBuildingData(buildingId)
     this.fetchFloorData(floorId)
-    this.fetchRoomsData()
+    this.fetchRoomsData(floorId)
   },
   methods: {
     async fetchFactilityData (id) {
@@ -201,11 +200,10 @@ export default {
     testBtn (item) {
       console.log('Test button clicked', item)
     },
-    async fetchFloorData (floorId) {
-      console.log('floorId', floorId)
+    async fetchFloorData (FloorID) {
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/floors/${floorId}`))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/floors/${FloorID}`))
         const floorData = (res.data || [])
         this.floor = {
           ID: floorData.ID,
@@ -213,7 +211,6 @@ export default {
           Name: floorData.Name,
           Description: floorData.Description
         }
-        console.log('floorData : ', floorData.Name)
       } catch (err) {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       } finally {
@@ -222,7 +219,7 @@ export default {
     },
     async fetchRoomsData (FloorID) {
       try {
-        const res = await this.$axios.$get(this.$apiUrl('/api/rooms'))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/${FloorID}/rooms`))
         this.rooms = res.data
       } catch {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')

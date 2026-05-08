@@ -5,6 +5,16 @@ export async function findAll() {
   return rows;
 }
 
+export async function findById(id){
+  const [result] = await db.query("SELECT * FROM Room WHERE ID = ?", [id])
+  return result[0]
+}
+
+export async function findByFloorID(FloorID){
+  const [result] = await db.query("SELECT * FROM Room WHERE FloorID = ?", [FloorID])
+  return result
+}
+
 export async function create(data) {
   const [result] = await db.query(
     "INSERT INTO Room (CreatedBy, FloorID, No, Name, Description, `Rows`, `Columns`, TemplateID) VALUES (?,?,?,?,?,?,?,?)",

@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1>Building Form</h1>
+    <h1>Room Form</h1>
     <v-row>
       <v-col cols="6">
         <p>สถานที่สอบ :</p>
@@ -11,24 +11,19 @@
     </v-row>
     <v-row>
       <v-col cols="6">
-        <p>ชื่ออาคารสอบ :</p>
+        <p>อาคารสอบ/ชั้น :</p>
       </v-col>
       <v-col cols="4">
-        <v-text-field
-          v-model.trim="building.Name"
-          label=""
-          outlined
-          dense
-        />
+        <p>{{ building.Name }} ชั้น {{ floor.Number }}</p>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="6">
-        <p>ชื่อย่อ :</p>
+        <p>ชื่อห้องสอบ :</p>
       </v-col>
       <v-col cols="4">
         <v-text-field
-          v-model.trim="building.Alias"
+          v-model.trim="room.Name"
           label=""
           outlined
           dense
@@ -41,55 +36,57 @@
       </v-col>
       <v-col cols="4">
         <v-text-field
-          v-model.trim="building.Description"
+          v-model.trim="room.Description"
           label=""
           outlined
           dense
         />
       </v-col>
     </v-row>
-    <v-simple-table
-      :loading="loading"
-      no-results-text="ไม่พบข้อมูลอาคารสอบ"
-      no-results-icon="mdi-office-building"
-      class="building-table"
-      hide-default-footer
-      style="margin-top: 20px;"
-    >
-      <template #default>
-        <thead>
-          <tr>
-            <th class="text-left">
-              ชั้นสอบ
-            </th>
-            <th class="text-left">
-              รายละเอียด
-            </th>
-            <th class="text-left" />
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in floors" :key="item.ID">
-            <td>{{ item.Number }}</td>
-            <td>
-              <v-btn small :to=" {path: '/Admins/FloorForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: item.ID }}">
-                แก้ไข
-              </v-btn>
-            </td>
-            <td>
-              <v-btn small color="error" @click="testBtn(item.ID)">
-                ลบ
-              </v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
+    <v-row>
+      <v-col cols="6">
+        <p>จำนวนแถว :</p>
+      </v-col>
+      <v-col cols="4">
+        <v-text-field
+          v-model.trim="room.Rows"
+          label=""
+          outlined
+          dense
+        />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="6">
+        <p>จำนวนคนในแถว :</p>
+      </v-col>
+      <v-col cols="4">
+        <v-text-field
+          v-model.trim="room.Columns"
+          label=""
+          outlined
+          dense
+        />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="6">
+        <p>ห้องสอบที่ :</p>
+      </v-col>
+      <v-col cols="4">
+        <v-text-field
+          v-model.trim="room.No"
+          label=""
+          outlined
+          dense
+        />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 <script>
 export default {
-  name: 'BuildingForm',
+  name: 'FloorForm',
   data () {
     return {
       loading: false,
@@ -106,7 +103,13 @@ export default {
         Alias: '',
         Description: ''
       },
-      floors: []
+      floor: {
+        ID: null,
+        Number: '',
+        Name: '',
+        Description: ''
+      },
+      room: []
     }
   },
   mounted () {
@@ -114,17 +117,22 @@ export default {
     this.facility.ID = facilityId || null
     const buildingId = this.$route.query.BuildingID
     this.building.ID = buildingId || null
-    console.log('BuildingID : ', buildingId)
+    const floorId = this.$route.query.FloorID
+    this.floor = floorId || null
+    const roomId = this.$route.query.RoomID
+    this.room = roomId || null
+    console.log('roomId : ', roomId)
     this.fetchFactilityData(facilityId)
     this.fetchBuildingData(buildingId)
-    this.fetchFloorsData(buildingId)
+    this.fetchFloorData(floorId)
+    this.fetchRoomData(roomId)
   },
   methods: {
     async fetchFactilityData (id) {
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/facility/${id}`))
-        const facility = (res.data || [])
-        if (!facility) {
+        const facilityData = (res.data || [])
+        if (!facilityData) {
           this.$swal.fire({
             icon: 'warning',
             title: 'ไม่พบข้อมูล',
@@ -136,10 +144,10 @@ export default {
         }
 
         this.facility = {
-          ID: facility.ID,
-          Name: facility.Name,
-          DisplayName: facility.DisplayName,
-          Description: facility.Description,
+          ID: facilityData.ID,
+          Name: facilityData.Name,
+          DisplayName: facilityData.DisplayName,
+          Description: facilityData.Description,
           CreatedBy: 'Admin'
         }
       } catch (err) {
@@ -154,30 +162,52 @@ export default {
       this.loading = true
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/buildings/${buildingId}`))
-        const Building = (res.data || [])
+        const BuildingData = (res.data || [])
         this.building = {
-          ID: Building.ID,
-          Name: Building.Name,
-          Alias: Building.Alias,
-          Description: Building.Descriptoin
+          ID: BuildingData.ID,
+          Name: BuildingData.Name,
+          Alias: BuildingData.Alias,
+          Description: BuildingData.Descriptoin
         }
-        console.log('Building : ', Building)
       } finally {
         this.loading = false
       }
     },
     testBtn (item) {
-      console.log('Test button clicked', item)
     },
-    async fetchFloorsData (BuildingID) {
+    async fetchFloorData (floorId) {
+      this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/${BuildingID}/floors`))
-        this.floors = (res.data || [])
-        console.log('res ', res)
+        const res = await this.$axios.$get(this.$apiUrl(`/api/floors/${floorId}`))
+        const floorData = (res.data || [])
+        this.floor = {
+          ID: floorData.ID,
+          Number: floorData.Number,
+          Name: floorData.Name,
+          Description: floorData.Description
+        }
       } catch (err) {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       } finally {
         this.loading = false
+      }
+    },
+    async fetchRoomData (id) {
+      try {
+        const res = await this.$axios.$get(this.$apiUrl(`/api/rooms/${id}`))
+        const roomData = res.data
+        this.room = {
+          ID: roomData.ID,
+          No: roomData.No,
+          Name: roomData.Name,
+          Rows: roomData.Rows,
+          Columns: roomData.Columns,
+          TemplateID: roomData.TemplateID,
+          Description: roomData.Description
+        }
+        console.log('fetchRoomData : ', this.room)
+      } catch {
+        this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       }
     }
   }
