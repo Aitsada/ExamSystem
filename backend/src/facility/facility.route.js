@@ -21,9 +21,11 @@ router.post("/:FacilityID/buildings", buildingController.Create);
 
 // Floor`
 router.get("/floors/test", floorController.test);
-router.get("/floors/:BuildingID", floorController.findById);
+router.get("/floors/:FloorID", floorController.findById);
+router.get("/:BuildingID/floors", floorController.findByBuildingID);
 router.post("/:BuildingID/floors", floorController.create);
 
 // Room
 router.get("/rooms", roomController.findAll);
+router.post("/:FloorID/rooms", roomController.create);
 export default router;

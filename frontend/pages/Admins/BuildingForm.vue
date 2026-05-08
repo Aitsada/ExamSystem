@@ -106,19 +106,7 @@ export default {
         Alias: '',
         Description: ''
       },
-      floors: [],
-      desserts: [
-        { name: 'Frozen Yogurt', calories: 159 },
-        { name: 'Ice cream sandwich', calories: 237 },
-        { name: 'Eclair', calories: 262 },
-        { name: 'Cupcake', calories: 305 },
-        { name: 'Gingerbread', calories: 356 },
-        { name: 'Jelly bean', calories: 375 },
-        { name: 'Lollipop', calories: 392 },
-        { name: 'Honeycomb', calories: 408 },
-        { name: 'Donut', calories: 452 },
-        { name: 'KitKat', calories: 518 }
-      ]
+      floors: []
     }
   },
   mounted () {
@@ -126,10 +114,10 @@ export default {
     this.facility.ID = facilityId || null
     const buildingId = this.$route.query.BuildingID
     this.building.ID = buildingId || null
-
+    console.log('BuildingID : ', buildingId)
     this.fetchFactilityData(facilityId)
-    this.fetchBuildingData(facilityId)
-    this.fetchFloorData(buildingId)
+    this.fetchBuildingData(buildingId)
+    this.fetchFloorsData(buildingId)
   },
   methods: {
     async fetchFactilityData (id) {
@@ -158,27 +146,14 @@ export default {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       }
     },
-    // async fetchBuildingData (id) {
-    //   if (!id) {
-    //     this.building = []
-    //     return
-    //   }
-    //   this.loading = true
-    //   try {
-    //     const res = await this.$axios.$get(this.$apiUrl(`/api/${id}/buildings`))
-    //     this.building = (res.data || [])
-    //   } finally {
-    //     this.loading = false
-    //   }
-    // },
-    async fetchBuildingData (id) {
-      if (!id) {
+    async fetchBuildingData (buildingId) {
+      if (!buildingId) {
         this.building = []
         return
       }
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/buildings/${id}`))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/buildings/${buildingId}`))
         const Building = (res.data || [])
         this.building = {
           ID: Building.ID,
@@ -194,10 +169,11 @@ export default {
     testBtn (item) {
       console.log('Test button clicked', item)
     },
-    async fetchFloorData (BuildingID) {
+    async fetchFloorsData (BuildingID) {
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/floors/${BuildingID}`))
         this.floors = (res.data || [])
+        console.log('res ', res)
       } catch (err) {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       } finally {

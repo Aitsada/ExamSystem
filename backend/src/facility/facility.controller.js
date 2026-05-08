@@ -20,7 +20,6 @@ export async function findById(req, res) {
         .json({ status: "fail", message: "Faiclity not found" });
     }
     res.status(200).json({ status: "success", data: data });
-    console.log("data : ", data);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -57,7 +56,6 @@ export async function Delete(req, res) {
 }
 
 export async function Update(req, res) {
-  console.log("ctrl : ", req.body, req.params.id)
   try {
     const id = req.params.id;
     const data = {

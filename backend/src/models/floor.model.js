@@ -4,10 +4,16 @@ export async function findAll() {
   const [result] = await db.query("SELECT * FROM Floor");
   return result;
 }
-
-export async function findById(BuildingID) {
-  const [result] = await db.query("SELECT * FROM Floor WHERE BuildingID = ?", [BuildingID])
-  return result
+export async function findById(id) {
+  const [result] = await db.query("SELECT * FROM Floor WHERE ID = ?", [id]);
+  console.log('md : ', result)
+  return result;
+}
+export async function findByBuildingID(BuildingID) {
+  const [result] = await db.query("SELECT * FROM Floor WHERE BuildingID = ?", [
+    BuildingID,
+  ]);
+  return result;
 }
 
 export async function create(data) {
