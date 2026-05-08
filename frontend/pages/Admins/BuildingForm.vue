@@ -171,7 +171,7 @@ export default {
     },
     async fetchFloorsData (BuildingID) {
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/floors/${BuildingID}`))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/${BuildingID}/floors`))
         this.floors = (res.data || [])
         console.log('res ', res)
       } catch (err) {

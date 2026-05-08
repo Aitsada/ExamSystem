@@ -7,15 +7,14 @@ export async function test(req, res) {
 
 export async function findById(req, res) {
   const { FloorID } = req.params;
-  console.log(FloorID);
-  
   const result = await floorService.findById(FloorID);
 }
+
 export async function findByBuildingID(req, res) {
   try {
     const { BuildingID } = req.params;
     const data = await floorService.findByBuildingID(BuildingID);
-
+    console.log( BuildingID);
     res.status(200).json({ message: "Find By Id", data: data });
   } catch (error) {
     res.status(500).json({ error: error.message });
