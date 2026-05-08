@@ -4,8 +4,11 @@ export async function test() {
   return await floorModel.findAll();
 }
 
-export async function findById(BuildingID) {
-  return await floorModel.findById(BuildingID);
+export async function findById(id) {
+  return await floorModel.findById(id);
+}
+export async function findByBuildingID(BuildingID) {
+  return await floorModel.findByBuildingID(BuildingID);
 }
 
 export async function create(data) {

@@ -131,7 +131,7 @@ export default {
     async fetchFacilities () {
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl('/api'))
+        const res = await this.$axios.$get(this.$apiUrl('/api/facility'))
         this.facility = res.data || []
       } catch (error) {
         console.error('Error loading facilities:', error)
@@ -163,7 +163,7 @@ export default {
       if (!result.isConfirmed) { return }
 
       try {
-        await this.$axios.$delete(this.$apiUrl(`/api/${item.ID}`))
+        await this.$axios.$delete(this.$apiUrl(`/api/facility/${item.ID}`))
         const res = this.facility.filter(f => f.ID !== item.ID)
         this.facility = res
         console.log('DELETE : ', res)

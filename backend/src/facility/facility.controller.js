@@ -20,7 +20,6 @@ export async function findById(req, res) {
         .json({ status: "fail", message: "Faiclity not found" });
     }
     res.status(200).json({ status: "success", data: data });
-    console.log("data : ", data);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -62,7 +61,7 @@ export async function Update(req, res) {
     const data = {
       ...req.body,
       LastModifiedDateTime: new Date(),
-      LastModifiedBy: "Ait0102",
+      LastModifiedBy: "Ait07",
     };
 
     const result = await facilityService.updateData(id, data);

@@ -1,0 +1,23 @@
+import db from "../config/db.js";
+
+export async function findAll() {
+  const [rows] = await db.query("SELECT * FROM Room");
+  return rows;
+}
+
+export async function create(data) {
+  const [result] = await db.query(
+    "INSERT INTO Room (CreatedBy, FloorID, No, Name, Description, `Rows`, `Columns`, TemplateID) VALUES (?,?,?,?,?,?,?,?)",
+    [
+      data.CreatedBy,
+      Number(data.FloorID),
+      data.No,
+      data.Name,
+      data.Description,
+      data.Rows,
+      data.Columns,
+      data.TemplateID,
+    ],
+  );
+  return result.insertId
+}

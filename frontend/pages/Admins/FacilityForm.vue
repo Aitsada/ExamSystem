@@ -95,7 +95,7 @@
           prepend-icon="mdi-content-save-outline"
           @click="saveFacility"
         >
-          {{ isEditMode ? 'บันทึกข้อมูลสถานที่สอบ' : 'บันทึกข้อมูลสถานที่สอบ' }} »
+          {{ isEditMode ? 'บันทึกการแก้ไขข้อมูลสถานที่สอบ' : 'บันทึกข้อมูลสถานที่สอบ' }} »
         </v-btn>
       </v-card-text>
     </v-card>
@@ -270,7 +270,7 @@ export default {
     async fetchFacilityById (id) {
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl('/api'))
+        const res = await this.$axios.$get(this.$apiUrl('/api/facility'))
         const facility = (res.data || []).find(item => String(item.ID) === String(id))
         if (!facility) {
           this.$swal.fire({
@@ -313,7 +313,7 @@ export default {
       }
     },
     testBtn () {
-      console.log(this.facility.Name, this.facility.DisplayName)
+      console.log('test btn : ', this.buildFacilityFormData())
     },
     backBtn () {
       this.$router.back()
@@ -345,10 +345,10 @@ export default {
       try {
         let res
         if (this.isEditMode) {
-          res = await this.$axios.$patch(this.$apiUrl(`/api/update/${this.facility.ID}`), this.buildFacilityFormData())
+          res = await this.$axios.$patch(this.$apiUrl(`/api/facility/update/${this.facility.ID}`), this.facility)
         } else {
           console.log('Create Facility Response:', this.buildFacilityFormData())
-          res = await this.$axios.$post(this.$apiUrl('/api/create'), this.facility)
+          res = await this.$axios.$post(this.$apiUrl('/api/facility/create'), this.facility)
           console.log('Create Facility Response:', this.facility)
           this.facility.ID = res.id
           this.isEditMode = true
