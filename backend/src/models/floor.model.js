@@ -6,8 +6,7 @@ export async function findAll() {
 }
 export async function findById(id) {
   const [result] = await db.query("SELECT * FROM Floor WHERE ID = ?", [id]);
-  console.log('md : ', result)
-  return result;
+  return result[0];
 }
 export async function findByBuildingID(BuildingID) {
   const [result] = await db.query("SELECT * FROM Floor WHERE BuildingID = ?", [
