@@ -6,12 +6,12 @@ export async function findAll() {
 }
 
 export async function findById(id) {
-  const [result] = await db.query("SELECT * FROM Room WHERE ID = ?", [id]);
+  const [result] = await db.query("SELECT * FROM Room WHERE ID = ? AND IsActive = 1", [id]);
   return result[0];
 }
 
 export async function findByFloorID(FloorID) {
-  const [result] = await db.query("SELECT * FROM Room WHERE FloorID = ?", [
+  const [result] = await db.query("SELECT * FROM Room WHERE FloorID = ? AND IsActive = 1", [
     FloorID,
   ]);
   return result;

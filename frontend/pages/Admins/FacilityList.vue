@@ -134,7 +134,6 @@ export default {
         const res = await this.$axios.$get(this.$apiUrl('/api/facility'))
         this.facility = res.data || []
       } catch (error) {
-        console.error('Error loading facilities:', error)
         this.$swal.fire({
           icon: 'error',
           title: 'โหลดข้อมูลไม่สำเร็จ',

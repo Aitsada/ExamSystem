@@ -14,19 +14,19 @@ router.patch("/facility/update/:id", facilityController.Update);
 
 // Building
 router.get("/buildings", buildingController.getAll);
-router.get("/buildings/:id", buildingController.findById);
+router.get("/:FacilityID/building/:BuildingID", buildingController.findById);
 router.get("/:FacilityID/buildings", buildingController.findByFacilityID);
 router.post("/:FacilityID/buildings", buildingController.Create);
-router.delete("/building/:id", buildingController.deleteById);
-router.patch("/building/update/:id", buildingController.update);
+router.delete("/:FacilityID/building/:BuildingID", buildingController.deleteById);
+router.patch("/:FacilityID/building/update/:BuildingID", buildingController.update);
 
 // Floor`
 router.get("/floors/test", floorController.test);
-router.get("/floors/:FloorID", floorController.findById);
+router.get("/:BuildingID/floor/:FloorID", floorController.findById);
 router.get("/:BuildingID/floors", floorController.findByBuildingID);
 router.post("/:BuildingID/floors", floorController.create);
-router.delete("/floor/:id", floorController.Delete)
-router.patch("/floor/update/:id", floorController.update);
+router.delete("/:BuildingID/floor/:FloorID", floorController.Delete);
+router.patch("/:BuildingID/floor/update/:FloorID", floorController.update);
 
 // Room
 router.get("/rooms", roomController.findAll);
@@ -34,5 +34,5 @@ router.get("/rooms/:id", roomController.findById);
 router.get("/:FloorID/rooms", roomController.findByFloorID);
 router.post("/:FloorID/rooms", roomController.create);
 router.delete("/room/:id", roomController.Delete);
-router.patch("/room/update/:id", roomController.update)
+router.patch("/room/update/:id", roomController.update);
 export default router;

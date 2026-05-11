@@ -5,13 +5,16 @@ export async function findAll() {
   return result;
 }
 
-export async function findById(id) {
-  const [result] = await db.query("SELECT * FROM Building WHERE ID = ?", [id]);
+export async function findById(BuildingID, FacilityID) {
+  const [result] = await db.query(
+    "SELECT * FROM Building WHERE ID = ? AND FacilityID = ? AND IsActive = 1",
+    [BuildingID, FacilityID],
+  );
   return result[0];
 }
 export async function findByFacilityID(FacilityID) {
   const [result] = await db.query(
-    "SELECT * FROM Building WHERE FacilityID = ?",
+    "SELECT * FROM Building WHERE FacilityID = ? AND IsActive = 1",
     [FacilityID],
   );
   return result;
@@ -23,18 +26,18 @@ export async function create(data) {
   );
   return result.insertId;
 }
-export async function update(id, data) {
+export async function update(BuildingID, FacilityID, data) {
   const [result] = await db.query(
-    "UPDATE Building SET Name = ?, Alias = ?, Description = ? WHERE ID = ?",
-    [data.Name, data.Alias, data.Description, id],
+    "UPDATE Building SET Name = ?, Alias = ?, Description = ? WHERE ID = ? AND FacilityID = ? AND IsActive = 1",
+    [data.Name, data.Alias, data.Description, BuildingID, FacilityID],
   );
   return result.affectedRows;
 }
 
-export async function deleteById(id) {
+export async function deleteById(BuildingID, FacilityID) {
   const [result] = await db.query(
-    "UPDATE Building SET IsActive = 0 WHERE id = ?",
-    [id],
+    "UPDATE Building SET IsActive = 0 WHERE id = ? AND FacilityID = ?",
+    [BuildingID, FacilityID],
   );
   return result.affectedRows;
 }

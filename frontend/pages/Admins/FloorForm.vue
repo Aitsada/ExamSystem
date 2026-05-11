@@ -109,6 +109,20 @@
         </tbody>
       </template>
     </v-simple-table>
+    <v-row>
+      <v-col style="text-align: end;">
+        <v-btn color="success" @click="saveEditData">
+          บันทึกการแก้ไข
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col style="text-align: end;">
+        <v-btn color="success" @click="testBtn">
+          TEST
+        </v-btn>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 <script>
@@ -185,7 +199,7 @@ export default {
       }
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/buildings/${buildingId}`))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/${this.facility.ID}/building/${buildingId}`))
         const BuildingData = (res.data || [])
         this.building = {
           ID: BuildingData.ID,
@@ -198,12 +212,17 @@ export default {
       }
     },
     testBtn (item) {
-      console.log('Test button clicked', item)
+      console.log('Test button clicked', {
+        ID: this.floor.ID,
+        Number: this.floor.Number,
+        Name: this.floor.Name,
+        Description: this.floor.Description
+      })
     },
     async fetchFloorData (FloorID) {
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/floors/${FloorID}`))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/${this.building.ID}/floor/${FloorID}`))
         const floorData = (res.data || [])
         this.floor = {
           ID: floorData.ID,
@@ -223,6 +242,32 @@ export default {
         this.rooms = res.data
       } catch {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
+      }
+    },
+    async deleteRoom (id) {
+      try {
+        await this.$axios.$get(this.$apiUrl(`/api/building/${id}`))
+      } catch (err) {
+        this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
+      }
+    },
+    async saveEditData () {
+      try {
+        await this.$axios.$patch(this.$apiUrl(`/api/${this.building.ID}/floor/update/${this.floor.ID}`), {
+          Number: this.floor.Number,
+          Name: this.floor.Name || '',
+          Description: this.floor.Description || ''
+        })
+        this.$swal.fire({
+          icon: 'success',
+          text: 'บันทึกการแก้ไขสำรเร็จ'
+        })
+        await this.fetchFloorData(this.floor.ID)
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'fail',
+          text: 'บันทึกการแก้ไขผิดพลาด'
+        })
       }
     }
   }

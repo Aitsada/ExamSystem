@@ -121,7 +121,6 @@ export default {
     this.floor = floorId || null
     const roomId = this.$route.query.RoomID
     this.room = roomId || null
-    console.log('roomId : ', roomId)
     this.fetchFactilityData(facilityId)
     this.fetchBuildingData(buildingId)
     this.fetchFloorData(floorId)
@@ -161,7 +160,7 @@ export default {
       }
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/buildings/${buildingId}`))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/${this.facility.ID}/building/${buildingId}`))
         const BuildingData = (res.data || [])
         this.building = {
           ID: BuildingData.ID,
@@ -205,7 +204,6 @@ export default {
           TemplateID: roomData.TemplateID,
           Description: roomData.Description
         }
-        console.log('fetchRoomData : ', this.room)
       } catch {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       }

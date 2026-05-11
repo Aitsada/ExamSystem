@@ -2,7 +2,7 @@ import * as facilityService from "./facility.service.js";
 
 export async function FindAll(req, res) {
   try {
-    const data = await facilityService.getAll();
+    const data = await facilityService.findAll();
 
     res.status(200).json({ data: data });
   } catch (err) {

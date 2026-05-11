@@ -1,6 +1,6 @@
 import * as facilityModel from "../models/facility.model.js";
 
-export async function getAll() {
+export async function findAll() {
   return facilityModel.findAll();
 }
 export async function findById(id) {
@@ -14,6 +14,5 @@ export async function deleteData(id) {
 }
 
 export async function updateData(id, data) {
-  console.log("sv");
   return facilityModel.update(id, data);
 }

@@ -4,8 +4,8 @@ export async function getAll() {
   return buildingModel.findAll();
 }
 
-export async function findById(id) {
-  return buildingModel.findById(id);
+export async function findById(BiuldingID, FacilityID) {
+  return buildingModel.findById(BiuldingID, FacilityID);
 }
 
 export async function findByFacilityID(FacilityID) {
@@ -22,9 +22,9 @@ export async function create(data) {
   }
   return buildingModel.create(data);
 }
-export async function update(id, data) {
-  return await buildingModel.update(id, data);
+export async function update(BuildingID, FacilityID, data) {
+  return await buildingModel.update(BuildingID, FacilityID, data);
 }
-export async function deleteById(id) {
-  return buildingModel.deleteById(id);
+export async function deleteById(BuildingID, FacilityID) {
+  return buildingModel.deleteById(BuildingID, FacilityID);
 }
