@@ -6,7 +6,10 @@ export async function findAll() {
 }
 
 export async function findById(id) {
-  const [rows] = await db.query("SELECT * FROM Facility WHERE ID = ?", [id]);
+  const [rows] = await db.query(
+    "SELECT * FROM Facility WHERE ID = ? AND IsActive = 1",
+    [id],
+  );
   return rows[0] || null;
 }
 export async function create(data) {
@@ -27,7 +30,6 @@ export async function deleteById(id) {
 }
 
 export async function update(id, data) {
-    console.log("md")
   const [result] = await db.query(
     "UPDATE Facility SET Name = ?, DisplayName = ?, Description = ?, LastModifiedBy = ? WHERE id = ?",
     [data.Name, data.DisplayName, data.Description, data.LastModifiedBy, id],

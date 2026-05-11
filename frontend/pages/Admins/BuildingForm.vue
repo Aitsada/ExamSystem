@@ -77,7 +77,7 @@
               </v-btn>
             </td>
             <td>
-              <v-btn small color="error" @click="testBtn(item.ID)">
+              <v-btn small color="error" @click="deleteFloor(item.ID)">
                 ลบ
               </v-btn>
             </td>
@@ -85,6 +85,20 @@
         </tbody>
       </template>
     </v-simple-table>
+    <v-row>
+      <v-col style="text-align: end;">
+        <v-btn color="success" @click="saveEditData(item.ID)">
+          บันทึกการแก้ไข
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col style="text-align: start;">
+        <v-btn color="success" @click="testBtn">
+          บันทึกการแก้ไข
+        </v-btn>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 <script>
@@ -114,7 +128,6 @@ export default {
     this.facility.ID = facilityId || null
     const buildingId = this.$route.query.BuildingID
     this.building.ID = buildingId || null
-    console.log('BuildingID : ', buildingId)
     this.fetchFactilityData(facilityId)
     this.fetchBuildingData(buildingId)
     this.fetchFloorsData(buildingId)
@@ -153,31 +166,58 @@ export default {
       }
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/buildings/${buildingId}`))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/${this.facility.ID}/building/${buildingId}`))
         const Building = (res.data || [])
         this.building = {
           ID: Building.ID,
           Name: Building.Name,
           Alias: Building.Alias,
-          Description: Building.Descriptoin
+          Description: Building.Description
         }
-        console.log('Building : ', Building)
       } finally {
         this.loading = false
       }
     },
-    testBtn (item) {
-      console.log('Test button clicked', item)
+    testBtn () {
+      console.log('testBtn : ', this.buildingId)
     },
     async fetchFloorsData (BuildingID) {
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/${BuildingID}/floors`))
         this.floors = (res.data || [])
-        console.log('res ', res)
       } catch (err) {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       } finally {
         this.loading = false
+      }
+    },
+    async deleteFloor (id) {
+      console.log(id)
+      try {
+        await this.$axios.$delete(this.$apiUrl(`/api/${this.building.ID}/floor/${id}`))
+
+        await this.fetchFloorsData()
+      } catch (err) {
+        this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
+      }
+    },
+    async saveEditData () {
+      try {
+        await this.$axios.$patch(this.$apiUrl(`/api/${this.facility.ID}/building/update/${this.building.ID}`), {
+          Name: this.building.Name,
+          Alias: this.building.Alias || '',
+          Description: this.building.Description || ''
+        })
+        this.$swal.fire({
+          icon: 'success',
+          text: 'แก้ไขข้อมูลสำเร็จ'
+        })
+        await this.fetchBuildingData(this.building.ID)
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: 'แก้ไขข้อมูลไม่สำเร็จ'
+        })
       }
     }
   }

@@ -2,35 +2,41 @@ import * as buildingService from "./building.service.js";
 
 export async function getAll(req, res) {
   try {
-    const data = await buildingService.getAll();
-    res.status(200).json({ data: data, message: "get all buildings" });
+    const result = await buildingService.getAll();
+    return res.status(200).json({ data: result, message: "get all buildings" });
   } catch (err) {
-    res.status(500).json({ err: err.message });
+    return res.status(500).json({ err: err.message });
   }
 }
 
 export async function findById(req, res) {
   try {
-    const { id } = req.params;
-    const data = await buildingService.findById(id);
-    if (!data) {
-      res.status(404).json({ status: "fail" });
+    const { BuildingID, FacilityID } = req.params;
+    const result = await buildingService.findById(BuildingID, FacilityID);
+    if (!FacilityID || !BuildingID) return;
+    if (!result) {
+      return res.status(404).json({
+        status: "fail",
+        message: "Building not found",
+      });
     }
-    res.status(200).json({ data: data, message: "get building by FacilityID" });
+    return res.status(200).json({ status: "success", data: result });
   } catch (err) {
-    res.status(500).json({ err: err.message });
+    return res.status(500).json({ err: err.message });
   }
 }
 export async function findByFacilityID(req, res) {
   try {
     const { FacilityID } = req.params;
-    const data = await buildingService.findByFacilityID(FacilityID);
-    if (!data) {
-      res.status(404).json({ status: "fail" });
+    const result = await buildingService.findByFacilityID(FacilityID);
+    if (!result) {
+      return res.status(404).json({ status: "fail" });
     }
-    res.status(200).json({ data: data, message: "get building by FacilityID" });
+    return res
+      .status(200)
+      .json({ data: result, message: "get building by FacilityID" });
   } catch (err) {
-    res.status(500).json({ err: err.message });
+    return res.status(500).json({ err: err.message });
   }
 }
 
@@ -39,36 +45,36 @@ export async function Create(req, res) {
     const { FacilityID } = req.params;
 
     const result = await buildingService.create({ ...req.body, FacilityID });
-    res.status(201).json({
+    return res.status(201).json({
       status: "success",
       result,
     });
   } catch (err) {
-    res.status(500).json({ err: err.message });
+    return res.status(500).json({ err: err.message });
   }
 }
 export async function update(req, res) {
   try {
-    const { id } = req.params;
+    const { BuildingID, FacilityID } = req.params;
     const data = req.body;
-    const result = await buildingService.update(id, data);
-
-    res.status(200).json({ status: "success", result });
+    const result = await buildingService.update(BuildingID, FacilityID, data);
+    if (!FacilityID || !BuildingID) return;
+    return res.status(200).json({ status: "success", result });
   } catch (err) {
-    res.status(500).json({ err: err.message });
+    return res.status(500).json({ err: err.message });
   }
 }
 export async function deleteById(req, res) {
-  console.log(req.params)
   try {
-    const { id } = req.params;
-    const result = await buildingService.deleteById(id);
+    const { BuildingID, FacilityID } = req.params;
+    const result = await buildingService.deleteById(BuildingID, FacilityID);
+    if (!FacilityID || !BuildingID) return;
     if (result) {
-      res.status(200).json({ message: "Building deleted successfully" });
+      return res.status(200).json({ message: "Building deleted successfully" });
     } else {
-      res.status(404).json({ message: "Building not found" });
+      return res.status(404).json({ message: "Building not found" });
     }
   } catch (err) {
-    res.status(500).json({ err: err.message });
+    return res.status(500).json({ err: err.message });
   }
 }

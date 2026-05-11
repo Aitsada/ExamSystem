@@ -7,8 +7,9 @@ export async function test(req, res) {
 
 export async function findById(req, res) {
   try {
-    const { FloorID } = req.params;
-    const result = await floorService.findById(FloorID);
+    const { BuildingID, FloorID } = req.params;
+    const result = await floorService.findById(BuildingID, FloorID);
+
     res.status(200).json({ status: "success", data: result });
   } catch (err) {
     res.status(500).json({ message: err });
@@ -19,7 +20,6 @@ export async function findByBuildingID(req, res) {
   try {
     const { BuildingID } = req.params;
     const data = await floorService.findByBuildingID(BuildingID);
-    console.log(BuildingID);
     res.status(200).json({ message: "Find By Id", data: data });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -38,20 +38,21 @@ export async function create(req, res) {
 
 export async function update(req, res) {
   try {
-    const { id } = req.params;
+    const { BuildingID, FloorID } = req.params;
     const data = req.body;
-    const result = await floorService.update(id, data);
+    const result = await floorService.update(BuildingID, FloorID, data);
+
     res.status(200).json({ status: "success", data: result });
-    console.log(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 }
 
 export async function Delete(req, res) {
+  console.log(req.params)
   try {
-    const { id } = req.params;
-    const data = await floorService.deleteById(id);
+    const { BuildingID, FloorID } = req.params;
+    const data = await floorService.deleteById(BuildingID, FloorID);
     if (data) {
       res.status(200).json({ message: "Floor deleted successfully" });
     } else {

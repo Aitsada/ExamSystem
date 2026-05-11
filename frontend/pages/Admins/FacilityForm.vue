@@ -382,7 +382,7 @@ export default {
 
       this.buildingSaving = true
       try {
-        await this.$axios.$patch(this.$apiUrl(`/api/buildings/${this.editingBuilding.ID}`), {
+        await this.$axios.$patch(this.$apiUrl(`/api/building/${this.editingBuilding.ID}`), {
           Name: this.editingBuilding.Name,
           Alias: this.editingBuilding.Alias || '',
           Description: this.editingBuilding.Description || ''
@@ -411,7 +411,11 @@ export default {
       if (!result.isConfirmed) { return }
 
       try {
-        await this.$axios.$delete(this.$apiUrl(`/api/buildings/${item.ID}`))
+        await this.$axios.$delete(this.$apiUrl(`/api/${this.facility.ID}/building/${item.ID}`))
+        this.$swal.fire({
+          icon: 'success',
+          text: 'ลบสำเร็จ'
+        })
         await this.fetchBuildings()
       } catch (error) {
         this.showError('ลบข้อมูลอาคารไม่สำเร็จ', 'กรุณาลองใหม่อีกครั้ง')
