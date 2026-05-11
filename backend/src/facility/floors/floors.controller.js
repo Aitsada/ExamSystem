@@ -36,7 +36,19 @@ export async function create(req, res) {
   }
 }
 
-export async function deleteById(req, res) {
+export async function update(req, res) {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+    const result = await floorService.update(id, data);
+    res.status(200).json({ status: "success", data: result });
+    console.log(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+export async function Delete(req, res) {
   try {
     const { id } = req.params;
     const data = await floorService.deleteById(id);

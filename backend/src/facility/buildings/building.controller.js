@@ -47,11 +47,22 @@ export async function Create(req, res) {
     res.status(500).json({ err: err.message });
   }
 }
-
-export async function deleteById(req, res) {
+export async function update(req, res) {
   try {
     const { id } = req.params;
-    const data = await buildingService.deleteById(id);
+    const data = req.body;
+    const result = await buildingService.update(id, data);
+
+    res.status(200).json({ status: "success", result });
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+}
+export async function deleteById(req, res) {
+  console.log(req.params)
+  try {
+    const { id } = req.params;
+    const result = await buildingService.deleteById(id);
     if (result) {
       res.status(200).json({ message: "Building deleted successfully" });
     } else {

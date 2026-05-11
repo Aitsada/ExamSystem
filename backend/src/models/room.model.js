@@ -5,14 +5,24 @@ export async function findAll() {
   return rows;
 }
 
-export async function findById(id){
-  const [result] = await db.query("SELECT * FROM Room WHERE ID = ?", [id])
-  return result[0]
+export async function findById(id) {
+  const [result] = await db.query("SELECT * FROM Room WHERE ID = ?", [id]);
+  return result[0];
 }
 
-export async function findByFloorID(FloorID){
-  const [result] = await db.query("SELECT * FROM Room WHERE FloorID = ?", [FloorID])
-  return result
+export async function findByFloorID(FloorID) {
+  const [result] = await db.query("SELECT * FROM Room WHERE FloorID = ?", [
+    FloorID,
+  ]);
+  return result;
+}
+
+export async function update(id, data) {
+  const [result] = await db.query(
+    "UPDATE Room SET Name = ?, Description = ?, Rows = ?, Columns = ?, No = ? WHERE ID =?",
+    [data.Name, data.Description, data.rows, data.Columns, data.No, id],
+  );
+  return result;
 }
 
 export async function create(data) {
@@ -29,5 +39,12 @@ export async function create(data) {
       data.TemplateID,
     ],
   );
-  return result.insertId
+  return result.insertId;
+}
+
+export async function Delete(id) {
+  const [result] = await db.query(
+    "UPDATE Room SET IsAcive = 0 WHERE ID = ?"[id],
+  );
+  return result.affectedRows;
 }

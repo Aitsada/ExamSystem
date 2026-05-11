@@ -6,8 +6,8 @@ export async function findAll() {
 }
 
 export async function findById(id) {
-  const [result] = await db.query("SELECT * FROM Building WHERE ID = ?", [id])
-  return result[0]
+  const [result] = await db.query("SELECT * FROM Building WHERE ID = ?", [id]);
+  return result[0];
 }
 export async function findByFacilityID(FacilityID) {
   const [result] = await db.query(
@@ -22,6 +22,13 @@ export async function create(data) {
     [data.CreatedBy, data.FacilityID, data.Name, data.Alias, data.Description],
   );
   return result.insertId;
+}
+export async function update(id, data) {
+  const [result] = await db.query(
+    "UPDATE Building SET Name = ?, Alias = ?, Description = ? WHERE ID = ?",
+    [data.Name, data.Alias, data.Description, id],
+  );
+  return result.affectedRows;
 }
 
 export async function deleteById(id) {
