@@ -15,3 +15,10 @@ export async function findByFloorID(FloorID) {
 export async function create(data) {
   return await roomModel.create(data);
 }
+
+export async function Delete(id){
+  return await roomModel.Delete(id)
+}
+export async function update(id, data) {
+  return await roomModel.update(id, data);
+}

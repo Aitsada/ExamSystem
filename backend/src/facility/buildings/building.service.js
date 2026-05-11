@@ -22,7 +22,9 @@ export async function create(data) {
   }
   return buildingModel.create(data);
 }
-
+export async function update(id, data) {
+  return await buildingModel.update(id, data);
+}
 export async function deleteById(id) {
   return buildingModel.deleteById(id);
 }

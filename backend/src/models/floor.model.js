@@ -22,7 +22,13 @@ export async function create(data) {
   );
   return result.insertId;
 }
-
+export async function update(id, data) {
+  const [result] = await db.query(
+    "UPDATE Floor SET Number = ?, Name = ?, Description = ? WHERE ID = ?",
+    [data.Number, data.Name, data.Description, id],
+  );
+  return result.affectedRows
+}
 export async function deleteById(id) {
   const [result] = await db.query(
     "UPDATE Floor SET IsActive = 0 WHERE id = ?",

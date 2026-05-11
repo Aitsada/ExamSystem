@@ -23,7 +23,7 @@ export async function findByFloorID(req, res) {
   try {
     const { FloorID } = req.params;
     const result = await roomController.findByFloorID(FloorID);
-    
+
     res.status(200).json({ status: "success", data: result });
   } catch (err) {
     res.status(500).json({ status: "fail", message: err });
@@ -37,7 +37,26 @@ export async function create(req, res) {
       FloorID,
       CreatedBy: "AdminX",
     });
-    res.status(200).json({ status: "sussess", data: result });
+    res.status(200).json({ status: "success", data: result });
+  } catch (err) {
+    res.status(500).json({ status: "fail", message: err });
+  }
+}
+export async function Delete(req, res) {
+  try {
+    const { id } = req.params;
+    const result = await roomController.Delete(id);
+    res.status(200).json({ status: "success", data: result });
+  } catch (err) {
+    res.status(500).json({ status: "fail", message: err });
+  }
+}
+export async function update(req, res) {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+    const result = await roomController.update(id, data);
+    res.status(200).json({ status: "success", data: result });
   } catch (err) {
     res.status(500).json({ status: "fail", message: err });
   }
