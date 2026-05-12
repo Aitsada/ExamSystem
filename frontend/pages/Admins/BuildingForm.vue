@@ -1,111 +1,135 @@
 <template>
-  <v-container>
-    <h1>Building Form</h1>
-    <v-row>
-      <v-col cols="6">
-        <p>สถานที่สอบ :</p>
-      </v-col>
-      <v-col cols="6">
-        <p>{{ facility.Name }}</p>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>ชื่ออาคารสอบ :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="building.Name"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>ชื่อย่อ :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="building.Alias"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>รายละเอียด :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="building.Description"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-simple-table
-      :loading="loading"
-      no-results-text="ไม่พบข้อมูลอาคารสอบ"
-      no-results-icon="mdi-office-building"
-      class="building-table"
-      hide-default-footer
-      style="margin-top: 20px;"
-    >
-      <template #default>
-        <thead>
-          <tr>
-            <th class="text-left">
-              ชั้นสอบ
-            </th>
-            <th class="text-left">
-              รายละเอียด
-            </th>
-            <th class="text-left" />
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in floors" :key="item.ID">
-            <td>{{ item.Number }}</td>
-            <td>
-              <v-btn small :to=" {path: '/Admins/FloorForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: item.ID }}">
-                แก้ไข
-              </v-btn>
-            </td>
-            <td>
-              <v-btn small color="error" @click="deleteFloor(item.ID)">
-                ลบ
-              </v-btn>
-            </td>
-          </tr>
-        </tbody>
+  <v-container style="max-width: 900px; padding: 0;">
+    <v-breadcrumbs :items="breadcrumbs" density="compact" class="pa-0 mb-4">
+      <template #divider>
+        <v-icon size="14" color="grey">
+          mdi-chevron-right
+        </v-icon>
       </template>
-    </v-simple-table>
-    <v-row>
-      <v-col style="text-align: end;">
-        <v-btn color="success" @click="saveEditData()">
-          บันทึกการแก้ไข
+    </v-breadcrumbs>
+
+    <v-row align="center" class="mb-5" no-gutters>
+      <v-col cols="auto" class="mr-3">
+        <v-sheet color="primary" rounded="lg" width="6" height="36" />
+      </v-col>
+      <v-col>
+        <p class="text-caption text-medium-emphasis mb-0">
+          ระบบจัดการสถานที่สอบ
+        </p>
+        <p class="text-h6 font-weight-bold mb-0 page-title">
+          แก้ไขอาคารสอบ
+        </p>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn variant="text" class="btn-cancel" @click="backBtn">
+          ยกเลิก
         </v-btn>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col style="text-align: end;">
-        <v-btn color="success" @click="saveEditData()">
-          บันทึกการแก้ไข
+
+    <v-card elevation="0" rounded="lg" border color="white" class="mb-4">
+      <v-card-text class="px-5 py-4">
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">สถานที่สอบ :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <span class="readonly-text">{{ facility.Name || '-' }}</span>
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">ชื่ออาคารสอบ :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="building.Name" outlined dense hide-details="auto" class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">ชื่อย่อ :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="building.Alias" outlined dense hide-details="auto" class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">รายละเอียด :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="building.Description" outlined dense hide-details class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-btn
+          color="primary"
+          class="btn-save mt-4"
+          :loading="loading"
+          prepend-icon="mdi-content-save-outline"
+          @click="saveEditData"
+        >
+          บันทึกการแก้ไขข้อมูลอาคาร
         </v-btn>
+      </v-card-text>
+    </v-card>
+
+    <v-row align="center" class="mb-3" no-gutters>
+      <v-col>
+        <p class="section-title mb-0">
+          ชั้นสอบ
+        </p>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col style="text-align: start;">
-        <v-btn color="success" @click="testBtn">
-          บันทึกการแก้ไข
-        </v-btn>
-      </v-col>
-    </v-row>
+
+    <v-card elevation="0" rounded="lg" border color="white">
+      <v-data-table
+        :headers="floorHeaders"
+        :items="floors"
+        :items-per-page="-1"
+        :loading="loading"
+        no-data-text="ยังไม่มีข้อมูลชั้นสอบ"
+        loading-text="กำลังโหลดข้อมูลชั้นสอบ..."
+        class="admin-table"
+        hide-default-footer
+      >
+        <template #[`item.Number`]="{ item }">
+          <span class="text-body-2 font-weight-medium">{{ item.Number }}</span>
+        </template>
+
+        <template #[`item.Description`]="{ item }">
+          <span class="text-body-2 text-medium-emphasis">{{ item.Description || '-' }}</span>
+        </template>
+
+        <template #[`item.edit`]="{ item }">
+          <v-btn
+            small
+            outlined
+            class="btn-action"
+            prepend-icon="mdi-pencil-outline"
+            :to="{ path: '/Admins/FloorForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: item.ID }}"
+          >
+            แก้ไข
+          </v-btn>
+        </template>
+
+        <template #[`item.delete`]="{ item }">
+          <v-btn
+            small
+            outlined
+            color="error"
+            class="btn-action"
+            prepend-icon="mdi-delete-outline"
+            @click="deleteFloor(item)"
+          >
+            ลบ
+          </v-btn>
+        </template>
+      </v-data-table>
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -127,7 +151,17 @@ export default {
         Alias: '',
         Description: ''
       },
-      floors: []
+      floors: [],
+      floorHeaders: [
+        { text: 'ชั้นสอบ', value: 'Number', align: 'start' },
+        { text: 'รายละเอียด', value: 'edit', sortable: false, align: 'center' },
+        { text: 'ลบข้อมูล', value: 'delete', sortable: false, align: 'center' }
+      ],
+      breadcrumbs: [
+        { text: 'หน้าหลัก', href: '/Admin', disabled: false },
+        { text: 'สถานที่สอบ', href: '/Admins/FacilityList', disabled: false },
+        { text: 'แก้ไขอาคารสอบ', disabled: true }
+      ]
     }
   },
   mounted () {
@@ -185,8 +219,8 @@ export default {
         this.loading = false
       }
     },
-    testBtn () {
-      console.log('testBtn : ', this.buildingId)
+    backBtn () {
+      this.$router.back()
     },
     async fetchFloorsData (BuildingID) {
       try {
@@ -198,14 +232,32 @@ export default {
         this.loading = false
       }
     },
-    async deleteFloor (id) {
-      console.log(id)
-      try {
-        await this.$axios.$delete(this.$apiUrl(`/api/${this.building.ID}/floor/${id}`))
+    async deleteFloor (item) {
+      const result = await this.$swal.fire({
+        icon: 'warning',
+        title: 'ยืนยันการลบชั้นสอบ',
+        text: `คุณต้องการลบชั้นสอบ "${item.Number}" ใช่หรือไม่?`,
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยันลบ',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#D32F2F',
+        cancelButtonColor: '#757575'
+      })
 
-        await this.fetchFloorsData()
+      if (!result.isConfirmed) { return }
+
+      try {
+        await this.$axios.$delete(this.$apiUrl(`/api/${this.building.ID}/floor/${item.ID}`))
+
+        await this.$swal.fire({
+          icon: 'success',
+          title: 'ลบข้อมูลสำเร็จ',
+          text: `ลบชั้นสอบ "${item.Number}" เรียบร้อยแล้ว`,
+          confirmButtonText: 'ตกลง'
+        })
+        await this.fetchFloorsData(this.building.ID)
       } catch (err) {
-        this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
+        this.showError('ลบข้อมูลชั้นสอบไม่สำเร็จ', 'กรุณาลองใหม่อีกครั้ง')
       }
     },
     async saveEditData () {
@@ -230,3 +282,96 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.page-title {
+  color: #1A237E;
+  letter-spacing: 0 !important;
+}
+
+.compact-row {
+  min-height: 38px;
+  border-bottom: 1px solid #ECEFF1;
+}
+
+.compact-row:first-child {
+  border-top: 1px solid #ECEFF1;
+}
+
+.field-label {
+  color: #333333;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.readonly-text {
+  color: #2C2C2A;
+  font-size: 13px;
+}
+
+.section-title {
+  color: #1A237E;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.form-field :deep(.v-input__slot) {
+  min-height: 32px !important;
+}
+
+.form-field :deep(input) {
+  font-size: 13px !important;
+}
+
+.form-field :deep(fieldset) {
+  border-color: #B0BEC5 !important;
+}
+
+.admin-table {
+  box-shadow: none !important;
+}
+
+.admin-table :deep(thead tr th) {
+  background-color: #EEF2FF !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #1A237E !important;
+  border-bottom: 1px solid #C5CAE9 !important;
+}
+
+.admin-table :deep(tbody tr td) {
+  font-size: 13px !important;
+  color: #2C2C2A !important;
+  height: 40px !important;
+  border-bottom: 0.5px solid #ECEFF1 !important;
+}
+
+.admin-table :deep(tbody tr:last-child td) {
+  border-bottom: none !important;
+}
+
+.admin-table :deep(tbody tr:hover td) {
+  background-color: #F8F9FF !important;
+}
+
+.btn-save,
+.btn-action,
+.btn-cancel {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.btn-save {
+  font-size: 13px !important;
+  border-radius: 6px !important;
+}
+
+.btn-action {
+  font-size: 12px !important;
+}
+
+.btn-cancel {
+  color: #555 !important;
+  font-size: 13px !important;
+}
+</style>

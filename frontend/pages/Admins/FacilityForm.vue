@@ -34,9 +34,6 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-btn @click="testBtn">
-      TEsT
-    </v-btn>
     <v-card elevation="0" rounded="lg" border color="white" class="mb-4">
       <v-card-text class="px-5 py-4">
         <v-form ref="form">
@@ -318,9 +315,6 @@ export default {
       } finally {
         this.buildingLoading = false
       }
-    },
-    testBtn () {
-      console.log('test btn : ', this.buildFacilityFormData())
     },
     backBtn () {
       this.$router.back()

@@ -144,9 +144,6 @@ export default {
         this.loading = false
       }
     },
-    testBtn (item) {
-      console.log('Test button clicked', item.ID)
-    },
     async confirmDelete (item) {
       const result = await this.$swal.fire({
         icon: 'warning',
@@ -165,7 +162,6 @@ export default {
         await this.$axios.$delete(this.$apiUrl(`/api/facility/${item.ID}`))
         const res = this.facility.filter(f => f.ID !== item.ID)
         this.facility = res
-        console.log('DELETE : ', res)
         this.$swal.fire({
           icon: 'success',
           title: 'ลบข้อมูลสำเร็จ',
@@ -173,7 +169,6 @@ export default {
           confirmButtonText: 'ตกลง'
         })
       } catch (error) {
-        console.error('Error deleting facility:', error)
         this.$swal.fire({
           icon: 'error',
           title: 'ลบข้อมูลไม่สำเร็จ',

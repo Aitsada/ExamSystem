@@ -1,106 +1,113 @@
 <template>
-  <v-container>
-    <h1>Room Form</h1>
-    <v-row>
-      <v-col cols="6">
-        <p>สถานที่สอบ :</p>
+  <v-container style="max-width: 900px; padding: 0;">
+    <v-breadcrumbs :items="breadcrumbs" density="compact" class="pa-0 mb-4">
+      <template #divider>
+        <v-icon size="14" color="grey">
+          mdi-chevron-right
+        </v-icon>
+      </template>
+    </v-breadcrumbs>
+
+    <v-row align="center" class="mb-5" no-gutters>
+      <v-col cols="auto" class="mr-3">
+        <v-sheet color="primary" rounded="lg" width="6" height="36" />
       </v-col>
-      <v-col cols="6">
-        <p>{{ facility.Name }}</p>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>อาคารสอบ/ชั้น :</p>
-      </v-col>
-      <v-col cols="4">
-        <p>{{ building.Name }} ชั้น {{ floor.Number }}</p>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>ชื่อห้องสอบ :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="room.Name"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>รายละเอียด :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="room.Description"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>จำนวนแถว :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="room.Rows"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>จำนวนคนในแถว :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="room.Columns"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>ห้องสอบที่ :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="room.No"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-row>
       <v-col>
-        <v-btn color="success" @click="saveEditData">
-          บันทึกการแก้ไข
+        <p class="text-caption text-medium-emphasis mb-0">
+          ระบบจัดการสถานที่สอบ
+        </p>
+        <p class="text-h6 font-weight-bold mb-0 page-title">
+          แก้ไขห้องสอบ
+        </p>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn variant="text" class="btn-cancel" @click="backBtn">
+          ยกเลิก
         </v-btn>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col>
-        <v-btn color="warning" @click="testBtn">
-          test
+
+    <v-card elevation="0" rounded="lg" border color="white">
+      <v-card-text class="px-5 py-4">
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">สถานที่สอบ :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <span class="readonly-text">{{ facility.Name || '-' }}</span>
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">อาคารสอบ/ชั้น :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <span class="readonly-text">{{ building.Name || '-' }} ชั้น {{ floor.Number || '-' }}</span>
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">ชื่อห้องสอบ :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="room.Name" outlined dense hide-details="auto" class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">รายละเอียด :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="room.Description" outlined dense hide-details class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">จำนวนแถว :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="room.Rows" outlined dense hide-details="auto" class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">จำนวนคนในแถว :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="room.Columns" outlined dense hide-details="auto" class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">ห้องสอบที่ :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="room.No" outlined dense hide-details="auto" class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-btn
+          color="primary"
+          class="btn-save mt-4"
+          :loading="loading"
+          prepend-icon="mdi-content-save-outline"
+          @click="saveEditData"
+        >
+          บันทึกการแก้ไขข้อมูลห้องสอบ
         </v-btn>
-      </v-col>
-    </v-row>
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
 <script>
 export default {
-  name: 'FloorForm',
+  name: 'RoomForm',
   data () {
     return {
       loading: false,
@@ -123,7 +130,12 @@ export default {
         Name: '',
         Description: ''
       },
-      room: []
+      room: [],
+      breadcrumbs: [
+        { text: 'หน้าหลัก', href: '/Admin', disabled: false },
+        { text: 'สถานที่สอบ', href: '/Admins/FacilityList', disabled: false },
+        { text: 'แก้ไขห้องสอบ', disabled: true }
+      ]
     }
   },
   mounted () {
@@ -186,8 +198,8 @@ export default {
         this.loading = false
       }
     },
-    testBtn () {
-      console.log(this.floor.ID, this.room.ID)
+    backBtn () {
+      this.$router.back()
     },
     async fetchFloorData (floorId) {
       this.loading = true
@@ -247,3 +259,58 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.page-title {
+  color: #1A237E;
+  letter-spacing: 0 !important;
+}
+
+.compact-row {
+  min-height: 38px;
+  border-bottom: 1px solid #ECEFF1;
+}
+
+.compact-row:first-child {
+  border-top: 1px solid #ECEFF1;
+}
+
+.field-label {
+  color: #333333;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.readonly-text {
+  color: #2C2C2A;
+  font-size: 13px;
+}
+
+.form-field :deep(.v-input__slot) {
+  min-height: 32px !important;
+}
+
+.form-field :deep(input) {
+  font-size: 13px !important;
+}
+
+.form-field :deep(fieldset) {
+  border-color: #B0BEC5 !important;
+}
+
+.btn-save,
+.btn-cancel {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.btn-save {
+  font-size: 13px !important;
+  border-radius: 6px !important;
+}
+
+.btn-cancel {
+  color: #555 !important;
+  font-size: 13px !important;
+}
+</style>
