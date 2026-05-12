@@ -87,7 +87,7 @@
     </v-simple-table>
     <v-row>
       <v-col style="text-align: end;">
-        <v-btn color="success" @click="saveEditData(item.ID)">
+        <v-btn color="success" @click="saveEditData()">
           บันทึกการแก้ไข
         </v-btn>
       </v-col>
