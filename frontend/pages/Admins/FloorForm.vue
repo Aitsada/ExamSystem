@@ -17,7 +17,7 @@
           ระบบจัดการสถานที่สอบ
         </p>
         <p class="text-h6 font-weight-bold mb-0 page-title">
-          แก้ไขชั้นสอบ
+          {{ pageTitle }}
         </p>
       </v-col>
       <v-col cols="auto">
@@ -79,9 +79,9 @@
           class="btn-save mt-4"
           :loading="loading"
           prepend-icon="mdi-content-save-outline"
-          @click="saveEditData"
+          @click="saveFloor"
         >
-          บันทึกการแก้ไขข้อมูลชั้นสอบ
+          {{ isEditMode ? 'บันทึกการแก้ไขข้อมูลชั้นสอบ' : 'บันทึกข้อมูลชั้นสอบ' }}
         </v-btn>
       </v-card-text>
     </v-card>
@@ -92,9 +92,20 @@
           ห้องสอบ
         </p>
       </v-col>
+      <v-col cols="auto">
+        <v-btn
+          color="primary"
+          class="btn-add mr-2"
+          prepend-icon="mdi-plus"
+          :disabled="!floor.ID"
+          :to="{ path: '/Admins/RoomForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: floor.ID } }"
+        >
+          เพิ่มห้องสอบ
+        </v-btn>
+      </v-col>
     </v-row>
 
-    <v-card elevation="0" rounded="lg" border color="white">
+    <v-card elevation="0" rounded="lg" border color="white" class="mb-5">
       <v-data-table
         :headers="roomHeaders"
         :items="rooms"
@@ -139,6 +150,46 @@
         </template>
       </v-data-table>
     </v-card>
+
+    <v-card elevation="0" rounded="lg" border color="white">
+      <v-card-text class="px-5 py-3">
+        <v-row align="center" no-gutters>
+          <v-col cols="12" md="2">
+            <span class="field-label">ห้องสอบ :</span>
+          </v-col>
+          <v-col cols="12" md="5">
+            <v-file-input
+              ref="roomFileInput"
+              v-model="roomFile"
+              dense
+              outlined
+              hide-details
+              show-size
+              accept=".xls,.xlsx"
+              placeholder="เลือกไฟล์ Excel..."
+              prepend-icon=""
+              prepend-inner-icon="mdi-upload-outline"
+              class="form-field"
+            />
+            <p class="text-caption text-medium-emphasis mt-1 mb-0">
+              Example Excel File: ต้องมีคอลัมน์ No, Name, Rows, Columns และ TemplateID
+            </p>
+          </v-col>
+          <v-col cols="12" md="5" class="text-md-right mt-3 mt-md-0">
+            <v-btn
+              color="primary"
+              class="btn-save"
+              :loading="loading"
+              :disabled="!floor.ID || !roomFile"
+              prepend-icon="mdi-database-import-outline"
+              @click="importRooms"
+            >
+              บันทึกข้อมูลห้องสอบ »
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -166,6 +217,7 @@ export default {
         Name: '',
         Description: ''
       },
+      roomFile: null,
       rooms: [],
       roomHeaders: [
         { text: 'ห้องสอบ', value: 'Name', align: 'start' },
@@ -179,21 +231,34 @@ export default {
       breadcrumbs: [
         { text: 'หน้าหลัก', href: '/Admin', disabled: false },
         { text: 'สถานที่สอบ', href: '/Admins/FacilityList', disabled: false },
-        { text: 'แก้ไขชั้นสอบ', disabled: true }
-      ]
+        { text: 'เพิ่มชั้นสอบ', disabled: true }
+      ],
+      isEditMode: false
+    }
+  },
+  computed: {
+    pageTitle () {
+      return this.isEditMode ? 'แก้ไขชั้นสอบ' : 'เพิ่มชั้นสอบ'
+    },
+    selectedRoomFile () {
+      return Array.isArray(this.roomFile) ? this.roomFile[0] : this.roomFile
     }
   },
   mounted () {
-    const facilityId = this.$route.query.FacilityID
+    const facilityId = this.$route.params.FacilityID || this.$route.query.FacilityID
     this.facility.ID = facilityId || null
-    const buildingId = this.$route.query.BuildingID
+    const buildingId = this.$route.params.BuildingID || this.$route.query.BuildingID
     this.building.ID = buildingId || null
-    const floorId = this.$route.query.FloorID
+    const floorId = this.$route.params.FloorID || this.$route.query.FloorID
     this.floor.ID = floorId || null
     this.fetchFactilityData(facilityId)
     this.fetchBuildingData(buildingId)
-    this.fetchFloorData(floorId)
-    this.fetchRoomsData(floorId)
+    if (floorId) {
+      this.isEditMode = true
+      this.breadcrumbs[2].text = 'แก้ไขชั้นสอบ'
+      this.fetchFloorData(floorId)
+      this.fetchRoomsData(floorId)
+    }
   },
   methods: {
     async fetchFactilityData (id) {
@@ -224,7 +289,12 @@ export default {
     },
     async fetchBuildingData (buildingId) {
       if (!buildingId) {
-        this.building = []
+        this.building = {
+          ID: null,
+          Name: '',
+          Alias: '',
+          Description: ''
+        }
         return
       }
       this.loading = true
@@ -245,6 +315,16 @@ export default {
       this.$router.back()
     },
     async fetchFloorData (FloorID) {
+      if (!FloorID) {
+        this.floor = {
+          ID: null,
+          Number: '',
+          Name: '',
+          Description: ''
+        }
+        return
+      }
+
       this.loading = true
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/${this.building.ID}/floor/${FloorID}`))
@@ -262,6 +342,11 @@ export default {
       }
     },
     async fetchRoomsData (FloorID) {
+      if (!FloorID) {
+        this.rooms = []
+        return
+      }
+
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/${FloorID}/rooms`))
         this.rooms = res.data
@@ -269,23 +354,66 @@ export default {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       }
     },
-    async saveEditData () {
+    async saveFloor () {
       try {
-        await this.$axios.$patch(this.$apiUrl(`/api/${this.building.ID}/floor/update/${this.floor.ID}`), {
+        let res
+        const payload = {
           Number: this.floor.Number,
           Name: this.floor.Name || '',
-          Description: this.floor.Description || ''
-        })
+          Description: this.floor.Description || '',
+          CreatedBy: 'Admin'
+        }
+
+        if (this.isEditMode) {
+          res = await this.$axios.$patch(this.$apiUrl(`/api/${this.building.ID}/floor/update/${this.floor.ID}`), payload)
+        } else {
+          res = await this.$axios.$post(this.$apiUrl(`/api/${this.building.ID}/floors`), payload)
+          this.floor.ID = res.data
+          this.isEditMode = true
+          this.breadcrumbs[2].text = 'แก้ไขชั้นสอบ'
+          this.$router.replace({
+            path: '/Admins/FloorForm',
+            query: { FacilityID: this.facility.ID, BuildingID: this.building.ID, FloorID: this.floor.ID }
+          })
+        }
+
         this.$swal.fire({
           icon: 'success',
-          text: 'บันทึกการแก้ไขสำรเร็จ'
+          text: 'บันทึกข้อมูลสำเร็จ'
         })
         await this.fetchFloorData(this.floor.ID)
+        await this.fetchRoomsData(this.floor.ID)
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
-          text: 'บันทึกการแก้ไขผิดพลาด'
+          text: 'บันทึกข้อมูลผิดพลาด'
         })
+      }
+    },
+    async importRooms () {
+      if (!this.floor.ID || !this.selectedRoomFile) {
+        this.showError('นำเข้าห้องสอบไม่สำเร็จ', 'กรุณาบันทึกชั้นสอบและเลือกไฟล์ Excel')
+        return
+      }
+
+      const formData = new FormData()
+      formData.append('file', this.selectedRoomFile)
+
+      this.loading = true
+      try {
+        const res = await this.$axios.$post(this.$apiUrl(`/api/${this.floor.ID}/rooms/import`), formData)
+        this.roomFile = null
+        await this.fetchRoomsData(this.floor.ID)
+        this.$swal.fire({
+          icon: 'success',
+          title: 'นำเข้าข้อมูลสำเร็จ',
+          text: `นำเข้าห้องสอบ ${res.imported || 0} รายการ`,
+          confirmButtonText: 'ตกลง'
+        })
+      } catch (err) {
+        this.showError('นำเข้าห้องสอบไม่สำเร็จ', err?.response?.data?.message || 'กรุณาลองใหม่อีกครั้ง')
+      } finally {
+        this.loading = false
       }
     },
     async deleteRoomData (roomID, roomName) {
@@ -323,6 +451,14 @@ export default {
           text: 'ลบข้อมูลห้องสอบผิดพลาด'
         })
       }
+    },
+    showError (title, text) {
+      this.$swal.fire({
+        icon: 'error',
+        title,
+        text,
+        confirmButtonText: 'ตกลง'
+      })
     }
   }
 }
@@ -399,6 +535,7 @@ export default {
   background-color: #F8F9FF !important;
 }
 
+.btn-add,
 .btn-save,
 .btn-action,
 .btn-cancel {
@@ -406,6 +543,7 @@ export default {
   letter-spacing: 0 !important;
 }
 
+.btn-add,
 .btn-save {
   font-size: 13px !important;
   border-radius: 6px !important;

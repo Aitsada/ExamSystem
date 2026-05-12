@@ -23,13 +23,14 @@ export async function findByFloorID(FloorID) {
 
 export async function update(FloorID, RoomID, data) {
   const [result] = await db.query(
-    "UPDATE Room SET Name = ?, Description = ?, \`Rows\` = ?, \`Columns\` = ?, No = ? WHERE ID = ? AND FloorID = ? AND IsActive = 1",
+    "UPDATE Room SET Name = ?, Description = ?, \`Rows\` = ?, \`Columns\` = ?, No = ?, TemplateID = ? WHERE ID = ? AND FloorID = ? AND IsActive = 1",
     [
       data.Name,
       data.Description,
       data.Rows,
       data.Columns,
       data.No,
+      data.TemplateID,
       RoomID,
       FloorID,
     ],
@@ -59,6 +60,5 @@ export async function Delete(FloorID, RoomID) {
     "UPDATE Room SET IsActive = 0 WHERE ID = ? AND FloorID = ?",
     [RoomID, FloorID],
   );
-  console.log(result);
   return result.affectedRows;
 }

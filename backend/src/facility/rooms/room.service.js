@@ -16,6 +16,33 @@ export async function create(data) {
   return await roomModel.create(data);
 }
 
+export async function importFromRows(FloorID, rows) {
+  if (!FloorID) {
+    throw new Error("FloorID is required");
+  }
+
+  let imported = 0;
+  for (const row of rows) {
+    if (!row.Name?.trim()) {
+      continue;
+    }
+
+    await create({
+      FloorID,
+      CreatedBy: row.CreatedBy || "Admin",
+      No: row.No,
+      Name: row.Name,
+      Description: row.Description || "",
+      Rows: row.Rows,
+      Columns: row.Columns,
+      TemplateID: row.TemplateID,
+    });
+    imported += 1;
+  }
+
+  return imported;
+}
+
 export async function Delete(FloorID, RoomID) {
   return await roomModel.Delete(FloorID, RoomID);
 }

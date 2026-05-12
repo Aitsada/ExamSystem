@@ -17,7 +17,7 @@
           ระบบจัดการสถานที่สอบ
         </p>
         <p class="text-h6 font-weight-bold mb-0 page-title">
-          แก้ไขห้องสอบ
+          {{ pageTitle }}
         </p>
       </v-col>
       <v-col cols="auto">
@@ -92,14 +92,23 @@
           </v-col>
         </v-row>
 
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">Template ID :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="room.TemplateID" outlined dense hide-details="auto" class="form-field" />
+          </v-col>
+        </v-row>
+
         <v-btn
           color="primary"
           class="btn-save mt-4"
           :loading="loading"
           prepend-icon="mdi-content-save-outline"
-          @click="saveEditData"
+          @click="saveRoom"
         >
-          บันทึกการแก้ไขข้อมูลห้องสอบ
+          {{ isEditMode ? 'บันทึกการแก้ไขข้อมูลห้องสอบ' : 'บันทึกข้อมูลห้องสอบ' }}
         </v-btn>
       </v-card-text>
     </v-card>
@@ -130,27 +139,45 @@ export default {
         Name: '',
         Description: ''
       },
-      room: [],
+      room: {
+        ID: null,
+        No: '',
+        Name: '',
+        Rows: '',
+        Columns: '',
+        TemplateID: '',
+        Description: ''
+      },
       breadcrumbs: [
         { text: 'หน้าหลัก', href: '/Admin', disabled: false },
         { text: 'สถานที่สอบ', href: '/Admins/FacilityList', disabled: false },
-        { text: 'แก้ไขห้องสอบ', disabled: true }
-      ]
+        { text: 'เพิ่มห้องสอบ', disabled: true }
+      ],
+      isEditMode: false
+    }
+  },
+  computed: {
+    pageTitle () {
+      return this.isEditMode ? 'แก้ไขห้องสอบ' : 'เพิ่มห้องสอบ'
     }
   },
   mounted () {
-    const facilityId = this.$route.query.FacilityID
+    const facilityId = this.$route.params.FacilityID || this.$route.query.FacilityID
     this.facility.ID = facilityId || null
-    const buildingId = this.$route.query.BuildingID
+    const buildingId = this.$route.params.BuildingID || this.$route.query.BuildingID
     this.building.ID = buildingId || null
-    const floorId = this.$route.query.FloorID
+    const floorId = this.$route.params.FloorID || this.$route.query.FloorID
     this.floor.ID = floorId || null
-    const roomId = this.$route.query.RoomID
-    this.room = roomId || null
+    const roomId = this.$route.params.RoomID || this.$route.query.RoomID
     this.fetchFactilityData(facilityId)
     this.fetchBuildingData(buildingId)
     this.fetchFloorData(floorId)
-    this.fetchRoomData(roomId)
+    if (roomId) {
+      this.isEditMode = true
+      this.breadcrumbs[2].text = 'แก้ไขห้องสอบ'
+      this.room.ID = roomId
+      this.fetchRoomData(roomId)
+    }
   },
   methods: {
     async fetchFactilityData (id) {
@@ -181,7 +208,12 @@ export default {
     },
     async fetchBuildingData (buildingId) {
       if (!buildingId) {
-        this.building = []
+        this.building = {
+          ID: null,
+          Name: '',
+          Alias: '',
+          Description: ''
+        }
         return
       }
       this.loading = true
@@ -202,6 +234,16 @@ export default {
       this.$router.back()
     },
     async fetchFloorData (floorId) {
+      if (!floorId) {
+        this.floor = {
+          ID: null,
+          Number: '',
+          Name: '',
+          Description: ''
+        }
+        return
+      }
+
       this.loading = true
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/${this.building.ID}/floor/${floorId}`))
@@ -219,6 +261,10 @@ export default {
       }
     },
     async fetchRoomData (id) {
+      if (!id) {
+        return
+      }
+
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/${this.floor.ID}/room/${id}`))
         const roomData = res.data
@@ -235,26 +281,51 @@ export default {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       }
     },
-    async saveEditData () {
+    async saveRoom () {
       try {
-        await this.$axios.$patch(this.$apiUrl(`/api/${this.floor.ID}/room/update/${this.room.ID}`), {
+        let res
+        const payload = {
           No: this.room.No,
           Name: this.room.Name,
           Description: this.room.Description,
           Rows: this.room.Rows,
-          Columns: this.room.Columns
-        })
+          Columns: this.room.Columns,
+          TemplateID: this.room.TemplateID || 0,
+          CreatedBy: 'Admin'
+        }
+
+        if (this.isEditMode) {
+          res = await this.$axios.$patch(this.$apiUrl(`/api/${this.floor.ID}/room/update/${this.room.ID}`), payload)
+        } else {
+          res = await this.$axios.$post(this.$apiUrl(`/api/${this.floor.ID}/rooms`), payload)
+          this.room.ID = res.data
+          this.isEditMode = true
+          this.breadcrumbs[2].text = 'แก้ไขห้องสอบ'
+          this.$router.replace({
+            path: '/Admins/RoomForm',
+            query: { FacilityID: this.facility.ID, BuildingID: this.building.ID, FloorID: this.floor.ID, RoomID: this.room.ID }
+          })
+        }
+
         this.$swal.fire({
           icon: 'success',
-          text: 'แก้ไขข้อมูลสำเร็จ'
+          text: 'บันทึกข้อมูลสำเร็จ'
         })
-        await this.fetchBuildingData(this.building.ID)
+        await this.fetchRoomData(this.room.ID)
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
-          text: 'แก้ไขข้อมูลไม่สำเร็จ'
+          text: 'บันทึกข้อมูลไม่สำเร็จ'
         })
       }
+    },
+    showError (title, text) {
+      this.$swal.fire({
+        icon: 'error',
+        title,
+        text,
+        confirmButtonText: 'ตกลง'
+      })
     }
   }
 }

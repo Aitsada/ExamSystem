@@ -106,6 +106,15 @@
       <v-col cols="auto">
         <v-btn
           color="primary"
+          class="btn-add mr-2"
+          prepend-icon="mdi-plus"
+          :disabled="!facility.ID"
+          :to="{ path: '/Admins/BuildingForm', query: { FacilityID: facility.ID } }"
+        >
+          เพิ่มอาคารสอบ
+        </v-btn>
+        <v-btn
+          color="primary"
           class="btn-add"
           prepend-icon="mdi-file-excel-outline"
           :disabled="!facility.ID"
@@ -194,19 +203,12 @@
             <v-btn
               color="primary"
               class="btn-save"
-              :loading="loading"
+              :loading="buildingLoading"
               :disabled="!facility.ID || !buildingFile"
               prepend-icon="mdi-database-import-outline"
-              @click="saveFacility"
+              @click="importBuildings"
             >
               บันทึกข้อมูลอาคาร »
-            </v-btn>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-btn color="warning" :to="{ path: 'Amdins/BuidingForm'}">
-              เพิ่มอาคารสอบ
             </v-btn>
           </v-col>
         </v-row>
@@ -222,16 +224,8 @@ export default {
     return {
       loading: false,
       buildingLoading: false,
-      buildingSaving: false,
-      buildingDialog: false,
       buildingFile: null,
       buildings: [],
-      editingBuilding: {
-        ID: null,
-        Name: '',
-        Alias: '',
-        Description: ''
-      },
       facility: {
         ID: null,
         Name: '',
@@ -262,7 +256,7 @@ export default {
     }
   },
   async mounted () {
-    const id = this.$route.query.ID
+    const id = this.$route.params.ID || this.$route.query.ID
     if (id) {
       this.isEditMode = true
       this.breadcrumbs[2].text = 'แก้ไขสถานที่สอบ'
@@ -325,19 +319,6 @@ export default {
         input.click()
       }
     },
-    buildFacilityFormData () {
-      const formData = new FormData()
-      formData.append('Name', this.facility.Name)
-      formData.append('DisplayName', this.facility.DisplayName)
-      formData.append('Description', this.facility.Description || '')
-      formData.append('CreatedBy', this.facility.CreatedBy)
-
-      if (this.selectedBuildingFile) {
-        formData.append('buildingFile', this.selectedBuildingFile)
-      }
-
-      return formData
-    },
     async saveFacility () {
       const valid = this.$refs.form.validate()
       if (!valid) { return }
@@ -373,26 +354,31 @@ export default {
         this.loading = false
       }
     },
-    async saveBuildingEdit () {
-      if (!this.editingBuilding.Name) {
-        this.showError('บันทึกข้อมูลไม่สำเร็จ', 'กรุณากรอกชื่ออาคาร')
+    async importBuildings () {
+      if (!this.facility.ID || !this.selectedBuildingFile) {
+        this.showError('นำเข้าอาคารไม่สำเร็จ', 'กรุณาบันทึกสถานที่สอบและเลือกไฟล์ Excel')
         return
       }
 
-      this.buildingSaving = true
-      try {
-        await this.$axios.$patch(this.$apiUrl(`/api/building/${this.editingBuilding.ID}`), {
-          Name: this.editingBuilding.Name,
-          Alias: this.editingBuilding.Alias || '',
-          Description: this.editingBuilding.Description || ''
-        })
+      const formData = new FormData()
+      formData.append('file', this.selectedBuildingFile)
 
-        this.buildingDialog = false
+      this.buildingLoading = true
+      try {
+        const res = await this.$axios.$post(this.$apiUrl(`/api/${this.facility.ID}/buildings/import`), formData)
+
+        this.buildingFile = null
         await this.fetchBuildings()
+        this.$swal.fire({
+          icon: 'success',
+          title: 'นำเข้าข้อมูลสำเร็จ',
+          text: `นำเข้าอาคาร ${res.imported || 0} รายการ`,
+          confirmButtonText: 'ตกลง'
+        })
       } catch (error) {
-        this.showError('บันทึกข้อมูลอาคารไม่สำเร็จ', 'กรุณาลองใหม่อีกครั้ง')
+        this.showError('นำเข้าอาคารไม่สำเร็จ', error?.response?.data?.err || 'กรุณาลองใหม่อีกครั้ง')
       } finally {
-        this.buildingSaving = false
+        this.buildingLoading = false
       }
     },
     async confirmDeleteBuilding (item) {
