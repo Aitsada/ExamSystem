@@ -93,6 +93,13 @@
       </v-col>
     </v-row>
     <v-row>
+      <v-col style="text-align: end;">
+        <v-btn color="success" @click="saveEditData()">
+          บันทึกการแก้ไข
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
       <v-col style="text-align: start;">
         <v-btn color="success" @click="testBtn">
           บันทึกการแก้ไข

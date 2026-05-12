@@ -49,7 +49,6 @@ export async function update(req, res) {
 }
 
 export async function Delete(req, res) {
-  console.log(req.params)
   try {
     const { BuildingID, FloorID } = req.params;
     const data = await floorService.deleteById(BuildingID, FloorID);

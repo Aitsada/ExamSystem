@@ -206,6 +206,13 @@
             </v-btn>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col>
+            <v-btn color="warning" :to="{ path: 'Amdins/BuidingForm'}">
+              เพิ่มอาคารสอบ
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-card-text>
     </v-card>
   </v-container>
@@ -347,9 +354,7 @@ export default {
         if (this.isEditMode) {
           res = await this.$axios.$patch(this.$apiUrl(`/api/facility/update/${this.facility.ID}`), this.facility)
         } else {
-          console.log('Create Facility Response:', this.buildFacilityFormData())
           res = await this.$axios.$post(this.$apiUrl('/api/facility/create'), this.facility)
-          console.log('Create Facility Response:', this.facility)
           this.facility.ID = res.id
           this.isEditMode = true
           this.breadcrumbs[2].text = 'แก้ไขสถานที่สอบ'

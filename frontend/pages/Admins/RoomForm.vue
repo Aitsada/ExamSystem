@@ -82,6 +82,20 @@
         />
       </v-col>
     </v-row>
+    <v-row>
+      <v-col>
+        <v-btn color="success" @click="saveEditData">
+          บันทึกการแก้ไข
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-btn color="warning" @click="testBtn">
+          test
+        </v-btn>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 <script>
@@ -118,7 +132,7 @@ export default {
     const buildingId = this.$route.query.BuildingID
     this.building.ID = buildingId || null
     const floorId = this.$route.query.FloorID
-    this.floor = floorId || null
+    this.floor.ID = floorId || null
     const roomId = this.$route.query.RoomID
     this.room = roomId || null
     this.fetchFactilityData(facilityId)
@@ -172,12 +186,13 @@ export default {
         this.loading = false
       }
     },
-    testBtn (item) {
+    testBtn () {
+      console.log(this.floor.ID, this.room.ID)
     },
     async fetchFloorData (floorId) {
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/floors/${floorId}`))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/${this.building.ID}/floor/${floorId}`))
         const floorData = (res.data || [])
         this.floor = {
           ID: floorData.ID,
@@ -193,7 +208,7 @@ export default {
     },
     async fetchRoomData (id) {
       try {
-        const res = await this.$axios.$get(this.$apiUrl(`/api/rooms/${id}`))
+        const res = await this.$axios.$get(this.$apiUrl(`/api/${this.floor.ID}/room/${id}`))
         const roomData = res.data
         this.room = {
           ID: roomData.ID,
@@ -206,6 +221,27 @@ export default {
         }
       } catch {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
+      }
+    },
+    async saveEditData () {
+      try {
+        await this.$axios.$patch(this.$apiUrl(`/api/${this.floor.ID}/room/update/${this.room.ID}`), {
+          No: this.room.No,
+          Name: this.room.Name,
+          Description: this.room.Description,
+          Rows: this.room.Rows,
+          Columns: this.room.Columns
+        })
+        this.$swal.fire({
+          icon: 'success',
+          text: 'แก้ไขข้อมูลสำเร็จ'
+        })
+        await this.fetchBuildingData(this.building.ID)
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: 'แก้ไขข้อมูลไม่สำเร็จ'
+        })
       }
     }
   }

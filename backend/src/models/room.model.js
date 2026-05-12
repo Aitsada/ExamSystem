@@ -5,22 +5,34 @@ export async function findAll() {
   return rows;
 }
 
-export async function findById(id) {
-  const [result] = await db.query("SELECT * FROM Room WHERE ID = ? AND IsActive = 1", [id]);
+export async function findById(FloorID, RoomID) {
+  const [result] = await db.query(
+    "SELECT * FROM Room WHERE ID = ? AND FloorID = ? AND IsActive = 1",
+    [RoomID, FloorID],
+  );
   return result[0];
 }
 
 export async function findByFloorID(FloorID) {
-  const [result] = await db.query("SELECT * FROM Room WHERE FloorID = ? AND IsActive = 1", [
-    FloorID,
-  ]);
+  const [result] = await db.query(
+    "SELECT * FROM Room WHERE FloorID = ? AND IsActive = 1",
+    [FloorID],
+  );
   return result;
 }
 
-export async function update(id, data) {
+export async function update(FloorID, RoomID, data) {
   const [result] = await db.query(
-    "UPDATE Room SET Name = ?, Description = ?, Rows = ?, Columns = ?, No = ? WHERE ID =?",
-    [data.Name, data.Description, data.rows, data.Columns, data.No, id],
+    "UPDATE Room SET Name = ?, Description = ?, \`Rows\` = ?, \`Columns\` = ?, No = ? WHERE ID = ? AND FloorID = ? AND IsActive = 1",
+    [
+      data.Name,
+      data.Description,
+      data.Rows,
+      data.Columns,
+      data.No,
+      RoomID,
+      FloorID,
+    ],
   );
   return result;
 }
@@ -42,9 +54,11 @@ export async function create(data) {
   return result.insertId;
 }
 
-export async function Delete(id) {
+export async function Delete(FloorID, RoomID) {
   const [result] = await db.query(
-    "UPDATE Room SET IsAcive = 0 WHERE ID = ?"[id],
+    "UPDATE Room SET IsActive = 0 WHERE ID = ? AND FloorID = ?",
+    [RoomID, FloorID],
   );
+  console.log(result);
   return result.affectedRows;
 }

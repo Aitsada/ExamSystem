@@ -101,7 +101,7 @@
               </v-btn>
             </td>
             <td>
-              <v-btn small color="error" @click="testBtn(item.ID)">
+              <v-btn small color="error" @click="deleteRoomData(item.ID, item.Name)">
                 ลบ
               </v-btn>
             </td>
@@ -159,7 +159,7 @@ export default {
     const buildingId = this.$route.query.BuildingID
     this.building.ID = buildingId || null
     const floorId = this.$route.query.FloorID
-    this.floor = floorId || null
+    this.floor.ID = floorId || null
     this.fetchFactilityData(facilityId)
     this.fetchBuildingData(buildingId)
     this.fetchFloorData(floorId)
@@ -212,11 +212,19 @@ export default {
       }
     },
     testBtn (item) {
-      console.log('Test button clicked', {
-        ID: this.floor.ID,
-        Number: this.floor.Number,
-        Name: this.floor.Name,
-        Description: this.floor.Description
+      this.$swal.fire({
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: 'white',
+        cancelButtonColor: 'white',
+
+        customClass: {
+          confirmButton: 'my-confirm-btn',
+          cancelButton: 'my-cancel-btn'
+        }
       })
     },
     async fetchFloorData (FloorID) {
@@ -244,13 +252,6 @@ export default {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       }
     },
-    async deleteRoom (id) {
-      try {
-        await this.$axios.$get(this.$apiUrl(`/api/building/${id}`))
-      } catch (err) {
-        this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
-      }
-    },
     async saveEditData () {
       try {
         await this.$axios.$patch(this.$apiUrl(`/api/${this.building.ID}/floor/update/${this.floor.ID}`), {
@@ -265,8 +266,44 @@ export default {
         await this.fetchFloorData(this.floor.ID)
       } catch (err) {
         this.$swal.fire({
-          icon: 'fail',
+          icon: 'error',
           text: 'บันทึกการแก้ไขผิดพลาด'
+        })
+      }
+    },
+    async deleteRoomData (roomID, roomName) {
+      try {
+        const result = await this.$swal.fire({
+          text: `ยืนยันการลบห้องสอบ ${roomName}`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: 'lightgreen',
+          cancelButtonColor: 'orange',
+          confirmButtonText: 'ยืนยันการลบ',
+          cancelButtonText: 'ยกเลิก'
+        })
+
+        if (!result.isConfirmed) {
+          return
+        }
+
+        await this.$axios.$delete(
+          this.$apiUrl(`/api/${this.floor.ID}/room/${roomID}`)
+        )
+
+        await this.$swal.fire({
+          title: 'Deleted!',
+          text: 'Your room has been deleted.',
+          icon: 'success'
+        })
+
+        await this.fetchRoomsData(this.floor.ID)
+      } catch (err) {
+        console.error(err)
+
+        this.$swal.fire({
+          icon: 'error',
+          text: 'ลบข้อมูลห้องสอบผิดพลาด'
         })
       }
     }

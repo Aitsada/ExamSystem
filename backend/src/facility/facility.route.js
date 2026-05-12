@@ -30,9 +30,9 @@ router.patch("/:BuildingID/floor/update/:FloorID", floorController.update);
 
 // Room
 router.get("/rooms", roomController.findAll);
-router.get("/rooms/:id", roomController.findById);
+router.get("/:FloorID/room/:RoomID", roomController.findById);
 router.get("/:FloorID/rooms", roomController.findByFloorID);
 router.post("/:FloorID/rooms", roomController.create);
-router.delete("/room/:id", roomController.Delete);
-router.patch("/room/update/:id", roomController.update);
+router.delete("/:FloorID/room/:RoomID", roomController.Delete);
+router.patch("/:FloorID/room/update/:RoomID", roomController.update);
 export default router;
