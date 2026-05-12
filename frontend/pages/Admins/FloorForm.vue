@@ -1,128 +1,195 @@
 <template>
-  <v-container>
-    <h1>Floor Form</h1>
-    <v-row>
-      <v-col cols="6">
-        <p>สถานที่สอบ :</p>
-      </v-col>
-      <v-col cols="6">
-        <p>{{ facility.Name }}</p>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>อาคารสอบ :</p>
-      </v-col>
-      <v-col cols="4">
-        <p>{{ building.Name }}</p>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>เลขชั้นสอบ :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="floor.Number"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>ชื่อชั้นสอบ :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="floor.Name"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <p>รายละเอียด :</p>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field
-          v-model.trim="floor.Description"
-          label=""
-          outlined
-          dense
-        />
-      </v-col>
-    </v-row>
-    <v-simple-table
-      :loading="loading"
-      no-results-text="ไม่พบข้อมูลอาคารสอบ"
-      no-results-icon="mdi-office-building"
-      class="building-table"
-      hide-default-footer
-      style="margin-top: 20px;"
-    >
-      <template #default>
-        <thead>
-          <tr>
-            <th class="text-left">
-              ห้องสอบ
-            </th>
-            <th class="text-left">
-              ห้องสอบที่
-            </th>
-            <th class="text-left">
-              จำนวนแถว
-            </th>
-            <th class="text-left">
-              จำนวนคนในแถว
-            </th>
-            <th class="text-left">
-              จำนวน
-            </th>
-            <th class="text-left">
-              รายละเอียด
-            </th>
-            <th class="text-left" />
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in rooms" :key="item.ID">
-            <td>{{ item.Name }}</td>
-            <td>{{ item.No }}</td>
-            <td>{{ item.Rows }}</td>
-            <td>{{ item.Columns }}</td>
-            <td>{{ item.TemplateID }}</td>
-            <td>
-              <v-btn small :to="{ path:'/Admins/RoomForm', query:{ FacilityID: facility.ID, BuildingID: building.ID, FloorID: floor.ID, RoomID: item.ID }}">
-                แก้ไข
-              </v-btn>
-            </td>
-            <td>
-              <v-btn small color="error" @click="testBtn(item.ID)">
-                ลบ
-              </v-btn>
-            </td>
-          </tr>
-        </tbody>
+  <v-container style="max-width: 900px; padding: 0;">
+    <v-breadcrumbs :items="breadcrumbs" density="compact" class="pa-0 mb-4">
+      <template #divider>
+        <v-icon size="14" color="grey">
+          mdi-chevron-right
+        </v-icon>
       </template>
-    </v-simple-table>
-    <v-row>
-      <v-col style="text-align: end;">
-        <v-btn color="success" @click="saveEditData">
-          บันทึกการแก้ไข
+    </v-breadcrumbs>
+
+    <v-row align="center" class="mb-5" no-gutters>
+      <v-col cols="auto" class="mr-3">
+        <v-sheet color="primary" rounded="lg" width="6" height="36" />
+      </v-col>
+      <v-col>
+        <p class="text-caption text-medium-emphasis mb-0">
+          ระบบจัดการสถานที่สอบ
+        </p>
+        <p class="text-h6 font-weight-bold mb-0 page-title">
+          {{ pageTitle }}
+        </p>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn variant="text" class="btn-cancel" @click="backBtn">
+          ยกเลิก
         </v-btn>
       </v-col>
     </v-row>
-    <v-row>
-      <v-col style="text-align: end;">
-        <v-btn color="success" @click="testBtn">
-          TEST
+
+    <v-card elevation="0" rounded="lg" border color="white" class="mb-4">
+      <v-card-text class="px-5 py-4">
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">สถานที่สอบ :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <span class="readonly-text">{{ facility.Name || '-' }}</span>
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">อาคารสอบ :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <span class="readonly-text">{{ building.Name || '-' }}</span>
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">เลขชั้นสอบ :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="floor.Number" outlined dense hide-details="auto" class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">ชื่อชั้นสอบ :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="floor.Name" outlined dense hide-details="auto" class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">รายละเอียด :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field v-model.trim="floor.Description" outlined dense hide-details class="form-field" />
+          </v-col>
+        </v-row>
+
+        <v-btn
+          color="primary"
+          class="btn-save mt-4"
+          :loading="loading"
+          prepend-icon="mdi-content-save-outline"
+          @click="saveFloor"
+        >
+          {{ isEditMode ? 'บันทึกการแก้ไขข้อมูลชั้นสอบ' : 'บันทึกข้อมูลชั้นสอบ' }}
+        </v-btn>
+      </v-card-text>
+    </v-card>
+
+    <v-row align="center" class="mb-3" no-gutters>
+      <v-col>
+        <p class="section-title mb-0">
+          ห้องสอบ
+        </p>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn
+          color="primary"
+          class="btn-add mr-2"
+          prepend-icon="mdi-plus"
+          :disabled="!floor.ID"
+          :to="{ path: '/Admins/RoomForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: floor.ID } }"
+        >
+          เพิ่มห้องสอบ
         </v-btn>
       </v-col>
     </v-row>
+
+    <v-card elevation="0" rounded="lg" border color="white" class="mb-5">
+      <v-data-table
+        :headers="roomHeaders"
+        :items="rooms"
+        :items-per-page="-1"
+        :loading="loading"
+        no-data-text="ยังไม่มีข้อมูลห้องสอบ"
+        loading-text="กำลังโหลดข้อมูลห้องสอบ..."
+        class="admin-table"
+        hide-default-footer
+      >
+        <template #[`item.Name`]="{ item }">
+          <span class="text-body-2 font-weight-medium">{{ item.Name }}</span>
+        </template>
+
+        <template #[`item.Description`]="{ item }">
+          <span class="text-body-2 text-medium-emphasis">{{ item.Description || '-' }}</span>
+        </template>
+
+        <template #[`item.edit`]="{ item }">
+          <v-btn
+            small
+            outlined
+            class="btn-action"
+            prepend-icon="mdi-pencil-outline"
+            :to="{ path: '/Admins/RoomForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: floor.ID, RoomID: item.ID }}"
+          >
+            แก้ไข
+          </v-btn>
+        </template>
+
+        <template #[`item.delete`]="{ item }">
+          <v-btn
+            small
+            outlined
+            color="error"
+            class="btn-action"
+            prepend-icon="mdi-delete-outline"
+            @click="deleteRoomData(item.ID, item.Name)"
+          >
+            ลบ
+          </v-btn>
+        </template>
+      </v-data-table>
+    </v-card>
+
+    <v-card elevation="0" rounded="lg" border color="white">
+      <v-card-text class="px-5 py-3">
+        <v-row align="center" no-gutters>
+          <v-col cols="12" md="2">
+            <span class="field-label">ห้องสอบ :</span>
+          </v-col>
+          <v-col cols="12" md="5">
+            <v-file-input
+              ref="roomFileInput"
+              v-model="roomFile"
+              dense
+              outlined
+              hide-details
+              show-size
+              accept=".xls,.xlsx"
+              placeholder="เลือกไฟล์ Excel..."
+              prepend-icon=""
+              prepend-inner-icon="mdi-upload-outline"
+              class="form-field"
+            />
+            <p class="text-caption text-medium-emphasis mt-1 mb-0">
+              Example Excel File: ต้องมีคอลัมน์ No, Name, Rows, Columns และ TemplateID
+            </p>
+          </v-col>
+          <v-col cols="12" md="5" class="text-md-right mt-3 mt-md-0">
+            <v-btn
+              color="primary"
+              class="btn-save"
+              :loading="loading"
+              :disabled="!floor.ID || !roomFile"
+              prepend-icon="mdi-database-import-outline"
+              @click="importRooms"
+            >
+              บันทึกข้อมูลห้องสอบ »
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -150,20 +217,48 @@ export default {
         Name: '',
         Description: ''
       },
-      rooms: []
+      roomFile: null,
+      rooms: [],
+      roomHeaders: [
+        { text: 'ห้องสอบ', value: 'Name', align: 'start' },
+        { text: 'ห้องสอบที่', value: 'No', align: 'start' },
+        { text: 'จำนวนแถว', value: 'Rows', align: 'start' },
+        { text: 'จำนวนคนในแถว', value: 'Columns', align: 'start' },
+        { text: 'รายละเอียด', value: 'Description', align: 'start' },
+        { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center' },
+        { text: 'ลบข้อมูล', value: 'delete', sortable: false, align: 'center' }
+      ],
+      breadcrumbs: [
+        { text: 'หน้าหลัก', href: '/Admin', disabled: false },
+        { text: 'สถานที่สอบ', href: '/Admins/FacilityList', disabled: false },
+        { text: 'เพิ่มชั้นสอบ', disabled: true }
+      ],
+      isEditMode: false
+    }
+  },
+  computed: {
+    pageTitle () {
+      return this.isEditMode ? 'แก้ไขชั้นสอบ' : 'เพิ่มชั้นสอบ'
+    },
+    selectedRoomFile () {
+      return Array.isArray(this.roomFile) ? this.roomFile[0] : this.roomFile
     }
   },
   mounted () {
-    const facilityId = this.$route.query.FacilityID
+    const facilityId = this.$route.params.FacilityID || this.$route.query.FacilityID
     this.facility.ID = facilityId || null
-    const buildingId = this.$route.query.BuildingID
+    const buildingId = this.$route.params.BuildingID || this.$route.query.BuildingID
     this.building.ID = buildingId || null
-    const floorId = this.$route.query.FloorID
-    this.floor = floorId || null
+    const floorId = this.$route.params.FloorID || this.$route.query.FloorID
+    this.floor.ID = floorId || null
     this.fetchFactilityData(facilityId)
     this.fetchBuildingData(buildingId)
-    this.fetchFloorData(floorId)
-    this.fetchRoomsData(floorId)
+    if (floorId) {
+      this.isEditMode = true
+      this.breadcrumbs[2].text = 'แก้ไขชั้นสอบ'
+      this.fetchFloorData(floorId)
+      this.fetchRoomsData(floorId)
+    }
   },
   methods: {
     async fetchFactilityData (id) {
@@ -194,7 +289,12 @@ export default {
     },
     async fetchBuildingData (buildingId) {
       if (!buildingId) {
-        this.building = []
+        this.building = {
+          ID: null,
+          Name: '',
+          Alias: '',
+          Description: ''
+        }
         return
       }
       this.loading = true
@@ -211,15 +311,20 @@ export default {
         this.loading = false
       }
     },
-    testBtn (item) {
-      console.log('Test button clicked', {
-        ID: this.floor.ID,
-        Number: this.floor.Number,
-        Name: this.floor.Name,
-        Description: this.floor.Description
-      })
+    backBtn () {
+      this.$router.back()
     },
     async fetchFloorData (FloorID) {
+      if (!FloorID) {
+        this.floor = {
+          ID: null,
+          Number: '',
+          Name: '',
+          Description: ''
+        }
+        return
+      }
+
       this.loading = true
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/${this.building.ID}/floor/${FloorID}`))
@@ -237,6 +342,11 @@ export default {
       }
     },
     async fetchRoomsData (FloorID) {
+      if (!FloorID) {
+        this.rooms = []
+        return
+      }
+
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/${FloorID}/rooms`))
         this.rooms = res.data
@@ -244,32 +354,207 @@ export default {
         this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
       }
     },
-    async deleteRoom (id) {
+    async saveFloor () {
       try {
-        await this.$axios.$get(this.$apiUrl(`/api/building/${id}`))
-      } catch (err) {
-        this.showError('โหลดข้อมูลไม่สำเร็จ', 'ไม่สามารถโหลดข้อมูลสถานที่สอบได้ กรุณาลองใหม่อีกครั้ง')
-      }
-    },
-    async saveEditData () {
-      try {
-        await this.$axios.$patch(this.$apiUrl(`/api/${this.building.ID}/floor/update/${this.floor.ID}`), {
+        let res
+        const payload = {
           Number: this.floor.Number,
           Name: this.floor.Name || '',
-          Description: this.floor.Description || ''
-        })
+          Description: this.floor.Description || '',
+          CreatedBy: 'Admin'
+        }
+
+        if (this.isEditMode) {
+          res = await this.$axios.$patch(this.$apiUrl(`/api/${this.building.ID}/floor/update/${this.floor.ID}`), payload)
+        } else {
+          res = await this.$axios.$post(this.$apiUrl(`/api/${this.building.ID}/floors`), payload)
+          this.floor.ID = res.data
+          this.isEditMode = true
+          this.breadcrumbs[2].text = 'แก้ไขชั้นสอบ'
+          this.$router.replace({
+            path: '/Admins/FloorForm',
+            query: { FacilityID: this.facility.ID, BuildingID: this.building.ID, FloorID: this.floor.ID }
+          })
+        }
+
         this.$swal.fire({
           icon: 'success',
-          text: 'บันทึกการแก้ไขสำรเร็จ'
+          text: 'บันทึกข้อมูลสำเร็จ'
         })
         await this.fetchFloorData(this.floor.ID)
+        await this.fetchRoomsData(this.floor.ID)
       } catch (err) {
         this.$swal.fire({
-          icon: 'fail',
-          text: 'บันทึกการแก้ไขผิดพลาด'
+          icon: 'error',
+          text: 'บันทึกข้อมูลผิดพลาด'
         })
       }
+    },
+    async importRooms () {
+      if (!this.floor.ID || !this.selectedRoomFile) {
+        this.showError('นำเข้าห้องสอบไม่สำเร็จ', 'กรุณาบันทึกชั้นสอบและเลือกไฟล์ Excel')
+        return
+      }
+
+      const formData = new FormData()
+      formData.append('file', this.selectedRoomFile)
+
+      this.loading = true
+      try {
+        const res = await this.$axios.$post(this.$apiUrl(`/api/${this.floor.ID}/rooms/import`), formData)
+        this.roomFile = null
+        await this.fetchRoomsData(this.floor.ID)
+        this.$swal.fire({
+          icon: 'success',
+          title: 'นำเข้าข้อมูลสำเร็จ',
+          text: `นำเข้าห้องสอบ ${res.imported || 0} รายการ`,
+          confirmButtonText: 'ตกลง'
+        })
+      } catch (err) {
+        this.showError('นำเข้าห้องสอบไม่สำเร็จ', err?.response?.data?.message || 'กรุณาลองใหม่อีกครั้ง')
+      } finally {
+        this.loading = false
+      }
+    },
+    async deleteRoomData (roomID, roomName) {
+      const result = await this.$swal.fire({
+        icon: 'warning',
+        title: 'ยืนยันการลบห้องสอบ',
+        text: `คุณต้องการลบห้องสอบ "${roomName}" ใช่หรือไม่?`,
+        showCancelButton: true,
+        confirmButtonColor: '#D32F2F',
+        cancelButtonColor: '#757575',
+        confirmButtonText: 'ยืนยันลบ',
+        cancelButtonText: 'ยกเลิก'
+      })
+
+      if (!result.isConfirmed) {
+        return
+      }
+
+      try {
+        await this.$axios.$delete(
+          this.$apiUrl(`/api/${this.floor.ID}/room/${roomID}`)
+        )
+
+        await this.$swal.fire({
+          title: 'ลบข้อมูลสำเร็จ',
+          text: `ลบห้องสอบ "${roomName}" เรียบร้อยแล้ว`,
+          confirmButtonText: 'ตกลง',
+          icon: 'success'
+        })
+
+        await this.fetchRoomsData(this.floor.ID)
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: 'ลบข้อมูลห้องสอบผิดพลาด'
+        })
+      }
+    },
+    showError (title, text) {
+      this.$swal.fire({
+        icon: 'error',
+        title,
+        text,
+        confirmButtonText: 'ตกลง'
+      })
     }
   }
 }
 </script>
+
+<style scoped>
+.page-title {
+  color: #1A237E;
+  letter-spacing: 0 !important;
+}
+
+.compact-row {
+  min-height: 38px;
+  border-bottom: 1px solid #ECEFF1;
+}
+
+.compact-row:first-child {
+  border-top: 1px solid #ECEFF1;
+}
+
+.field-label {
+  color: #333333;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.readonly-text {
+  color: #2C2C2A;
+  font-size: 13px;
+}
+
+.section-title {
+  color: #1A237E;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.form-field :deep(.v-input__slot) {
+  min-height: 32px !important;
+}
+
+.form-field :deep(input) {
+  font-size: 13px !important;
+}
+
+.form-field :deep(fieldset) {
+  border-color: #B0BEC5 !important;
+}
+
+.admin-table {
+  box-shadow: none !important;
+}
+
+.admin-table :deep(thead tr th) {
+  background-color: #EEF2FF !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #1A237E !important;
+  border-bottom: 1px solid #C5CAE9 !important;
+}
+
+.admin-table :deep(tbody tr td) {
+  font-size: 13px !important;
+  color: #2C2C2A !important;
+  height: 40px !important;
+  border-bottom: 0.5px solid #ECEFF1 !important;
+}
+
+.admin-table :deep(tbody tr:last-child td) {
+  border-bottom: none !important;
+}
+
+.admin-table :deep(tbody tr:hover td) {
+  background-color: #F8F9FF !important;
+}
+
+.btn-add,
+.btn-save,
+.btn-action,
+.btn-cancel {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.btn-add,
+.btn-save {
+  font-size: 13px !important;
+  border-radius: 6px !important;
+}
+
+.btn-action {
+  font-size: 12px !important;
+}
+
+.btn-cancel {
+  color: #555 !important;
+  font-size: 13px !important;
+}
+</style>

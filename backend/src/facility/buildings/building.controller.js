@@ -1,4 +1,5 @@
 import * as buildingService from "./building.service.js";
+import { getValue, parseExcelRows } from "../../utils/excelImport.js";
 
 export async function getAll(req, res) {
   try {
@@ -53,6 +54,28 @@ export async function Create(req, res) {
     return res.status(500).json({ err: err.message });
   }
 }
+
+export async function importExcel(req, res) {
+  try {
+    const { FacilityID } = req.params;
+    const rows = parseExcelRows(req.file).map((row) => ({
+      CreatedBy: getValue(row, "CreatedBy", "Admin"),
+      Name: getValue(row, ["Name", "ชื่ออาคารสอบ", "อาคารสอบ"]),
+      Alias: getValue(row, ["Alias", "ชื่อย่อ"]),
+      Description: getValue(row, ["Description", "รายละเอียด"]),
+    }));
+    const imported = await buildingService.importFromRows(FacilityID, rows);
+
+    return res.status(201).json({
+      status: "success",
+      imported,
+      message: `Imported ${imported} buildings`,
+    });
+  } catch (err) {
+    return res.status(500).json({ err: err.message });
+  }
+}
+
 export async function update(req, res) {
   try {
     const { BuildingID, FacilityID } = req.params;

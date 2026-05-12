@@ -1,4 +1,5 @@
 import * as roomController from "./room.service.js";
+import { getValue, parseExcelRows, toNumber } from "../../utils/excelImport.js";
 
 export async function findAll(req, res) {
   try {
@@ -11,8 +12,8 @@ export async function findAll(req, res) {
 
 export async function findById(req, res) {
   try {
-    const { id } = req.params;
-    const result = await roomController.findById(id);
+    const { FloorID, RoomID } = req.params;
+    const result = await roomController.findById(FloorID, RoomID);
     res.status(200).json({ status: "success", data: result });
   } catch (err) {
     res.status(500).json({ status: "fail", message: err });
@@ -35,17 +36,42 @@ export async function create(req, res) {
     const result = await roomController.create({
       ...req.body,
       FloorID,
-      CreatedBy: "AdminX",
+      CreatedBy: req.body.CreatedBy || "Admin",
     });
     res.status(200).json({ status: "success", data: result });
   } catch (err) {
     res.status(500).json({ status: "fail", message: err });
   }
 }
+
+export async function importExcel(req, res) {
+  try {
+    const { FloorID } = req.params;
+    const rows = parseExcelRows(req.file).map((row) => ({
+      CreatedBy: getValue(row, "CreatedBy", "Admin"),
+      No: toNumber(getValue(row, ["No", "ห้องสอบที่"]), 0),
+      Name: getValue(row, ["Name", "ชื่อห้องสอบ", "ห้องสอบ"]),
+      Description: getValue(row, ["Description", "รายละเอียด"]),
+      Rows: toNumber(getValue(row, ["Rows", "จำนวนแถว"]), 0),
+      Columns: toNumber(getValue(row, ["Columns", "จำนวนคนในแถว"]), 0),
+      TemplateID: toNumber(getValue(row, ["TemplateID", "Template"], 0), 0),
+    }));
+    const imported = await roomController.importFromRows(FloorID, rows);
+
+    res.status(201).json({
+      status: "success",
+      imported,
+      message: `Imported ${imported} rooms`,
+    });
+  } catch (err) {
+    res.status(500).json({ status: "fail", message: err.message });
+  }
+}
+
 export async function Delete(req, res) {
   try {
-    const { id } = req.params;
-    const result = await roomController.Delete(id);
+    const { FloorID, RoomID } = req.params;
+    const result = await roomController.Delete(FloorID, RoomID);
     res.status(200).json({ status: "success", data: result });
   } catch (err) {
     res.status(500).json({ status: "fail", message: err });
@@ -53,9 +79,9 @@ export async function Delete(req, res) {
 }
 export async function update(req, res) {
   try {
-    const { id } = req.params;
+    const { FloorID, RoomID } = req.params;
     const data = req.body;
-    const result = await roomController.update(id, data);
+    const result = await roomController.update(FloorID, RoomID, data);
     res.status(200).json({ status: "success", data: result });
   } catch (err) {
     res.status(500).json({ status: "fail", message: err });

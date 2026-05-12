@@ -1,4 +1,5 @@
 import * as floorService from "./floors.service.js";
+import { getValue, parseExcelRows, toNumber } from "../../utils/excelImport.js";
 
 export async function test(req, res) {
   const data = await floorService.test();
@@ -36,6 +37,27 @@ export async function create(req, res) {
   }
 }
 
+export async function importExcel(req, res) {
+  try {
+    const { BuildingID } = req.params;
+    const rows = parseExcelRows(req.file).map((row) => ({
+      CreatedBy: getValue(row, "CreatedBy", "Admin"),
+      Number: toNumber(getValue(row, ["Number", "เลขชั้นสอบ", "ชั้นสอบ"]), null),
+      Name: getValue(row, ["Name", "ชื่อชั้นสอบ"]),
+      Description: getValue(row, ["Description", "รายละเอียด"]),
+    }));
+    const imported = await floorService.importFromRows(BuildingID, rows);
+
+    res.status(201).json({
+      status: "success",
+      imported,
+      message: `Imported ${imported} floors`,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 export async function update(req, res) {
   try {
     const { BuildingID, FloorID } = req.params;
@@ -49,7 +71,6 @@ export async function update(req, res) {
 }
 
 export async function Delete(req, res) {
-  console.log(req.params)
   try {
     const { BuildingID, FloorID } = req.params;
     const data = await floorService.deleteById(BuildingID, FloorID);
