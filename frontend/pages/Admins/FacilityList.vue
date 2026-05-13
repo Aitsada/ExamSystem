@@ -1,10 +1,10 @@
 <template>
-  <v-container style="max-width: 900px; padding: 0;">
+  <v-container class="admin-page">
     <!-- Breadcrumb -->
     <v-breadcrumbs
       :items="breadcrumbs"
       density="compact"
-      class="pa-0 mb-4"
+      class="admin-breadcrumbs pa-0 mb-4"
     >
       <template #divider>
         <v-icon size="14" color="grey">
@@ -14,15 +14,15 @@
     </v-breadcrumbs>
 
     <!-- Page Header -->
-    <v-row align="center" class="mb-5" no-gutters>
+    <v-row align="center" class="admin-page-header mb-5" no-gutters>
       <v-col cols="auto" class="mr-3">
-        <v-sheet color="primary" rounded="lg" width="6" height="36" />
+        <div class="admin-title-marker" />
       </v-col>
       <v-col>
-        <p class="text-caption text-medium-emphasis mb-0">
+        <p class="admin-eyebrow mb-0">
           ระบบจัดการสถานที่สอบ
         </p>
-        <p class="text-h6 font-weight-bold mb-0" style="color: #1A237E; letter-spacing: 0.02em;">
+        <p class="admin-page-title mb-0">
           รายการสถานที่สอบ
         </p>
       </v-col>
@@ -51,7 +51,7 @@
     </v-row>
 
     <!-- Main Card -->
-    <v-card elevation="0" rounded="lg" border color="white">
+    <v-card elevation="0" rounded="lg" border color="white" class="admin-card">
       <!-- Data Table -->
       <v-data-table
         :headers="headers"
@@ -113,12 +113,12 @@
       rounded="lg"
       border
       color="white"
-      class="mt-4"
+      class="admin-card admin-import-card mt-4"
     >
       <v-card-text class="px-5 py-3">
         <v-row align="center" no-gutters>
           <v-col cols="12" md="2">
-            <span class="field-label">สถานที่สอบ :</span>
+            <span class="field-label">ไฟล์สถานที่สอบ :</span>
           </v-col>
           <v-col cols="12" md="5" class="mt-3 mt-md-0">
             <v-file-input
@@ -139,15 +139,14 @@
 
         <v-row align="center" class="mt-3" no-gutters>
           <v-col cols="12" md="7">
-            <p class="text-caption text-medium-emphasis mb-0">
+            <p class="admin-helper-text mb-0">
               Example Excel File: ต้องมีคอลัมน์ Name และ DisplayName
             </p>
           </v-col>
           <v-col cols="12" md="5" class="text-md-right mt-3 mt-md-0">
             <v-btn
               small
-              color="warning"
-              class="mr-2"
+              class="admin-template-btn mr-2"
               :href="$apiUrl('/api/template/facility')"
             >
               ดาวโหลดตัวอย่างไฟล์
@@ -306,121 +305,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.btn-add {
-  font-size: 13px !important;
-  text-transform: none !important;
-  letter-spacing: 0 !important;
-  border-radius: 6px !important;
-}
-
-.header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.field-label {
-  color: #333333;
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.form-field :deep(.v-input__slot) {
-  min-height: 32px !important;
-}
-
-.form-field :deep(input) {
-  font-size: 13px !important;
-}
-
-.form-field :deep(fieldset) {
-  border-color: #B0BEC5 !important;
-}
-
-.btn-save {
-  font-size: 13px !important;
-  text-transform: none !important;
-  letter-spacing: 0 !important;
-  border-radius: 6px !important;
-}
-
-.search-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.search-label {
-  flex: 0 0 auto;
-  color: #333333;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 40px;
-  white-space: nowrap;
-}
-
-.search-field {
-  flex: 1 1 auto;
-  max-width: 300px;
-  border: 1px solid #B0BEC5;
-  border-radius: 6px;
-}
-
-.search-field :deep(.v-field__outline) {
-  border-color: #B0BEC5 !important;
-}
-
-.search-field :deep(.v-field__input) {
-  font-size: 13px !important;
-}
-
-.facility-table {
-  box-shadow: none !important;
-}
-
-.facility-table :deep(thead tr th) {
-  background-color: #EEF2FF !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  color: #1A237E !important;
-  border-bottom: 1px solid #C5CAE9 !important;
-}
-
-.facility-table :deep(tbody tr td) {
-  font-size: 13px !important;
-  color: #2C2C2A !important;
-  height: 52px !important;
-  border-bottom: 0.5px solid #ECEFF1 !important;
-}
-
-.facility-table :deep(tbody tr:last-child td) {
-  border-bottom: none !important;
-}
-
-.facility-table :deep(tbody tr:hover td) {
-  background-color: #F8F9FF !important;
-}
-
-.btn-action {
-  font-size: 12px !important;
-  text-transform: none !important;
-  letter-spacing: 0 !important;
-}
-
-.btn-cancel {
-  font-size: 13px !important;
-  text-transform: none !important;
-  letter-spacing: 0 !important;
-  color: #555 !important;
-  border-color: #B0BEC5 !important;
-}
-
-.btn-confirm {
-  font-size: 13px !important;
-  text-transform: none !important;
-  letter-spacing: 0 !important;
-}
-</style>
