@@ -212,6 +212,11 @@
             </v-btn>
           </v-col>
         </v-row>
+        <v-row>
+          <v-col>
+            <v-btn small color="warning" :href="$apiUrl('/api/template/building.xls')">ดาวโหลดตัวอย่างไฟล์</v-btn>
+          </v-col>
+        </v-row>
       </v-card-text>
     </v-card>
   </v-container>

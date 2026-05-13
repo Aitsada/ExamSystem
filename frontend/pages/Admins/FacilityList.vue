@@ -27,15 +27,26 @@
         </p>
       </v-col>
       <v-col cols="auto">
-        <v-btn
-          color="primary"
-          variant="flat"
-          prepend-icon="mdi-plus"
-          class="btn-add"
-          :to="'/Admins/FacilityForm'"
-        >
-          เพิ่มสถานที่สอบ
-        </v-btn>
+        <div class="header-actions">
+          <v-btn
+            color="secondary"
+            variant="flat"
+            prepend-icon="mdi-file-excel-outline"
+            class="btn-add"
+            @click="focusImportCard"
+          >
+            เพิ่มสถานที่จาก Excel
+          </v-btn>
+          <v-btn
+            color="primary"
+            variant="flat"
+            prepend-icon="mdi-plus"
+            class="btn-add"
+            :to="'/Admins/FacilityForm'"
+          >
+            เพิ่มสถานที่สอบ
+          </v-btn>
+        </div>
       </v-col>
     </v-row>
 
@@ -95,6 +106,66 @@
         </template>
       </v-data-table>
     </v-card>
+
+    <v-card
+      ref="importCard"
+      elevation="0"
+      rounded="lg"
+      border
+      color="white"
+      class="mt-4"
+    >
+      <v-card-text class="px-5 py-3">
+        <v-row align="center" no-gutters>
+          <v-col cols="12" md="2">
+            <span class="field-label">สถานที่สอบ :</span>
+          </v-col>
+          <v-col cols="12" md="5" class="mt-3 mt-md-0">
+            <v-file-input
+              ref="facilityFileInput"
+              v-model="facilityFile"
+              dense
+              outlined
+              hide-details
+              show-size
+              accept=".xls,.xlsx"
+              placeholder="เลือกไฟล์ Excel..."
+              prepend-icon=""
+              prepend-inner-icon="mdi-upload-outline"
+              class="form-field"
+            />
+          </v-col>
+        </v-row>
+
+        <v-row align="center" class="mt-3" no-gutters>
+          <v-col cols="12" md="7">
+            <p class="text-caption text-medium-emphasis mb-0">
+              Example Excel File: ต้องมีคอลัมน์ Name และ DisplayName
+            </p>
+          </v-col>
+          <v-col cols="12" md="5" class="text-md-right mt-3 mt-md-0">
+            <v-btn
+              small
+              color="warning"
+              class="mr-2"
+              :href="$apiUrl('/api/template/facility')"
+            >
+              ดาวโหลดตัวอย่างไฟล์
+            </v-btn>
+            <v-btn
+              color="primary"
+              class="btn-save"
+              :loading="importLoading"
+              :disabled="!facilityFile"
+              prepend-icon="mdi-database-import-outline"
+              @click="importFacilities"
+            >
+              บันทึกข้อมูลสถานที่สอบ »
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
 
@@ -104,7 +175,9 @@ export default {
   data () {
     return {
       loading: false,
+      importLoading: false,
       search: '',
+      facilityFile: null,
       facility: [],
       headers: [
         { text: 'ชื่อสถานที่สอบ', value: 'Name', align: 'start', width: '60%' },
@@ -122,6 +195,9 @@ export default {
       if (!this.search) { return this.facility }
       const q = this.search.toLowerCase()
       return this.facility.filter(f => f.Name.toLowerCase().includes(q))
+    },
+    selectedFacilityFile () {
+      return Array.isArray(this.facilityFile) ? this.facilityFile[0] : this.facilityFile
     }
   },
   mounted () {
@@ -142,6 +218,48 @@ export default {
         })
       } finally {
         this.loading = false
+      }
+    },
+    focusImportCard () {
+      const importCard = this.$refs.importCard?.$el
+      if (importCard) {
+        importCard.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    },
+    async importFacilities () {
+      if (!this.selectedFacilityFile) {
+        this.$swal.fire({
+          icon: 'error',
+          title: 'นำเข้าสถานที่สอบไม่สำเร็จ',
+          text: 'กรุณาเลือกไฟล์ Excel',
+          confirmButtonText: 'ตกลง'
+        })
+        return
+      }
+
+      const formData = new FormData()
+      formData.append('file', this.selectedFacilityFile)
+
+      this.importLoading = true
+      try {
+        const res = await this.$axios.$post(this.$apiUrl('/api/facility/import'), formData)
+        this.facilityFile = null
+        await this.fetchFacilities()
+        this.$swal.fire({
+          icon: 'success',
+          title: 'นำเข้าข้อมูลสำเร็จ',
+          text: `นำเข้าสถานที่สอบ ${res.imported || 0} รายการ`,
+          confirmButtonText: 'ตกลง'
+        })
+      } catch (error) {
+        this.$swal.fire({
+          icon: 'error',
+          title: 'นำเข้าสถานที่สอบไม่สำเร็จ',
+          text: error?.response?.data?.message || 'กรุณาลองใหม่อีกครั้ง',
+          confirmButtonText: 'ตกลง'
+        })
+      } finally {
+        this.importLoading = false
       }
     },
     async confirmDelete (item) {
@@ -191,6 +309,38 @@ export default {
 
 <style scoped>
 .btn-add {
+  font-size: 13px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  border-radius: 6px !important;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.field-label {
+  color: #333333;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.form-field :deep(.v-input__slot) {
+  min-height: 32px !important;
+}
+
+.form-field :deep(input) {
+  font-size: 13px !important;
+}
+
+.form-field :deep(fieldset) {
+  border-color: #B0BEC5 !important;
+}
+
+.btn-save {
   font-size: 13px !important;
   text-transform: none !important;
   letter-spacing: 0 !important;

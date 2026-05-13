@@ -177,6 +177,14 @@
             >
               บันทึกข้อมูลชั้นสอบ »
             </v-btn>
+            <v-btn
+              small
+              color="warning"
+              class="mr-2"
+              :href="$apiUrl('/api/template/floor.xls')"
+            >
+              ดาวโหลดตัวอย่างไฟล์
+            </v-btn>
           </v-col>
         </v-row>
       </v-card-text>

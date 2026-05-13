@@ -3,7 +3,10 @@ import * as facilityController from "./facility.controller.js";
 import * as buildingController from "./buildings/building.controller.js";
 import * as floorController from "./floors/floors.controller.js";
 import * as roomController from "./rooms/room.controller.js";
+import * as templateController from "../template/template.controller.js"
+
 import multer from "multer";
+
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 // /api
@@ -11,6 +14,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.get("/facility", facilityController.FindAll);
 router.get("/facility/:id", facilityController.findById);
 router.post("/facility/create", facilityController.Create);
+router.post(
+  "/facility/import",
+  upload.single("file"),
+  facilityController.importExcel,
+);
 router.delete("/facility/:id", facilityController.Delete);
 router.patch("/facility/update/:id", facilityController.Update);
 
@@ -24,8 +32,14 @@ router.post(
   upload.single("file"),
   buildingController.importExcel,
 );
-router.delete("/:FacilityID/building/:BuildingID", buildingController.deleteById);
-router.patch("/:FacilityID/building/update/:BuildingID", buildingController.update);
+router.delete(
+  "/:FacilityID/building/:BuildingID",
+  buildingController.deleteById,
+);
+router.patch(
+  "/:FacilityID/building/update/:BuildingID",
+  buildingController.update,
+);
 
 // Floor`
 router.get("/floors/test", floorController.test);
@@ -52,4 +66,10 @@ router.post(
 );
 router.delete("/:FloorID/room/:RoomID", roomController.Delete);
 router.patch("/:FloorID/room/update/:RoomID", roomController.update);
+
+// Template
+router.get("/template/facility.xls", templateController.downloadFacilityTemplate);
+router.get("/template/building.xls", templateController.downloadBuildingTemplate);
+router.get("/template/floor.xls", templateController.downloadFloorTemplate);
+router.get("/template/room.xls", templateController.downloadRoomTemplate);
 export default router;

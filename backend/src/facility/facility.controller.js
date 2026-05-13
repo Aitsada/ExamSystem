@@ -1,4 +1,5 @@
 import * as facilityService from "./facility.service.js";
+import { getValue, parseExcelRows } from "../utils/excelImport.js";
 
 export async function FindAll(req, res) {
   try {
@@ -40,6 +41,26 @@ export async function Create(req, res) {
     res.status(201).json({ id: result });
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+}
+
+export async function importExcel(req, res) {
+  try {
+    const rows = parseExcelRows(req.file).map((row) => ({
+      CreatedBy: getValue(row, "CreatedBy", "Admin"),
+      Name: getValue(row, ["Name", "ชื่อสถานที่สอบ", "สถานที่สอบ"]),
+      DisplayName: getValue(row, ["DisplayName", "ชื่อที่แสดง"]),
+      Description: getValue(row, ["Description", "รายละเอียด"]),
+    }));
+    const imported = await facilityService.importFromRows(rows);
+
+    return res.status(201).json({
+      status: "success",
+      imported,
+      message: `Imported ${imported} facilities`,
+    });
+  } catch (err) {
+    return res.status(500).json({ status: "fail", message: err.message });
   }
 }
 
