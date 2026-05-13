@@ -177,6 +177,13 @@
           </v-col>
           <v-col cols="12" md="5" class="text-md-right mt-3 mt-md-0">
             <v-btn
+              small
+              class="admin-template-btn"
+              :href="$apiUrl('/api/template/room.xls')"
+            >
+              ดาวโหลดตัวอย่างไฟล์
+            </v-btn>``
+            <v-btn
               color="primary"
               class="btn-save mr-2"
               :loading="loading"
@@ -185,13 +192,6 @@
               @click="importRooms"
             >
               บันทึกข้อมูลห้องสอบ »
-            </v-btn>
-            <v-btn
-              small
-              class="admin-template-btn"
-              :href="$apiUrl('/api/template/room.xls')"
-            >
-              ดาวโหลดตัวอย่างไฟล์
             </v-btn>
           </v-col>
         </v-row>

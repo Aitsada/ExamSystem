@@ -12,6 +12,7 @@ export async function findById(id) {
   );
   return rows[0] || null;
 }
+
 export async function create(data) {
   const [result] = await db.query(
     "INSERT INTO Facility (CreatedBy, Name, Description, DisplayName) VALUES (?,?,?,?)",

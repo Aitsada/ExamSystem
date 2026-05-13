@@ -68,7 +68,7 @@ export default {
           icon: 'mdi-file-excel-outline',
           title: 'นำเข้าข้อมูล',
           description: 'เพิ่มข้อมูลสถานที่สอบจากไฟล์ Excel',
-          to: '/Admins/FacilityList'
+          to: '/Organizations/OrganizationList'
         }
       ]
     }
