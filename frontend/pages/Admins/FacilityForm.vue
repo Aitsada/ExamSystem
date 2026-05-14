@@ -125,7 +125,13 @@
       </v-col>
     </v-row>
 
-    <v-card elevation="0" rounded="lg" border color="white" class="admin-card mb-5">
+    <v-card
+      elevation="0"
+      rounded="lg"
+      border
+      color="white"
+      class="admin-card mb-5"
+    >
       <v-data-table
         :headers="buildingHeaders"
         :items="buildings"

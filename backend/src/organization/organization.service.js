@@ -4,6 +4,10 @@ export async function findAll() {
   return await organizationModel.findAll();
 }
 
+export async function findById(id) {
+  return await organizationModel.findById(id);
+}
+
 export async function create(data) {
   return await organizationModel.create(data);
 }

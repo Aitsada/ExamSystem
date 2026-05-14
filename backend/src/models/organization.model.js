@@ -2,8 +2,14 @@ import db from "../config/db.js";
 
 export async function findAll() {
   const [result] = await db.query("SELECT * FROM Organization");
-  console.log(result);
   return result;
+}
+
+export async function findById(id) {
+  const [result] = await db.query("SELECT * FROM Organization WHERE ID = ?", [
+    id,
+  ]);
+  return result[0];
 }
 
 export async function create(data) {
@@ -11,11 +17,11 @@ export async function create(data) {
     "INSERT INTO Organization (Name, Description, Createdby) VALUES (?, ?, ?)",
     [data.Name, data.Description, "Ait"],
   );
-  console.log("result : ", result);
   return result;
 }
 
 export async function update(id, data) {
+  console.log("md")
   const [result] = await db.query(
     "UPDATE Organization SET Name = COALESCE(?, Name), Description = COALESCE(?, Description) WHERE ID = ?",
     [data.Name ?? null, data.Description ?? null, id],
