@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "local": "nodemon src/app.js",
+    "local": "nodemon --no-stdin src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

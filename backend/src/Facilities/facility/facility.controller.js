@@ -1,5 +1,5 @@
 import * as facilityService from "./facility.service.js";
-import { getValue, parseExcelRows } from "../utils/excelImport.js";
+import { getValue, parseExcelRows } from "../../utils/excelImport.js";
 
 export async function FindAll(req, res) {
   try {

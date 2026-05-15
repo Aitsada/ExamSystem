@@ -1,9 +1,9 @@
-import * as floorService from "./floors.service.js";
+import * as floorService from "./floor.service.js";
 import { getValue, parseExcelRows, toNumber } from "../../utils/excelImport.js";
 
-export async function test(req, res) {
-  const data = await floorService.test();
-  res.status(200).json({ data: data, message: "test floor" });
+export async function findAll(req, res) {
+  const data = await floorService.findAll();
+  res.status(200).json({ message: "test floor", data: data });
 }
 
 export async function findById(req, res) {
@@ -42,7 +42,10 @@ export async function importExcel(req, res) {
     const { BuildingID } = req.params;
     const rows = parseExcelRows(req.file).map((row) => ({
       CreatedBy: getValue(row, "CreatedBy", "Admin"),
-      Number: toNumber(getValue(row, ["Number", "เลขชั้นสอบ", "ชั้นสอบ"]), null),
+      Number: toNumber(
+        getValue(row, ["Number", "เลขชั้นสอบ", "ชั้นสอบ"]),
+        null,
+      ),
       Name: getValue(row, ["Name", "ชื่อชั้นสอบ"]),
       Description: getValue(row, ["Description", "รายละเอียด"]),
     }));

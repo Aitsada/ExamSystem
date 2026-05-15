@@ -1,4 +1,4 @@
-import * as organizationModel from "../models/organization.model.js";
+import * as organizationModel from "../../models/organization.model.js";
 
 export async function findAll() {
   return await organizationModel.findAll();

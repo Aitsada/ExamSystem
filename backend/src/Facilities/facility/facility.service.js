@@ -1,4 +1,4 @@
-import * as facilityModel from "../models/facility.model.js";
+import * as facilityModel from "../../models/facility.model.js";
 
 export async function findAll() {
   return facilityModel.findAll();

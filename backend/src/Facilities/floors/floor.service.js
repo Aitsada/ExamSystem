@@ -1,6 +1,6 @@
 import * as floorModel from "../../models/floor.model.js";
 
-export async function test() {
+export async function findAll() {
   return await floorModel.findAll();
 }
 export async function findById(BuildingID, FloorID) {
