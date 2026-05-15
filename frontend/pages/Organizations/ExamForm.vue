@@ -48,8 +48,8 @@
           >
             <template #activator="{ on, attrs }">
               <v-text-field
-                v-model="date"
-                label="Picker in menu"
+                :value="dateText"
+                label="วัน/เดือน/ปี"
                 prepend-icon="mdi-calendar"
                 readonly
                 dense
@@ -84,10 +84,11 @@
 
         <v-col>
           <v-select
-            :items="startTime"
+            v-model="selectedStartTime"
+            :items="timeOptions"
             dense
             solo
-            hide-detailsl
+            hide-details
           />
         </v-col>
 
@@ -99,7 +100,8 @@
 
         <v-col>
           <v-select
-            :items="endTime"
+            v-model="selectedEndTime"
+            :items="timeOptions"
             dense
             solo
             hide-details
@@ -112,7 +114,8 @@
         </v-col>
         <v-col style="">
           <v-select
-            :items="statusId"
+            v-model="exam.StatusID"
+            :items="status"
             label=""
             dense
             solo
@@ -151,9 +154,11 @@
         </v-col>
       </v-row> -->
       <v-divider class="my-10" />
-
-      <v-btn color="warning" @click="testBtn">
+      <v-btn depressed color="warning" @click="testBtn">
         testBtn
+      </v-btn>
+      <v-btn color="primary" :loading="loading" @click="saveAddData">
+        {{ isEditMode ? 'บันทึกการแก้ไขรอบสอบ' : 'บันทึกรอบสอบ' }}
       </v-btn>
     </v-form>
   </v-container>
@@ -165,30 +170,13 @@ export default {
     return {
       loading: false,
       isEditMode: false,
-      statusId: ['None', 'Opened', 'Canceled', 'Completed'],
-      startTime: [
-        '8:00',
-        '8:30',
-        '9:00',
-        '9:30',
-        '10:00',
-        '10:30',
-        '11:00',
-        '11:30',
-        '12:00',
-        '12:30',
-        '13:00',
-        '13:30',
-        '14:00',
-        '14:30',
-        '15:00',
-        '15:30',
-        '16:00',
-        '16:30',
-        '17:00',
-        '17:30'
+      status: [
+        { text: 'None', value: 0 },
+        { text: 'Opened', value: 1 },
+        { text: 'Canceled', value: 2 },
+        { text: 'Completed', value: 3 }
       ],
-      endTime: ['8:00',
+      timeOptions: ['8:00',
         '8:30',
         '9:00',
         '9:30',
@@ -208,17 +196,22 @@ export default {
         '16:30',
         '17:00',
         '17:30'],
+      selectedStartTime: '8:00',
+      selectedEndTime: '17:00',
       date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       menu: false,
       modal: false,
       menu2: false,
       organ: { ID: '', Name: '', Description: '' },
-      exam: { ID: '', StatusID: '', StartDateTime: '', EndDateTime: '' }
+      exam: { ID: '', StatusID: 0, StartDateTime: '', EndDateTime: '' }
     }
   },
   computed: {
     pageTitle () {
       return this.isEditMode ? 'แก้ไขรอบสอบ' : 'เพิ่มรอบสอบ'
+    },
+    dateText () {
+      return this.formatDate(this.date)
     }
   },
   async mounted () {
@@ -226,7 +219,6 @@ export default {
     const examId = this.$route.query.ExamID
     this.exam.ID = examId || ''
     this.organ.ID = organId || ''
-    console.log(organId, examId)
     await this.fetchOrganDataByID(organId)
     if (examId) {
       this.isEditMode = true
@@ -235,7 +227,7 @@ export default {
   },
   methods: {
     testBtn () {
-      console.log(this.startTime, this.endTime)
+      console.log('testBtn : ', this.fetchExamDataByID(4))
     },
     async fetchOrganDataByID (organID) {
       const result = await this.$axios.$get(this.$apiUrl(`/api/organization/${organID}`))
@@ -243,7 +235,9 @@ export default {
       this.organ = {
         ID: data.ID,
         Name: data.Name,
-        Description: data.Description || ''
+        Description: data.Description || '',
+        StartDateTime: data.StartDateTime || '',
+        EndDateTime: data.EndDateTime || ''
       }
     },
     async fetchExamDataByID (examID) {
@@ -253,11 +247,11 @@ export default {
         this.exam = {
           ID: data.ID,
           Name: data.Name,
-          StatusID: data.StatusID,
+          StatusID: Number(data.StatusID || 0),
           StartDateTime: data.StartDateTime,
           EndDateTime: data.EndDateTime
         }
-        console.log('this.exam', this.exam)
+        this.setDateAndTimeFromExam(data)
       } catch (error) {
         const message = error.response?.data?.message
         this.$swal.fire({
@@ -266,19 +260,74 @@ export default {
         })
       }
     },
+    formatDate (date) {
+      if (!date) {
+        return ''
+      }
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
+    },
+    normalizeTime (time) {
+      const [hour, minute] = time.split(':')
+      return `${hour.padStart(2, '0')}:${minute || '00'}:00`
+    },
+    combineDateTime (time) {
+      return `${this.date} ${this.normalizeTime(time)}`
+    },
+    setDateAndTimeFromExam (data) {
+      const start = this.parseDateTime(data.StartDateTime)
+      const end = this.parseDateTime(data.EndDateTime)
+
+      if (start.date) {
+        this.date = start.date
+      }
+      if (start.time) {
+        this.selectedStartTime = start.time
+      }
+      if (end.time) {
+        this.selectedEndTime = end.time
+      }
+    },
+    parseDateTime (value) {
+      if (!value) {
+        return { date: '', time: '' }
+      }
+
+      const text = String(value).replace('T', ' ')
+      const date = text.substr(0, 10)
+      const time = text.substr(11, 5).replace(/^0/, '')
+
+      return { date, time }
+    },
+    buildPayload () {
+      return {
+        Name: this.exam.Name,
+        StatusID: Number(this.exam.StatusID),
+        StartDateTime: this.combineDateTime(this.selectedStartTime),
+        EndDateTime: this.combineDateTime(this.selectedEndTime)
+      }
+    },
     async saveAddData () {
+      this.loading = true
       try {
-        await this.$axios.$post(this.$apiUrl('/api/organization'), { Name: this.organ.Name, Description: this.organ.Description })
+        const payload = this.buildPayload()
+        if (this.isEditMode) {
+          await this.$axios.$patch(this.$apiUrl(`/api/${this.organ.ID}/exam/${this.exam.ID}`), payload)
+        } else {
+          await this.$axios.$post(this.$apiUrl(`/api/${this.organ.ID}/exam`), payload)
+        }
         this.$swal.fire({
           icon: 'success',
-          text: 'เพิ่มข้อมูลหน่วยงานสำเร็จ'
+          text: this.isEditMode ? 'แก้ไขรอบสอบสำเร็จ' : 'เพิ่มรอบสอบสำเร็จ'
         })
       } catch (error) {
         const message = error.response?.data?.message
         this.$swal.fire({
           icon: 'error',
-          text: `ไม่สามารถเพิ่มข้อมูลหน่วยงานได้ ${message}`
+          text: `ไม่สามารถบันทึกรอบสอบได้ ${message}`
         })
+      } finally {
+        this.loading = false
       }
     }
   }

@@ -64,6 +64,9 @@
                     ชื่อ
                   </th>
                   <th class="text-left">
+                    สถานะ
+                  </th>
+                  <th class="text-left">
                     รายละเอียด
                   </th>
                 </tr>
@@ -74,6 +77,7 @@
                   :key="item.ID"
                 >
                   <td>{{ item.Name }}</td>
+                  <td>{{ getStatusName(item.StatusID) }}</td>
                   <td>
                     <v-btn small color="warning" :to="{path: 'ExamForm', query: {OrganID: organ.ID, ExamID: item.ID}}">
                       แก้ไข
@@ -89,7 +93,7 @@
       <!-- <v-btn depressed color="warning" @click="testBtn">
         testBtn
       </v-btn> -->
-      <v-btn color="primary" depressed :to="{ path: 'ExamForm', query: {OrganID: organ.ID} }">
+      <v-btn v-if="isEditMode" color="primary" depressed :to="{ path: 'ExamForm', query: {OrganID: organ.ID} }">
         เพิ่มรอบสอบ
       </v-btn>
     </v-form>
@@ -102,6 +106,12 @@ export default {
     return {
       loading: false,
       isEditMode: false,
+      statusMap: {
+        0: 'None',
+        1: 'Opened',
+        2: 'Canceled',
+        3: 'Completed'
+      },
       organ: { ID: '', Name: '', Description: '' },
       exam: []
     }
@@ -123,6 +133,9 @@ export default {
   methods: {
     testBtn () {
       console.log(this.organ.ID)
+    },
+    getStatusName (statusID) {
+      return this.statusMap[Number(statusID)] || '-'
     },
     async fetchDataByID (organID) {
       const result = await this.$axios.$get(this.$apiUrl(`/api/organization/${organID}`))

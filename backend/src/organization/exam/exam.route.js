@@ -7,5 +7,5 @@ const router = Router();
 router.get("/exam/:id", examController.findById);
 router.get("/:OrganID/exam", examController.findByOrganID);
 router.post("/:OrganID/exam", examController.Create);
-router.patch("/:OraganID/exam/:ExamID", examController.Update);
+router.patch("/:OrganID/exam/:ExamID", examController.Update);
 export default router;

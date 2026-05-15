@@ -14,16 +14,30 @@ export async function findByOrganID(organID) {
 }
 export async function create(OrganID, data) {
   const [result] = await db.query(
-    "INSERT INTO Exam (CreatedBy, OrganizationID, Name, StartDateTime, EndDateTime) VALUES (?,?,?,?,?)",
-    ["Ait", Number(OrganID), data.Name, data.StartDateTime, data.EndDateTime],
+    "INSERT INTO Exam (CreatedBy, OrganizationID, Name, StatusID, StartDateTime, EndDateTime) VALUES (?,?,?,?,?,?)",
+    [
+      "Ait",
+      Number(OrganID),
+      data.Name,
+      data.StatusID,
+      data.StartDateTime,
+      data.EndDateTime,
+    ],
   );
   return result;
 }
 
 export async function update(ExamID, OrganID, data) {
   const [result] = await db.query(
-    "UPDATE Exam SET Name = COALESCE(?, Name) WHERE ID = ? AND OrganizationID",
-    [data.Name ?? null, ExamID, OrganID],
+    "UPDATE Exam SET Name = COALESCE(?, Name), StatusID = COALESCE(?, StatusID), StartDateTime = COALESCE(?, StartDateTime), EndDateTime = COALESCE(?, EndDateTime) WHERE ID = ? AND OrganizationID = ?",
+    [
+      data.Name ?? null,
+      data.StatusID ?? null,
+      data.StartDateTime ?? null,
+      data.EndDateTime ?? null,
+      ExamID,
+      OrganID,
+    ],
   );
   return result;
 }
