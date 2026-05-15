@@ -41,6 +41,6 @@ export async function Update(req, res) {
     const result = await organizationService.update(id, data);
     res.status(200).json({ status: "success", data: result });
   } catch (err) {
-    res.status(500).json({ status: "fail" });
+    res.status(500).json({ status: "fail", message: err.message });
   }
 }

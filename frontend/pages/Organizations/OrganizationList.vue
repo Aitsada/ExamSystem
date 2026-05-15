@@ -53,14 +53,22 @@ export default {
       organ: []
     }
   },
-  async mounted () {
-    await this.fetchData()
+  mounted () {
+    this.fetchData()
   },
   methods: {
     async fetchData () {
-      const result = await this.$axios.$get(this.$apiUrl('/api/organization'))
-      this.organ = result.data
-      console.log('this.organ', this.organ)
+      this.loading = true
+      try {
+        const result = await this.$axios.$get(this.$apiUrl('/api/organization'))
+        this.organ = result.data
+        console.log('this.organ', this.organ)
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `ดึงข้อมูลไม่สำเร็จ ${err.message}`
+        })
+      }
     },
     testBtn (id) {
       console.log('testBtn : ', id)
