@@ -1,3 +1,4 @@
+import e from "express";
 import * as organizationModel from "../../models/organization.model.js";
 
 export async function findAll() {
@@ -14,4 +15,13 @@ export async function create(data) {
 
 export async function update(id, data) {
   return await organizationModel.update(id, data);
+}
+
+// Upload LOGO File
+export async function findLogoById(id) {
+  return await organizationModel.findLogoById(id);
+}
+
+export async function updateLogo(id, data) {
+  return await organizationModel.updateLogo(id, data);
 }

@@ -40,6 +40,7 @@
         </v-col>
         <v-col>
           <v-file-input
+            v-model="logoFile"
             dense
             outlined
             hide-details
@@ -105,6 +106,7 @@ export default {
   data () {
     return {
       loading: false,
+      logoFile: null,
       isEditMode: false,
       statusMap: {
         0: 'None',
@@ -131,9 +133,6 @@ export default {
     }
   },
   methods: {
-    testBtn () {
-      console.log(this.organ.ID)
-    },
     getStatusName (statusID) {
       return this.statusMap[Number(statusID)] || '-'
     },
@@ -148,7 +147,7 @@ export default {
     },
     async fetchExamData (organID) {
       try {
-        const result = await this.$axios.$get(this.$apiUrl(`/api/${organID}/exam`))
+        const result = await this.$axios.$get(this.$apiUrl(`/api/${organID}/exams`))
         this.exam = result.data
       } catch (error) {
         const message = error.response?.data?.message
@@ -159,10 +158,23 @@ export default {
       }
     },
     async saveAddData () {
+      const formData = new FormData()
+
+      formData.append('Name', this.organ.Name)
+      formData.append('Description', this.organ.Description)
+
+      if (this.logoFile) {
+        formData.append('logo', this.logoFile)
+      }
       this.loading = true
       if (this.isEditMode === true) {
         try {
-          await this.$axios.$patch(this.$apiUrl(`api/organization/${this.organ.ID}`), { Name: this.organ.Name, Description: this.organ.Description })
+          await this.$axios.$patch(this.$apiUrl(`/api/organization/${this.organ.ID}`), { Name: this.organ.Name, Description: this.organ.Description })
+
+          if (this.logoFile) {
+            await this.$axios.$patch(this.$apiUrl(`/api/organization/${this.organ.ID}/logo`), formData)
+          }
+
           this.$swal.fire({
             icon: 'success',
             text: 'แก้ไขข้อมูลหน่วยงานสำเร็จ'
@@ -177,7 +189,7 @@ export default {
         }
       } else {
         try {
-          await this.$axios.$post(this.$apiUrl('/api/organization'), { Name: this.organ.Name, Description: this.organ.Description })
+          await this.$axios.$post(this.$apiUrl('/api/organization'), formData)
           this.$swal.fire({
             icon: 'success',
             text: 'เพิ่มข้อมูลหน่วยงานสำเร็จ'
