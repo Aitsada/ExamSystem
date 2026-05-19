@@ -76,9 +76,8 @@
         <!-- eslint-disable-next-line vue/valid-v-slot -->
         <template #[`item.edit`]="{ item }">
           <v-btn
-            size="small"
-            variant="outlined"
-            color="white"
+            small
+            outlined
             class="btn-action"
             prepend-icon="mdi-pencil-outline"
             :to="{
@@ -94,8 +93,8 @@
         <!-- eslint-disable-next-line vue/valid-v-slot -->
         <template #[`item.delete`]="{ item }">
           <v-btn
-            size="small"
-            variant="outlined"
+            small
+            outlined
             color="error"
             class="btn-action"
             prepend-icon="mdi-delete-outline"

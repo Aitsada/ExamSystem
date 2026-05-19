@@ -78,9 +78,8 @@ export default {
       loading: false,
       organ: [],
       headers: [
-        { text: 'ชื่อหน่วยงาน', value: 'Name', align: 'start', width: '40%' },
-        { text: 'รายละเอียด', value: 'Description', align: 'start', width: '40%' },
-        { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center', width: '20%' }
+        { text: 'ชื่อหน่วยงาน', value: 'Name', align: 'start', styled: {} },
+        { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center' }
       ],
       breadcrumbs: [
         { text: 'หน้าหลัก', href: '/Admin', disabled: false },
