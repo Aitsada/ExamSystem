@@ -60,7 +60,7 @@ export default {
     async fetchData () {
       this.loading = true
       try {
-        const result = await this.$axios.$get(this.$apiUrl('/api/organization'))
+        const result = await this.$axios.$get(this.$apiUrl('/api/organizations'))
         this.organ = result.data
         console.log('this.organ', this.organ)
       } catch (err) {
