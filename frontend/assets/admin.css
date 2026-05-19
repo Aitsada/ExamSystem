@@ -8,6 +8,10 @@
   max-width: 1200px;
 }
 
+.admin-form-card .v-card__text {
+  padding: 16px 20px !important;
+}
+
 .admin-breadcrumbs {
   color: #64748B;
   font-size: 12px;
@@ -71,8 +75,8 @@
 }
 
 .compact-row {
-  min-height: 44px;
-  padding: 6px 0;
+  min-height: 42px;
+  padding: 5px 0;
   border-bottom: 1px solid #E6EEF8;
 }
 
@@ -86,6 +90,10 @@
   font-weight: 600 !important;
 }
 
+.field-col {
+  max-width: 520px;
+}
+
 .readonly-text {
   display: inline-flex;
   align-items: center;
@@ -95,10 +103,16 @@
 }
 
 .form-field .v-input__slot {
-  min-height: 34px !important;
+  min-height: 32px !important;
 }
 
-.form-field input {
+.form-field input,
+.form-field textarea,
+.form-field .v-select__selection {
+  font-size: 13px !important;
+}
+
+.form-field .v-label {
   font-size: 13px !important;
 }
 
@@ -192,6 +206,23 @@
 .admin-helper-text {
   color: #64748B !important;
   font-size: 12px !important;
+}
+
+.admin-muted-text {
+  color: #64748B !important;
+  font-size: 13px !important;
+}
+
+.admin-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.admin-empty-note {
+  color: #64748B;
+  font-size: 13px;
 }
 
 @media (max-width: 600px) {

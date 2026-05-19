@@ -224,7 +224,7 @@ export default {
           ID: BuildingData.ID,
           Name: BuildingData.Name,
           Alias: BuildingData.Alias,
-          Description: BuildingData.Descriptoin
+          Description: BuildingData.Description
         }
       } finally {
         this.loading = false

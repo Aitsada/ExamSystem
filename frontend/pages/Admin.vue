@@ -59,13 +59,15 @@ export default {
     return {
       adminLinks: [
         {
-          icon: '',
+          icon: 'mdi-map-marker-multiple-outline',
           title: 'เพิ่มข้อมูลสถานที่สอบ',
+          description: 'จัดการสถานที่ อาคาร ชั้น ห้อง และนำเข้าข้อมูลจาก Excel',
           to: '/Admins/FacilityList'
         },
         {
-          icon: '',
+          icon: 'mdi-domain',
           title: 'เพิ่มข้อมูลผู้สมัคร',
+          description: 'จัดการหน่วยงาน รอบสอบ ตำแหน่ง และข้อมูลผู้สมัคร',
           to: '/Organizations/OrganizationList'
         }
       ]

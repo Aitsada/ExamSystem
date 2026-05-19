@@ -1,47 +1,73 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col style="text-align: center;">
-        <h1>รายชื่อหน่วยงาน</h1>
-      </v-col>
-    </v-row>
-    <v-divider class="my-5" />
-
-    <v-simple-table :loading="loading">
-      <template #default>
-        <thead>
-          <tr>
-            <th class="text-left">
-              ชื่อ
-            </th>
-            <th class="text-left">
-              รายละเอียด
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="item in organ"
-            :key="item.ID"
-          >
-            <td>{{ item.Name }}</td>
-            <td>
-              <v-btn small color="warning" :to="{path: 'OrganizationForm', query: {OrganID: item.ID}}">
-                แก้ไข
-              </v-btn>
-            </td>
-          </tr>
-        </tbody>
+  <v-container class="admin-page">
+    <v-breadcrumbs
+      :items="breadcrumbs"
+      density="compact"
+      class="admin-breadcrumbs pa-0 mb-4"
+    >
+      <template #divider>
+        <v-icon size="14" color="grey">
+          mdi-chevron-right
+        </v-icon>
       </template>
-    </v-simple-table>
-    <v-divider class="my-5" />
-    <v-row>
+    </v-breadcrumbs>
+
+    <v-row align="center" class="admin-page-header mb-5" no-gutters>
+      <v-col cols="auto" class="mr-3">
+        <div class="admin-title-marker" />
+      </v-col>
       <v-col>
-        <v-btn color="primary" :to="{path: 'OrganizationForm'}">
+        <p class="admin-eyebrow mb-0">
+          ระบบจัดการหน่วยงาน
+        </p>
+        <p class="admin-page-title mb-0">
+          รายชื่อหน่วยงาน
+        </p>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn
+          color="primary"
+          class="btn-add"
+          prepend-icon="mdi-plus"
+          :to="{ path: '/Organizations/OrganizationForm' }"
+        >
           เพิ่มหน่วยงาน
         </v-btn>
       </v-col>
     </v-row>
+
+    <v-card elevation="0" rounded="lg" border color="white" class="admin-card">
+      <v-data-table
+        :headers="headers"
+        :items="organ"
+        :items-per-page="-1"
+        :loading="loading"
+        no-data-text="ยังไม่มีข้อมูลหน่วยงาน"
+        loading-text="กำลังโหลดข้อมูลหน่วยงาน..."
+        class="admin-table"
+        hide-default-footer
+      >
+        <template #[`item.Name`]="{ item }">
+          <span class="text-body-2 font-weight-medium">{{ item.Name }}</span>
+        </template>
+
+        <template #[`item.Description`]="{ item }">
+          <span class="admin-muted-text">{{ item.Description || '-' }}</span>
+        </template>
+
+        <template #[`item.edit`]="{ item }">
+          <v-btn
+            small
+            outlined
+            class="btn-action"
+            prepend-icon="mdi-pencil-outline"
+            :to="{ path: '/Organizations/OrganizationForm', query: { OrganID: item.ID } }"
+          >
+            แก้ไข
+          </v-btn>
+        </template>
+      </v-data-table>
+    </v-card>
   </v-container>
 </template>
 <script>
@@ -50,7 +76,16 @@ export default {
   data () {
     return {
       loading: false,
-      organ: []
+      organ: [],
+      headers: [
+        { text: 'ชื่อหน่วยงาน', value: 'Name', align: 'start', width: '40%' },
+        { text: 'รายละเอียด', value: 'Description', align: 'start', width: '40%' },
+        { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center', width: '20%' }
+      ],
+      breadcrumbs: [
+        { text: 'หน้าหลัก', href: '/Admin', disabled: false },
+        { text: 'หน่วยงาน', disabled: true }
+      ]
     }
   },
   mounted () {
@@ -61,18 +96,15 @@ export default {
       this.loading = true
       try {
         const result = await this.$axios.$get(this.$apiUrl('/api/organizations'))
-        this.organ = result.data
-        console.log('this.organ', this.organ)
+        this.organ = result.data || []
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
           text: `ดึงข้อมูลไม่สำเร็จ ${err.message}`
         })
+      } finally {
+        this.loading = false
       }
-    },
-    testBtn (id) {
-      console.log('testBtn : ', id)
-      this.$router.push('/A')
     }
   }
 }

@@ -1,225 +1,269 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col style="text-align: center;">
-        <h1>{{ pageTitle }}</h1>
+  <v-container class="admin-page admin-page-wide">
+    <v-breadcrumbs
+      :items="breadcrumbs"
+      density="compact"
+      class="admin-breadcrumbs pa-0 mb-4"
+    >
+      <template #divider>
+        <v-icon size="14" color="grey">
+          mdi-chevron-right
+        </v-icon>
+      </template>
+    </v-breadcrumbs>
+
+    <v-row align="center" class="admin-page-header mb-5" no-gutters>
+      <v-col cols="auto" class="mr-3">
+        <div class="admin-title-marker" />
+      </v-col>
+      <v-col>
+        <p class="admin-eyebrow mb-0">
+          ระบบจัดการหน่วยงาน
+        </p>
+        <p class="admin-page-title mb-0">
+          {{ pageTitle }}
+        </p>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn variant="text" class="btn-cancel" @click="backBtn">
+          ยกเลิก
+        </v-btn>
       </v-col>
     </v-row>
-    <v-divider class="my-5" />
 
-    <v-form>
-      <v-row dense>
-        <v-col>
-          <p>หน่วยงาน:</p>
-        </v-col>
-        <v-col>
-          <p>{{ organ.Name }}</p>
-        </v-col>
-      </v-row>
-      <v-row dense>
-        <v-col>
-          <p>ชื่อรอบสอบ:</p>
-        </v-col>
-        <v-col>
-          <v-text-field
-            v-model="exam.Name"
-            outlined
-            dense
-            required
-          />
-        </v-col>
-      </v-row>
-      <v-row dense align="center">
-        <v-col cols="auto">
-          <p class="mb-0">
-            สอบวันที่:
-          </p>
-        </v-col>
+    <v-card elevation="0" rounded="lg" border color="white" class="admin-card admin-form-card mb-5">
+      <v-card-text>
+        <v-form ref="form">
+          <v-row align="center" class="compact-row" no-gutters>
+            <v-col cols="12" md="3">
+              <span class="field-label">หน่วยงาน :</span>
+            </v-col>
+            <v-col cols="12" md="6" class="field-col">
+              <span class="readonly-text">{{ organ.Name || '-' }}</span>
+            </v-col>
+          </v-row>
 
-        <v-col>
-          <v-menu
-            ref="menu"
-            v-model="menu"
-            :close-on-content-click="false"
-            :return-value.sync="date"
-            transition="scale-transition"
-            offset-y
-            min-width="auto"
-          >
-            <template #activator="{ on, attrs }">
+          <v-row align="center" class="compact-row" no-gutters>
+            <v-col cols="12" md="3">
+              <span class="field-label">ชื่อรอบสอบ :</span>
+            </v-col>
+            <v-col cols="12" md="6" class="field-col">
               <v-text-field
-                :value="dateText"
-                label="วัน/เดือน/ปี"
-                prepend-icon="mdi-calendar"
-                readonly
+                v-model.trim="exam.Name"
+                outlined
                 dense
-                solo
-                hide-details
-                v-bind="attrs"
-                v-on="on"
+                hide-details="auto"
+                :rules="[v => !!v || 'กรุณากรอกชื่อรอบสอบ']"
+                class="form-field"
               />
-            </template>
+            </v-col>
+          </v-row>
 
-            <v-date-picker
-              v-model="date"
-              no-title
-              scrollable
-            >
-              <v-spacer />
-              <v-btn text color="primary" @click="menu = false">
-                Cancel
-              </v-btn>
-              <v-btn text color="primary" @click="$refs.menu.save(date)">
-                OK
-              </v-btn>
-            </v-date-picker>
-          </v-menu>
-        </v-col>
+          <v-row align="center" class="compact-row" no-gutters>
+            <v-col cols="12" md="3">
+              <span class="field-label">วันที่สอบ :</span>
+            </v-col>
+            <v-col cols="12" md="3" class="pr-md-3">
+              <v-menu
+                ref="menu"
+                v-model="menu"
+                :close-on-content-click="false"
+                :return-value.sync="date"
+                transition="scale-transition"
+                offset-y
+                min-width="auto"
+              >
+                <template #activator="{ on, attrs }">
+                  <v-text-field
+                    :value="dateText"
+                    prepend-inner-icon="mdi-calendar"
+                    readonly
+                    dense
+                    outlined
+                    hide-details
+                    class="form-field"
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
 
-        <v-col cols="auto" class="text-end">
-          <p class="mb-0">
-            ตั้งแต่เวลา:
+                <v-date-picker v-model="date" no-title scrollable>
+                  <v-spacer />
+                  <v-btn text color="primary" @click="menu = false">
+                    ยกเลิก
+                  </v-btn>
+                  <v-btn text color="primary" @click="$refs.menu.save(date)">
+                    ตกลง
+                  </v-btn>
+                </v-date-picker>
+              </v-menu>
+            </v-col>
+            <v-col cols="6" md="2" class="pr-2">
+              <v-select
+                v-model="selectedStartTime"
+                :items="timeOptions"
+                dense
+                outlined
+                hide-details
+                prepend-inner-icon="mdi-clock-start"
+                class="form-field"
+              />
+            </v-col>
+            <v-col cols="6" md="2">
+              <v-select
+                v-model="selectedEndTime"
+                :items="timeOptions"
+                dense
+                outlined
+                hide-details
+                prepend-inner-icon="mdi-clock-end"
+                class="form-field"
+              />
+            </v-col>
+          </v-row>
+
+          <v-row align="center" class="compact-row" no-gutters>
+            <v-col cols="12" md="3">
+              <span class="field-label">สถานะ :</span>
+            </v-col>
+            <v-col cols="12" md="4" class="field-col">
+              <v-select
+                v-model="exam.StatusID"
+                :items="status"
+                dense
+                outlined
+                hide-details
+                class="form-field"
+              />
+            </v-col>
+          </v-row>
+        </v-form>
+
+        <div class="admin-actions-row">
+          <v-btn
+            color="primary"
+            class="btn-save"
+            :loading="loading"
+            prepend-icon="mdi-content-save-outline"
+            @click="saveAddData"
+          >
+            {{ isEditMode ? 'บันทึกการแก้ไขรอบสอบ' : 'บันทึกรอบสอบ' }}
+          </v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
+
+    <template v-if="isEditMode">
+      <v-row align="center" class="admin-section-header mb-3" no-gutters>
+        <v-col>
+          <p class="section-title mb-0">
+            ผู้สมัครและตำแหน่ง
           </p>
         </v-col>
-
-        <v-col>
-          <v-select
-            v-model="selectedStartTime"
-            :items="timeOptions"
-            dense
-            solo
-            hide-details
-          />
-        </v-col>
-
-        <v-col cols="auto" class="text-end">
-          <p class="mb-0">
-            ถึงเวลา:
-          </p>
-        </v-col>
-
-        <v-col>
-          <v-select
-            v-model="selectedEndTime"
-            :items="timeOptions"
-            dense
-            solo
-            hide-details
-          />
-        </v-col>
-      </v-row>
-      <v-row dense>
-        <v-col>
-          <p>สถานะ:</p>
-        </v-col>
-        <v-col style="">
-          <v-select
-            v-model="exam.StatusID"
-            :items="status"
-            label=""
-            dense
-            solo
-          />
-        </v-col>
-      </v-row>
-      <v-btn color="primary" depressed :loading="loading" @click="saveAddData">
-        {{ isEditMode ? 'บันทึกการแก้ไขรอบสอบ' : 'บันทึกรอบสอบ' }}
-      </v-btn>
-    </v-form>
-    <v-divider class="my-5" />
-    <v-form v-if="isEditMode">
-      <v-row>
-        <v-col>
-          <p>ตำแหน่ง:</p>
-        </v-col>
-        <v-col>
-          <v-select
-            :items="selectPosition"
-            dense
-            solo
-            hide-details
-          />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <p>ผู้สมัคร:</p>
-        </v-col>
-        <v-col>
-          <v-file-input
-            dense
-            outlined
-            hide-details
-            show-size
-            prepend-icon=""
-            placeholder="Choose File | No file chosen"
-          />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <p>Start AppId:</p>
-        </v-col>
-        <v-col>
-          <v-text-field small dense outlined />
-        </v-col>
-        <v-col>
-          <p>End AppId:</p>
-        </v-col>
-        <v-col>
-          <v-text-field small dense outlined />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-btn color="primary" depressed>
-            เพิ่มข้อมูลผู้สมัคร
+        <v-col cols="auto">
+          <v-btn color="primary" class="btn-add" prepend-icon="mdi-seat-outline">
+            จัดที่นั่งสอบ
           </v-btn>
         </v-col>
       </v-row>
-      <v-divider class="my-5" />
-    </v-form>
-    <v-simple-table v-if="isEditMode">
-      <template #default>
-        <thead>
-          <tr>
-            <th class="text-left">
-              ชื่อ
-            </th>
-            <th class="text-left">
-              สถานะ
-            </th>
-            <th class="text-left">
-              รายละเอียด
-            </th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="item in positions"
-            :key="item.ID"
-          >
-            <td>{{ item.ID }}</td>
-            <td>{{ item.Name }}</td>
-            <td>{{ item.Number }}</td>
-            <td>
-              <v-btn small depressed color="error">
-                ลบ
-              </v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-    <v-btn color="primary">
-      จัดที่นั่งสอบ
-    </v-btn>
+
+      <v-card elevation="0" rounded="lg" border color="white" class="admin-card admin-form-card mb-5">
+        <v-card-text>
+          <v-row align="center" class="compact-row" no-gutters>
+            <v-col cols="12" md="3">
+              <span class="field-label">ตำแหน่ง :</span>
+            </v-col>
+            <v-col cols="12" md="5" class="field-col">
+              <v-select
+                v-model="selectedPosition"
+                :items="selectPosition"
+                dense
+                outlined
+                hide-details
+                class="form-field"
+              />
+            </v-col>
+          </v-row>
+
+          <v-row align="center" class="compact-row" no-gutters>
+            <v-col cols="12" md="3">
+              <span class="field-label">ผู้สมัคร :</span>
+            </v-col>
+            <v-col cols="12" md="5" class="field-col">
+              <v-file-input
+                v-model="applicantFile"
+                dense
+                outlined
+                hide-details
+                show-size
+                prepend-icon=""
+                prepend-inner-icon="mdi-upload-outline"
+                placeholder="เลือกไฟล์ผู้สมัคร"
+                class="form-field"
+              />
+            </v-col>
+          </v-row>
+
+          <v-row align="center" class="compact-row" no-gutters>
+            <v-col cols="12" md="3">
+              <span class="field-label">ช่วง AppId :</span>
+            </v-col>
+            <v-col cols="6" md="2" class="pr-2">
+              <v-text-field
+                v-model.trim="startAppId"
+                dense
+                outlined
+                hide-details
+                placeholder="เริ่มต้น"
+                class="form-field"
+              />
+            </v-col>
+            <v-col cols="6" md="2">
+              <v-text-field
+                v-model.trim="endAppId"
+                dense
+                outlined
+                hide-details
+                placeholder="สิ้นสุด"
+                class="form-field"
+              />
+            </v-col>
+          </v-row>
+
+          <div class="admin-actions-row">
+            <v-btn color="primary" class="btn-save" prepend-icon="mdi-account-plus-outline">
+              เพิ่มข้อมูลผู้สมัคร
+            </v-btn>
+          </div>
+        </v-card-text>
+      </v-card>
+
+      <v-card elevation="0" rounded="lg" border color="white" class="admin-card">
+        <v-data-table
+          :headers="positionHeaders"
+          :items="positions"
+          :items-per-page="-1"
+          no-data-text="ยังไม่มีข้อมูลตำแหน่ง"
+          class="admin-table"
+          hide-default-footer
+        >
+          <template #[`item.Name`]="{ item }">
+            <span class="text-body-2 font-weight-medium">{{ item.Name }}</span>
+          </template>
+
+          <template #[`item.delete`]>
+            <v-btn small outlined color="error" class="btn-action" prepend-icon="mdi-delete-outline">
+              ลบ
+            </v-btn>
+          </template>
+        </v-data-table>
+      </v-card>
+    </template>
   </v-container>
 </template>
 <script>
 export default {
-  name: 'OrganizationForm',
+  name: 'ExamForm',
   data () {
     return {
       loading: false,
@@ -256,10 +300,25 @@ export default {
       menu: false,
       modal: false,
       menu2: false,
+      selectedPosition: '',
+      applicantFile: null,
+      startAppId: '',
+      endAppId: '',
       organ: { ID: '', Name: '', Description: '' },
       exam: { ID: '', StatusID: 0, StartDateTime: '', EndDateTime: '' },
       positions: [],
-      selectPosition: ['นักวิชาการขนส่งปฏิบัติการ', 'อื่นๆ (ระบุ)']
+      selectPosition: ['นักวิชาการขนส่งปฏิบัติการ', 'อื่นๆ (ระบุ)'],
+      positionHeaders: [
+        { text: 'รหัส', value: 'ID', align: 'start', width: '20%' },
+        { text: 'ตำแหน่ง', value: 'Name', align: 'start', width: '50%' },
+        { text: 'จำนวน', value: 'Number', align: 'start', width: '15%' },
+        { text: 'ลบข้อมูล', value: 'delete', sortable: false, align: 'center', width: '15%' }
+      ],
+      breadcrumbs: [
+        { text: 'หน้าหลัก', href: '/Admin', disabled: false },
+        { text: 'หน่วยงาน', href: '/Organizations/OrganizationList', disabled: false },
+        { text: 'รอบสอบ', disabled: true }
+      ]
     }
   },
   computed: {
@@ -278,13 +337,14 @@ export default {
     await this.fetchOrganDataByID(organId)
     if (examId) {
       this.isEditMode = true
+      this.breadcrumbs[2].text = 'แก้ไขรอบสอบ'
       await this.fetchExamDataByID(examId)
       await this.fetchPositionByExamID(examId)
     }
   },
   methods: {
-    testBtn () {
-      console.log('testBtn : ', this.fetchExamDataByID(4))
+    backBtn () {
+      this.$router.back()
     },
     async fetchOrganDataByID (organID) {
       const result = await this.$axios.$get(this.$apiUrl(`/api/organization/${organID}`))
@@ -320,10 +380,9 @@ export default {
     async fetchPositionByExamID (examID) {
       try {
         const result = await this.$axios.$get(this.$apiUrl(`/api/${examID}/positions`))
-        this.positions = result.data
-        console.log('data : ', this.positions)
+        this.positions = result.data || []
       } catch (err) {
-        this.$swal({
+        this.$swal.fire({
           icon: 'error',
           text: `fail ${err.message}`
         })
@@ -377,13 +436,26 @@ export default {
       }
     },
     async saveAddData () {
+      const valid = this.$refs.form.validate()
+      if (!valid) { return }
+
       this.loading = true
       try {
         const payload = this.buildPayload()
         if (this.isEditMode) {
           await this.$axios.$patch(this.$apiUrl(`/api/${this.organ.ID}/exam/${this.exam.ID}`), payload)
         } else {
-          await this.$axios.$post(this.$apiUrl(`/api/${this.organ.ID}/exam`), payload)
+          const result = await this.$axios.$post(this.$apiUrl(`/api/${this.organ.ID}/exam`), payload)
+          const newId = result?.data || result?.id
+          if (newId) {
+            this.exam.ID = newId
+            this.isEditMode = true
+            this.breadcrumbs[2].text = 'แก้ไขรอบสอบ'
+            this.$router.replace({
+              path: '/Organizations/ExamForm',
+              query: { OrganID: this.organ.ID, ExamID: newId }
+            })
+          }
         }
         this.$swal.fire({
           icon: 'success',

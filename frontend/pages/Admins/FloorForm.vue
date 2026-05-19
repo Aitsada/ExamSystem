@@ -182,7 +182,7 @@
               :href="$apiUrl('/api/template/room.xls')"
             >
               ดาวโหลดตัวอย่างไฟล์
-            </v-btn>``
+            </v-btn>
             <v-btn
               color="primary"
               class="btn-save mr-2"
@@ -312,7 +312,7 @@ export default {
           ID: BuildingData.ID,
           Name: BuildingData.Name,
           Alias: BuildingData.Alias,
-          Description: BuildingData.Descriptoin
+          Description: BuildingData.Description
         }
       } finally {
         this.loading = false
