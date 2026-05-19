@@ -5,7 +5,7 @@
         <h1>{{ pageTitle }}</h1>
       </v-col>
     </v-row>
-    <v-divider class="my-10" />
+    <v-divider class="my-5" />
 
     <v-form>
       <v-row dense>
@@ -122,45 +122,99 @@
           />
         </v-col>
       </v-row>
-      <!-- <v-row>
-        <v-col>
-          <v-simple-table v-if="isEditMode">
-            <template #default>
-              <thead>
-                <tr>
-                  <th class="text-left">
-                    ชื่อ
-                  </th>
-                  <th class="text-left">
-                    รายละเอียด
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <trx
-                  v-for="item in exam"
-                  :key="item.ID"
-                >
-                  <td>{{ item.Name }}</td>
-                  <td>
-                    <v-btn small color="warning">
-                      แก้ไข
-                    </v-btn>
-                  </td>
-                </trx>
-              </tbody>
-            </template>
-          </v-simple-table>
-        </v-col>
-      </v-row> -->
-      <v-divider class="my-10" />
-      <v-btn depressed color="warning" @click="testBtn">
-        testBtn
-      </v-btn>
-      <v-btn color="primary" :loading="loading" @click="saveAddData">
+      <v-btn color="primary" depressed :loading="loading" @click="saveAddData">
         {{ isEditMode ? 'บันทึกการแก้ไขรอบสอบ' : 'บันทึกรอบสอบ' }}
       </v-btn>
     </v-form>
+    <v-divider class="my-5" />
+    <v-form v-if="isEditMode">
+      <v-row>
+        <v-col>
+          <p>ตำแหน่ง:</p>
+        </v-col>
+        <v-col>
+          <v-select
+            :items="selectPosition"
+            dense
+            solo
+            hide-details
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <p>ผู้สมัคร:</p>
+        </v-col>
+        <v-col>
+          <v-file-input
+            dense
+            outlined
+            hide-details
+            show-size
+            prepend-icon=""
+            placeholder="Choose File | No file chosen"
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <p>Start AppId:</p>
+        </v-col>
+        <v-col>
+          <v-text-field small dense outlined />
+        </v-col>
+        <v-col>
+          <p>End AppId:</p>
+        </v-col>
+        <v-col>
+          <v-text-field small dense outlined />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-btn color="primary" depressed>
+            เพิ่มข้อมูลผู้สมัคร
+          </v-btn>
+        </v-col>
+      </v-row>
+      <v-divider class="my-5" />
+    </v-form>
+    <v-simple-table v-if="isEditMode">
+      <template #default>
+        <thead>
+          <tr>
+            <th class="text-left">
+              ชื่อ
+            </th>
+            <th class="text-left">
+              สถานะ
+            </th>
+            <th class="text-left">
+              รายละเอียด
+            </th>
+            <th />
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="item in positions"
+            :key="item.ID"
+          >
+            <td>{{ item.ID }}</td>
+            <td>{{ item.Name }}</td>
+            <td>{{ item.Number }}</td>
+            <td>
+              <v-btn small depressed color="error">
+                ลบ
+              </v-btn>
+            </td>
+          </tr>
+        </tbody>
+      </template>
+    </v-simple-table>
+    <v-btn color="primary">
+      จัดที่นั่งสอบ
+    </v-btn>
   </v-container>
 </template>
 <script>
@@ -203,7 +257,9 @@ export default {
       modal: false,
       menu2: false,
       organ: { ID: '', Name: '', Description: '' },
-      exam: { ID: '', StatusID: 0, StartDateTime: '', EndDateTime: '' }
+      exam: { ID: '', StatusID: 0, StartDateTime: '', EndDateTime: '' },
+      positions: [],
+      selectPosition: ['นักวิชาการขนส่งปฏิบัติการ', 'อื่นๆ (ระบุ)']
     }
   },
   computed: {
@@ -223,6 +279,7 @@ export default {
     if (examId) {
       this.isEditMode = true
       await this.fetchExamDataByID(examId)
+      await this.fetchPositionByExamID(examId)
     }
   },
   methods: {
@@ -257,6 +314,18 @@ export default {
         this.$swal.fire({
           icon: 'error',
           text: `ดึงข้อมูลไม่สำเร็จ ${message}`
+        })
+      }
+    },
+    async fetchPositionByExamID (examID) {
+      try {
+        const result = await this.$axios.$get(this.$apiUrl(`/api/${examID}/positions`))
+        this.positions = result.data
+        console.log('data : ', this.positions)
+      } catch (err) {
+        this.$swal({
+          icon: 'error',
+          text: `fail ${err.message}`
         })
       }
     },

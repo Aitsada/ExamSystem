@@ -1,16 +1,30 @@
 import db from "../config/db.js";
 
+export async function findById(id) {
+  const [result] = await db.query(`SELECT * FROM Position WHERE ID = ?`, [id]);
+  return result[0];
+}
+
 export async function findByExamID(ExamID) {
-  const [result] = await db.query("SELECT * FROM Exam WHERE ExamID = ?", [
+  console.log("examID : ", ExamID);
+
+  const [result] = await db.query(`SELECT * FROM Position WHERE ExamID = ?`, [
     ExamID,
   ]);
+  console.log(result);
   return result;
 }
 
 export async function create(ExamID, data) {
   const [result] = await db.query(
     "INSERT INTO `Position` (CreatedBy, ExamID, Number, Name, Description) VALUES (?,?,?,?,?)",
-    ["Ait", Number(ExamID), data.Number, data.Name, data.Description],
+    [
+      data.CreatedBy ?? "Ait",
+      Number(ExamID),
+      data.Number,
+      data.Name,
+      data.Description,
+    ],
   );
   return result;
 }

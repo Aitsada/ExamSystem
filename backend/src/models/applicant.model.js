@@ -22,7 +22,7 @@ export async function create(PositionID, data) {
   const [result] = await db.query(
     "INSERT INTO Applicant (CreatedBy, PositionID, Prefix, FirstName, LastName, ApplicantNumber, CitizenNumber, SeatRow) VALUES (?,?,?,?,?,?,?,?)",
     [
-      "Ait",
+      data.CreatedBy ?? "Ait",
       PositionID,
       data.Prefix,
       data.FirstName,
@@ -39,7 +39,7 @@ export async function update(ApplicantID, PositionID, data) {
   const [result] = await db.query(
     "UPDATE Applicant SET LastModifiedDateTime = ?, Prefix = ?, FirstName = ?, LastName = ?, ApplicantNumber = ?, CitizenNumber = ?, SeatRow = ? WHERE ID = ? AND PositionID = ?",
     [
-      "Aut",
+      data.CreatedBy ?? "Aut",
       data.Prefix,
       data.FirstName,
       data.LastName,
