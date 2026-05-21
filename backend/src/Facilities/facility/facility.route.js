@@ -6,7 +6,7 @@ const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 // /api
-router.get("/facility", facilityController.FindAll);
+router.get("/facilities", facilityController.FindAll);
 router.get("/facility/:id", facilityController.findById);
 router.post("/facility/create", facilityController.Create);
 router.post(

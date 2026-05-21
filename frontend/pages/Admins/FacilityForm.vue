@@ -281,7 +281,7 @@ export default {
     async fetchFacilityById (id) {
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl('/api/facility'))
+        const res = await this.$axios.$get(this.$apiUrl('/api/facilities'))
         const facility = (res.data || []).find(item => String(item.ID) === String(id))
         if (!facility) {
           this.$swal.fire({

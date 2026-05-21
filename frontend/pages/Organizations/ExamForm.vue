@@ -196,6 +196,7 @@
                 outlined
                 hide-details
                 show-size
+                accept=".xls,.xlsx"
                 prepend-icon=""
                 prepend-inner-icon="mdi-upload-outline"
                 placeholder="เลือกไฟล์ผู้สมัคร"
@@ -231,7 +232,14 @@
           </v-row>
 
           <div class="admin-actions-row">
-            <v-btn color="primary" class="btn-save" prepend-icon="mdi-account-plus-outline">
+            <v-btn
+              color="primary"
+              class="btn-save"
+              :loading="applicantLoading"
+              :disabled="!selectedPosition || !selectedApplicantFile"
+              prepend-icon="mdi-account-plus-outline"
+              @click="importApplicants"
+            >
               เพิ่มข้อมูลผู้สมัคร
             </v-btn>
           </div>
@@ -267,6 +275,7 @@ export default {
   data () {
     return {
       loading: false,
+      applicantLoading: false,
       isEditMode: false,
       status: [
         { text: 'None', value: 0 },
@@ -307,7 +316,7 @@ export default {
       organ: { ID: '', Name: '', Description: '' },
       exam: { ID: '', StatusID: 0, StartDateTime: '', EndDateTime: '' },
       positions: [],
-      selectPosition: ['อื่นๆ (ระบุ)'],
+      selectPosition: [],
       positionHeaders: [
         { text: 'รหัส', value: 'ID', align: 'start', width: '20%' },
         { text: 'ตำแหน่ง', value: 'Name', align: 'start', width: '50%' },
@@ -327,6 +336,9 @@ export default {
     },
     dateText () {
       return this.formatDate(this.date)
+    },
+    selectedApplicantFile () {
+      return Array.isArray(this.applicantFile) ? this.applicantFile[0] : this.applicantFile
     }
   },
   async mounted () {
@@ -381,6 +393,10 @@ export default {
       try {
         const result = await this.$axios.$get(this.$apiUrl(`/api/${examID}/positions`))
         this.positions = result.data || []
+        this.selectPosition = this.positions.map(position => ({
+          text: position.Name,
+          value: position.ID
+        }))
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
@@ -435,6 +451,36 @@ export default {
         EndDateTime: this.combineDateTime(this.selectedEndTime)
       }
     },
+    async importApplicants () {
+      if (!this.selectedPosition || !this.selectedApplicantFile) {
+        this.showError('นำเข้าผู้สมัครไม่สำเร็จ', 'กรุณาเลือกตำแหน่งและไฟล์ Excel')
+        return
+      }
+
+      const formData = new FormData()
+      formData.append('file', this.selectedApplicantFile)
+
+      this.applicantLoading = true
+      try {
+        const result = await this.$axios.$post(
+          this.$apiUrl(`/api/${this.selectedPosition}/applicants/import`),
+          formData
+        )
+
+        this.applicantFile = null
+        this.$swal.fire({
+          icon: 'success',
+          text: `นำเข้าผู้สมัคร ${result.imported || 0} รายการ`
+        })
+      } catch (error) {
+        this.showError(
+          'นำเข้าผู้สมัครไม่สำเร็จ',
+          error.response?.data?.message || 'กรุณาลองใหม่อีกครั้ง'
+        )
+      } finally {
+        this.applicantLoading = false
+      }
+    },
     async saveAddData () {
       const valid = this.$refs.form.validate()
       if (!valid) { return }
@@ -470,6 +516,13 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    showError (title, text) {
+      this.$swal.fire({
+        icon: 'error',
+        title,
+        text
+      })
     }
   }
 }

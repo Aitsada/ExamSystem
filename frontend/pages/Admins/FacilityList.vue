@@ -205,7 +205,7 @@ export default {
     async fetchFacilities () {
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl('/api/facility'))
+        const res = await this.$axios.$get(this.$apiUrl('/api/facilities'))
         this.facility = res.data || []
       } catch (error) {
         this.$swal.fire({
