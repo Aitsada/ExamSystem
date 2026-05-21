@@ -173,10 +173,19 @@
             <v-col cols="12" md="3">
               <span class="field-label">ตำแหน่ง :</span>
             </v-col>
-            <v-col cols="12" md="5" class="field-col">
+            <v-col cols="3" class="field-col">
               <v-select
                 v-model="selectedPosition"
                 :items="selectPosition"
+                dense
+                outlined
+                hide-details
+                class="form-field"
+              />
+            </v-col>
+            <v-col cols="3" class="field-col">
+              <v-text-field
+                v-model="positionInput"
                 dense
                 outlined
                 hide-details
@@ -236,9 +245,9 @@
               color="primary"
               class="btn-save"
               :loading="applicantLoading"
-              :disabled="!selectedPosition || !selectedApplicantFile"
+              :disabled="positionInput === ''"
               prepend-icon="mdi-account-plus-outline"
-              @click="importApplicants"
+              @click="createPostion"
             >
               เพิ่มข้อมูลผู้สมัคร
             </v-btn>
@@ -311,10 +320,12 @@ export default {
       menu2: false,
       selectedPosition: '',
       applicantFile: null,
+      AppRange: 0,
       startAppId: '',
       endAppId: '',
       organ: { ID: '', Name: '', Description: '' },
       exam: { ID: '', StatusID: 0, StartDateTime: '', EndDateTime: '' },
+      positionInput: '',
       positions: [],
       selectPosition: [],
       positionHeaders: [
@@ -449,6 +460,21 @@ export default {
         StatusID: Number(this.exam.StatusID),
         StartDateTime: this.combineDateTime(this.selectedStartTime),
         EndDateTime: this.combineDateTime(this.selectedEndTime)
+      }
+    },
+    async createPostion () {
+      const payload = {
+        Number: '',
+        Name: this.positions,
+        Description: ''
+      }
+      try {
+        await this.$axios.$post(this.$apiUrl(`api/${this.exam.ID}/position`), payload)
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `เกิดข้อผิดพลาดในการสร้างตำแหน่ง ${err.message}`
+        })
       }
     },
     async importApplicants () {

@@ -12,7 +12,6 @@ export async function findByPositionID(PositionID) {
   return await applicantModel.findByPositionID(PositionID);
 }
 
-
 export async function importFromRows(PositionID, rows) {
   if (!PositionID) {
     throw new Error("PositionID is required");

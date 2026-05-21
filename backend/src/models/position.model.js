@@ -21,7 +21,7 @@ export async function create(ExamID, data) {
     [
       data.CreatedBy ?? "Ait",
       Number(ExamID),
-      data.Number,
+      Number(data.Number),
       data.Name,
       data.Description ?? "",
     ],
