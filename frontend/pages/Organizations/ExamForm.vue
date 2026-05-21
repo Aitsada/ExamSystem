@@ -307,7 +307,7 @@ export default {
       organ: { ID: '', Name: '', Description: '' },
       exam: { ID: '', StatusID: 0, StartDateTime: '', EndDateTime: '' },
       positions: [],
-      selectPosition: ['นักวิชาการขนส่งปฏิบัติการ', 'อื่นๆ (ระบุ)'],
+      selectPosition: ['อื่นๆ (ระบุ)'],
       positionHeaders: [
         { text: 'รหัส', value: 'ID', align: 'start', width: '20%' },
         { text: 'ตำแหน่ง', value: 'Name', align: 'start', width: '50%' },

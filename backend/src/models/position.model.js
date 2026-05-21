@@ -23,7 +23,7 @@ export async function create(ExamID, data) {
       Number(ExamID),
       data.Number,
       data.Name,
-      data.Description,
+      data.Description ?? "",
     ],
   );
   return result;

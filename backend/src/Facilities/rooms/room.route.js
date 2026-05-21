@@ -6,15 +6,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 const router = Router();
 
 router.get("/rooms", roomController.findAll);
-router.get("/:FloorID/rooms/:RoomID", roomController.findById);
+router.get("/:FloorID/room/:RoomID", roomController.findById);
 router.get("/:FloorID/rooms", roomController.findByFloorID);
-router.post("/:FloorID/rooms", roomController.create);
-router.post(
-  "/:FloorID/rooms/import",
-  upload.single("file"),
-  roomController.importExcel,
-);
-router.delete("/:FloorID/rooms/:RoomID", roomController.Delete);
-router.patch("/:FloorID/rooms/:RoomID", roomController.update);
+router.post("/:FloorID/room", roomController.Create);
+router.post("/:FloorID/rooms/import",upload.single("file"),roomController.importExcel);
+router.delete("/:FloorID/room/:RoomID", roomController.Delete);
+router.patch("/:FloorID/room/:RoomID", roomController.update);
 
 export default router;

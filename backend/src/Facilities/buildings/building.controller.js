@@ -56,6 +56,7 @@ export async function Create(req, res) {
 }
 
 export async function importExcel(req, res) {
+  console.log("building ctrl import : ")
   try {
     const { FacilityID } = req.params;
     const rows = parseExcelRows(req.file).map((row) => ({

@@ -5,28 +5,13 @@ import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage() });
 const router = Router();
 
+// api
 router.get("/buildings", buildingController.getAll);
-router.get(
-  "/:FacilityID/buildings/:BuildingID",
-  buildingController.findById,
-);
-router.get(
-  "/:FacilityID/buildings",
-  buildingController.findByFacilityID,
-);
-router.post("/:FacilityID/buildings", buildingController.Create);
-router.post(
-  "/facilities/:FacilityID/buildings/import",
-  upload.single("file"),
-  buildingController.importExcel,
-);
-router.delete(
-  "/:FacilityID/buildings/:BuildingID",
-  buildingController.deleteById,
-);
-router.patch(
-  "/:FacilityID/buildings/:BuildingID",
-  buildingController.update,
-);
+router.get("/:FacilityID/building/:BuildingID", buildingController.findById);
+router.get("/:FacilityID/buildings", buildingController.findByFacilityID);
+router.post("/:FacilityID/building", buildingController.Create);
+router.post("/:FacilityID/buildings/import",upload.single("file"),buildingController.importExcel,);
+router.delete("/:FacilityID/buildings/:BuildingID",buildingController.deleteById,);
+router.patch("/:FacilityID/buildings/:BuildingID", buildingController.update);
 
 export default router;

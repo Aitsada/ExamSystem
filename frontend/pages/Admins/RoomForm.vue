@@ -297,7 +297,7 @@ export default {
         if (this.isEditMode) {
           res = await this.$axios.$patch(this.$apiUrl(`/api/${this.floor.ID}/room/update/${this.room.ID}`), payload)
         } else {
-          res = await this.$axios.$post(this.$apiUrl(`/api/${this.floor.ID}/rooms`), payload)
+          res = await this.$axios.$post(this.$apiUrl(`/api/${this.floor.ID}/room`), payload)
           this.room.ID = res.data
           this.isEditMode = true
           this.breadcrumbs[2].text = 'แก้ไขห้องสอบ'
@@ -315,7 +315,7 @@ export default {
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
-          text: 'บันทึกข้อมูลไม่สำเร็จ'
+          text: `บันทึกข้อมูลไม่สำเร็จ ${err.message}`
         })
       }
     },

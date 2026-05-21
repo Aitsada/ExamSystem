@@ -30,7 +30,7 @@ export async function findByFloorID(req, res) {
     res.status(500).json({ status: "fail", message: err });
   }
 }
-export async function create(req, res) {
+export async function Create(req, res) {
   try {
     const { FloorID } = req.params;
     const result = await roomController.create({

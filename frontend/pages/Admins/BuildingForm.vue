@@ -356,7 +356,7 @@ export default {
         if (this.isEditMode) {
           res = await this.$axios.$patch(this.$apiUrl(`/api/${this.facility.ID}/building/update/${this.building.ID}`), payload)
         } else {
-          res = await this.$axios.$post(this.$apiUrl(`/api/${this.facility.ID}/buildings`), payload)
+          res = await this.$axios.$post(this.$apiUrl(`/api/${this.facility.ID}/building`), payload)
           this.building.ID = res.result
           this.isEditMode = true
           this.breadcrumbs[2].text = 'แก้ไขอาคารสอบ'

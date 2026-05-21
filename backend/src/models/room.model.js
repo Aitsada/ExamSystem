@@ -39,6 +39,7 @@ export async function update(FloorID, RoomID, data) {
 }
 
 export async function create(data) {
+  
   const [result] = await db.query(
     "INSERT INTO Room (CreatedBy, FloorID, No, Name, Description, `Rows`, `Columns`, TemplateID) VALUES (?,?,?,?,?,?,?,?)",
     [
