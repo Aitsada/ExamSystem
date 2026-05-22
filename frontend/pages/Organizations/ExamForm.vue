@@ -173,22 +173,14 @@
             <v-col cols="12" md="3">
               <span class="field-label">ตำแหน่ง :</span>
             </v-col>
-            <v-col cols="3" class="field-col">
+            <v-col cols="12" md="5" class="field-col">
               <v-select
                 v-model="selectedPosition"
                 :items="selectPosition"
                 dense
                 outlined
                 hide-details
-                class="form-field"
-              />
-            </v-col>
-            <v-col cols="3" class="field-col">
-              <v-text-field
-                v-model="positionInput"
-                dense
-                outlined
-                hide-details
+                placeholder="เลือกตำแหน่ง"
                 class="form-field"
               />
             </v-col>
@@ -245,9 +237,9 @@
               color="primary"
               class="btn-save"
               :loading="applicantLoading"
-              :disabled="positionInput === ''"
+              :disabled="!selectedPosition || !selectedApplicantFile"
               prepend-icon="mdi-account-plus-outline"
-              @click="createPostion"
+              @click="importApplicants"
             >
               เพิ่มข้อมูลผู้สมัคร
             </v-btn>
@@ -276,9 +268,6 @@
         </v-data-table>
       </v-card>
     </template>
-    <v-btn @click="testBtn">
-      TEST btn
-    </v-btn>
   </v-container>
 </template>
 <script>
@@ -328,7 +317,6 @@ export default {
       endAppId: '',
       organ: { ID: '', Name: '', Description: '' },
       exam: { ID: '', StatusID: 0, StartDateTime: '', EndDateTime: '' },
-      positionInput: '',
       positions: [],
       selectPosition: [],
       positionHeaders: [
@@ -369,9 +357,6 @@ export default {
     }
   },
   methods: {
-    testBtn () {
-      console.log(this.selectedPosition)
-    },
     backBtn () {
       this.$router.back()
     },
@@ -466,26 +451,6 @@ export default {
         StatusID: Number(this.exam.StatusID),
         StartDateTime: this.combineDateTime(this.selectedStartTime),
         EndDateTime: this.combineDateTime(this.selectedEndTime)
-      }
-    },
-    async createPostion () {
-      const payload = {
-        Name: this.positionInput,
-        Description: ''
-      }
-      try {
-        await this.$axios.$post(this.$apiUrl(`api/${this.exam.ID}/position`), payload)
-        this.$swal.fire({
-          icon: 'success',
-          text: `เพิ่มตำแหน่งสำเร็จ ${this.Name}`
-        })
-        await this.$axios.$post(this.$apiUrl(`api/${this.po}`))
-        this.fetchPositionByExamID(this.exam.ID)
-      } catch (err) {
-        this.$swal.fire({
-          icon: 'error',
-          text: `เกิดข้อผิดพลาดในการสร้างตำแหน่ง ${err.message}`
-        })
       }
     },
     async importApplicants () {
