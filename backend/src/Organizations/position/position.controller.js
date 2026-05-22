@@ -21,7 +21,6 @@ export async function findByExamID(req, res) {
 }
 
 export async function Create(req, res) {
-  console.log(req.body, req.params);
   try {
     const { ExamID } = req.params;
     const data = req.body;
@@ -31,3 +30,4 @@ export async function Create(req, res) {
     res.status(500).json({ status: "fail", message: err.message });
   }
 }
+

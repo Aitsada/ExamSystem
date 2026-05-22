@@ -276,6 +276,9 @@
         </v-data-table>
       </v-card>
     </template>
+    <v-btn @click="testBtn">
+      TEST btn
+    </v-btn>
   </v-container>
 </template>
 <script>
@@ -366,6 +369,9 @@ export default {
     }
   },
   methods: {
+    testBtn () {
+      console.log(this.selectedPosition)
+    },
     backBtn () {
       this.$router.back()
     },
@@ -464,12 +470,17 @@ export default {
     },
     async createPostion () {
       const payload = {
-        Number: '',
-        Name: this.positions,
+        Name: this.positionInput,
         Description: ''
       }
       try {
         await this.$axios.$post(this.$apiUrl(`api/${this.exam.ID}/position`), payload)
+        this.$swal.fire({
+          icon: 'success',
+          text: `เพิ่มตำแหน่งสำเร็จ ${this.Name}`
+        })
+        await this.$axios.$post(this.$apiUrl(`api/${this.po}`))
+        this.fetchPositionByExamID(this.exam.ID)
       } catch (err) {
         this.$swal.fire({
           icon: 'error',

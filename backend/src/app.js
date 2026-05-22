@@ -16,6 +16,4 @@ app.get("/health", (req, res) => {
 });
 app.use("/", router);
 
-app.listen(port, () => {
-  console.log(`Server Running At ${port} `);
-});
+app.listen(port);

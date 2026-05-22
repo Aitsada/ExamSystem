@@ -6,12 +6,9 @@ export async function findById(id) {
 }
 
 export async function findByExamID(ExamID) {
-  console.log("examID : ", ExamID);
-
   const [result] = await db.query(`SELECT * FROM Position WHERE ExamID = ?`, [
     ExamID,
   ]);
-  console.log(result);
   return result;
 }
 
@@ -21,7 +18,7 @@ export async function create(ExamID, data) {
     [
       data.CreatedBy ?? "Ait",
       Number(ExamID),
-      Number(data.Number),
+      Number(data.Number) || 0,
       data.Name,
       data.Description ?? "",
     ],

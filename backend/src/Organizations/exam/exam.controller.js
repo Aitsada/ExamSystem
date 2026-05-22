@@ -1,14 +1,10 @@
 import * as examService from "./exam.service.js";
 
 export async function findById(req, res) {
-  console.log(req.params);
-  
   try {
     const { id } = req.params;
     const result = await examService.findById(id);
     res.status(200).json({ status: "success", data: result });
-    console.log(result);
-    
   } catch (err) {
     res.status(500).json({ status: "fail", message: err.message });
   }

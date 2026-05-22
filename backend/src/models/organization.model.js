@@ -40,7 +40,6 @@ export async function create(data) {
   return result
 }
 export async function update(id, data) {
-  console.log("md");
   const [result] = await db.query(
     "UPDATE Organization SET Name = COALESCE(?, Name), Description = COALESCE(?, Description) WHERE ID = ?",
     [data.Name ?? null, data.Description ?? null, id],
@@ -64,7 +63,6 @@ export async function findLogoById(id) {
 }
 
 export async function updateLogo(id, data) {
-  console.log("model upload");
   const [result] = await db.query(
     `
     UPDATE Organization
