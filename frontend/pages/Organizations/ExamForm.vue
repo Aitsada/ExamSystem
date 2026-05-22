@@ -186,6 +186,24 @@
             </v-col>
           </v-row>
 
+          <v-row v-if="isNewPosition" align="start" class="compact-row" no-gutters>
+            <v-col cols="12" md="3">
+              <span class="field-label">ตำแหน่งใหม่ :</span>
+            </v-col>
+            <v-col cols="12" md="5" class="field-col">
+              <v-textarea
+                v-model.trim="newPositionName"
+                dense
+                outlined
+                auto-grow
+                rows="1"
+                hide-details
+                placeholder="กรอกตำแหน่งใหม่"
+                class="form-field"
+              />
+            </v-col>
+          </v-row>
+
           <v-row align="center" class="compact-row" no-gutters>
             <v-col cols="12" md="3">
               <span class="field-label">ผู้สมัคร :</span>
@@ -237,7 +255,7 @@
               color="primary"
               class="btn-save"
               :loading="applicantLoading"
-              :disabled="!selectedPosition || !selectedApplicantFile"
+              :disabled="!canImportApplicants"
               prepend-icon="mdi-account-plus-outline"
               @click="importApplicants"
             >
@@ -310,7 +328,9 @@ export default {
       menu: false,
       modal: false,
       menu2: false,
+      newPositionValue: '__new_position__',
       selectedPosition: '',
+      newPositionName: '',
       applicantFile: null,
       AppRange: 0,
       startAppId: '',
@@ -341,6 +361,16 @@ export default {
     },
     selectedApplicantFile () {
       return Array.isArray(this.applicantFile) ? this.applicantFile[0] : this.applicantFile
+    },
+    isNewPosition () {
+      return this.selectedPosition === this.newPositionValue
+    },
+    canImportApplicants () {
+      if (!this.selectedPosition || !this.selectedApplicantFile) {
+        return false
+      }
+
+      return !this.isNewPosition || !!this.newPositionName
     }
   },
   async mounted () {
@@ -399,6 +429,10 @@ export default {
           text: position.Name,
           value: position.ID
         }))
+        this.selectPosition.push({
+          text: 'อื่นๆ',
+          value: this.newPositionValue
+        })
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
@@ -459,17 +493,20 @@ export default {
         return
       }
 
-      const formData = new FormData()
-      formData.append('file', this.selectedApplicantFile)
-
       this.applicantLoading = true
       try {
+        const positionID = await this.getApplicantPositionID()
+        const formData = new FormData()
+        formData.append('file', this.selectedApplicantFile)
+
         const result = await this.$axios.$post(
-          this.$apiUrl(`/api/${this.selectedPosition}/applicants/import`),
+          this.$apiUrl(`/api/${positionID}/applicants/import`),
           formData
         )
 
         this.applicantFile = null
+        this.newPositionName = ''
+        this.selectedPosition = positionID
         this.$swal.fire({
           icon: 'success',
           text: `นำเข้าผู้สมัคร ${result.imported || 0} รายการ`
@@ -477,11 +514,37 @@ export default {
       } catch (error) {
         this.showError(
           'นำเข้าผู้สมัครไม่สำเร็จ',
-          error.response?.data?.message || 'กรุณาลองใหม่อีกครั้ง'
+          error.response?.data?.message || error.message || 'กรุณาลองใหม่อีกครั้ง'
         )
       } finally {
         this.applicantLoading = false
       }
+    },
+    async getApplicantPositionID () {
+      if (!this.isNewPosition) {
+        return this.selectedPosition
+      }
+
+      if (!this.newPositionName) {
+        throw new Error('กรุณากรอกตำแหน่งใหม่')
+      }
+
+      const payload = {
+        Name: this.newPositionName,
+        Description: ''
+      }
+      const result = await this.$axios.$post(
+        this.$apiUrl(`/api/${this.exam.ID}/position`),
+        payload
+      )
+      const positionID = result.data?.insertId
+
+      if (!positionID) {
+        throw new Error('ไม่พบรหัสตำแหน่งที่สร้างใหม่')
+      }
+
+      await this.fetchPositionByExamID(this.exam.ID)
+      return positionID
     },
     async saveAddData () {
       const valid = this.$refs.form.validate()
