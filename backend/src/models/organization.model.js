@@ -29,15 +29,15 @@ export async function create(data) {
     [
       data.Name,
       data.Description,
-      data.CreatedBy ?? 'Ait',
+      data.CreatedBy ?? "Ait",
       data.Logo ?? null,
       data.LogoMimeType ?? null,
       data.LogoOriginalName ?? null,
-      data.LogoSize ?? null
-    ]
-  )
+      data.LogoSize ?? null,
+    ],
+  );
 
-  return result
+  return result;
 }
 export async function update(id, data) {
   const [result] = await db.query(

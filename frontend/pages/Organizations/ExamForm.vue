@@ -278,8 +278,15 @@
             <span class="text-body-2 font-weight-medium">{{ item.Name }}</span>
           </template>
 
-          <template #[`item.delete`]>
-            <v-btn small outlined color="error" class="btn-action" prepend-icon="mdi-delete-outline">
+          <template #[`item.delete`]="{ item }">
+            <v-btn
+              small
+              outlined
+              color="error"
+              class="btn-action"
+              prepend-icon="mdi-delete-outline"
+              @click="confirmDeletePosition(item)"
+            >
               ลบ
             </v-btn>
           </template>
@@ -492,25 +499,32 @@ export default {
         this.showError('นำเข้าผู้สมัครไม่สำเร็จ', 'กรุณาเลือกตำแหน่งและไฟล์ Excel')
         return
       }
+      if (!this.isValidAppIdRange()) {
+        return
+      }
 
       this.applicantLoading = true
       try {
         const positionID = await this.getApplicantPositionID()
         const formData = new FormData()
         formData.append('file', this.selectedApplicantFile)
-
+        formData.append('startAppId', this.startAppId)
+        formData.append('endAppId', this.endAppId)
         const result = await this.$axios.$post(
           this.$apiUrl(`/api/${positionID}/applicants/import`),
           formData
         )
 
         this.applicantFile = null
+        this.startAppId = ''
+        this.endAppId = ''
         this.newPositionName = ''
         this.selectedPosition = positionID
         this.$swal.fire({
           icon: 'success',
           text: `นำเข้าผู้สมัคร ${result.imported || 0} รายการ`
         })
+        await this.fetchPositionByExamID(this.exam.ID)
       } catch (error) {
         this.showError(
           'นำเข้าผู้สมัครไม่สำเร็จ',
@@ -519,6 +533,30 @@ export default {
       } finally {
         this.applicantLoading = false
       }
+    },
+    isValidAppIdRange () {
+      const startAppId = this.startAppId.trim()
+      const endAppId = this.endAppId.trim()
+      const appIdPattern = /^\d+$/
+
+      if (startAppId && !appIdPattern.test(startAppId)) {
+        this.showError('นำเข้าผู้สมัครไม่สำเร็จ', 'AppId เริ่มต้นต้องเป็นตัวเลข')
+        return false
+      }
+      if (endAppId && !appIdPattern.test(endAppId)) {
+        this.showError('นำเข้าผู้สมัครไม่สำเร็จ', 'AppId สิ้นสุดต้องเป็นตัวเลข')
+        return false
+      }
+      if ((startAppId && !endAppId) || (!startAppId && endAppId)) {
+        this.showError('นำเข้าผู้สมัครไม่สำเร็จ', 'กรุณากรอก AppId เริ่มต้นและสิ้นสุด')
+        return false
+      }
+      if (startAppId && endAppId && Number(startAppId) > Number(endAppId)) {
+        this.showError('นำเข้าผู้สมัครไม่สำเร็จ', 'AppId เริ่มต้นต้องไม่มากกว่าสิ้นสุด')
+        return false
+      }
+
+      return true
     },
     async getApplicantPositionID () {
       if (!this.isNewPosition) {
@@ -588,6 +626,34 @@ export default {
         title,
         text
       })
+    },
+    async confirmDeletePosition (item) {
+      const result = await this.$swal.fire({
+        icon: 'warning',
+        title: 'ยืนยันการลบตำแหน่ง',
+        text: `คุณต้องการลบตำแหน่ง "${item.Name}" ใช่หรือไม่?`,
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยันลบ',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#D32F2F',
+        cancelButtonColor: '#757575'
+      })
+
+      if (!result.isConfirmed) { return }
+
+      try {
+        await this.$axios.$delete(this.$apiUrl(`/api/position/${item.ID}`))
+        this.$swal.fire({
+          icon: 'success',
+          text: 'ลบข้อมูลตำแหน่งสำเร็จ'
+        })
+        await this.fetchPositionByExamID(this.exam.ID)
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `ไม่สามารถลบตำแหน่งได้ ${err}`
+        })
+      }
     }
   }
 }

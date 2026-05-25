@@ -39,3 +39,17 @@ export async function Update(req, res) {
     res.status(500).json({ status: "fail", message: err.message });
   }
 }
+
+export async function test(req, res) {
+  res.json("Hello world")
+}
+export async function Delete(req, res) {
+  console.log("exam: ")
+  try {
+    const { id } = req.params;
+    const result = await examService.Delete(id);
+    res.status(200).json({ status: "success", data: result });
+  } catch (err) {
+    res.status(500).json({ status: "fail", message: err.message });
+  }
+}

@@ -23,7 +23,7 @@ export async function importFromRows(PositionID, rows) {
       continue;
     }
 
-    await create(PositionID, {
+    await applicantModel.create(PositionID, {
       CreatedBy: row.CreatedBy || "Admin",
       Prefix: row.Prefix,
       FirstName: row.FirstName,
@@ -35,13 +35,18 @@ export async function importFromRows(PositionID, rows) {
     imported += 1
   }
 
+  await applicantModel.updatePositionNumber(PositionID);
   return imported
 }
 
 export async function create(PositionID, data) {
-  return await applicantModel.create(PositionID, data);
+  const result = await applicantModel.create(PositionID, data);
+  await applicantModel.updatePositionNumber(PositionID);
+  return result;
 }
 
 export async function update(ApplicantID, PositionID, data) {
-  return await applicantModel.update(ApplicantID, PositionID, data);
+  const result = await applicantModel.update(ApplicantID, PositionID, data);
+  await applicantModel.updatePositionNumber(PositionID);
+  return result;
 }

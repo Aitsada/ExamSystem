@@ -6,7 +6,7 @@ export async function findById(id) {
 }
 
 export async function findByExamID(ExamID) {
-  const [result] = await db.query(`SELECT * FROM Position WHERE ExamID = ?`, [
+  const [result] = await db.query(`SELECT * FROM Position WHERE ExamID = ? AND isActive = 1`, [
     ExamID,
   ]);
   return result;
@@ -22,6 +22,14 @@ export async function create(ExamID, data) {
       data.Name,
       data.Description ?? "",
     ],
+  );
+  return result;
+}
+
+export async function Delete(id) {
+  const [result] = await db.query(
+    "UPDATE Position SET isActive = 0 WHERE ID = ?",
+    id,
   );
   return result;
 }

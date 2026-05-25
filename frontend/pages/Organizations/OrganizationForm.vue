@@ -147,6 +147,17 @@
               แก้ไข
             </v-btn>
           </template>
+          <template #[`item.delete`]="{ item }">
+            <v-btn
+              small
+              outlined
+              class="btn-action"
+              prepend-icon="mdi-delete-outline"
+              @click="confirmDeleteExam(item)"
+            >
+              ลบ
+            </v-btn>
+          </template>
         </v-data-table>
       </v-card>
     </template>
@@ -171,7 +182,8 @@ export default {
       examHeaders: [
         { text: 'ชื่อรอบสอบ', value: 'Name', align: 'start', width: '55%' },
         { text: 'สถานะ', value: 'StatusID', align: 'start', width: '25%' },
-        { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center', width: '20%' }
+        { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center', width: '10%' },
+        { text: 'ลบข้อมูล', value: 'delete', sortable: false, align: 'center', width: '10%' }
       ],
       breadcrumbs: [
         { text: 'หน้าหลัก', href: '/Admin', disabled: false },
@@ -192,7 +204,7 @@ export default {
       this.isEditMode = true
       this.breadcrumbs[2].text = 'แก้ไขหน่วยงาน'
       await this.fetchDataByID(organId)
-      await this.fetchExamData(organId)
+      await this.fetchExamByOrganID(organId)
     }
   },
   methods: {
@@ -211,7 +223,7 @@ export default {
         Description: data.Description || ''
       }
     },
-    async fetchExamData (organID) {
+    async fetchExamByOrganID (organID) {
       try {
         const result = await this.$axios.$get(this.$apiUrl(`/api/${organID}/exams`))
         this.exam = result.data
@@ -273,6 +285,34 @@ export default {
         })
       } finally {
         this.loading = false
+      }
+    },
+    async confirmDeleteExam (item) {
+      const result = await this.$swal.fire({
+        icon: 'warning',
+        title: 'ยืนยันการลบรอบสอบ',
+        text: `คุณต้องการลบรอบสอบ "${item.Name}" ใช่หรือไม่?`,
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยันลบ',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#D32F2F',
+        cancelButtonColor: '#757575'
+      })
+
+      if (!result.isConfirmed) { return }
+
+      try {
+        await this.$axios.delete(this.$apiUrl(`/api/exam/${item.ID}`))
+        this.$swal.fire({
+          icon: 'success',
+          text: 'ลบข้อมูลรอบสอบสำเร็จ'
+        })
+        await this.fetchExamByOrganID(this.organ.ID)
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `ไม่สามารถลบข้อมูลรอบสอบได้ ${err}`
+        })
       }
     }
   }

@@ -7,7 +7,7 @@ export async function findById(id) {
 
 export async function findByOrganID(organID) {
   const [result] = await db.query(
-    "SELECT * FROM Exam WHERE OrganizationID = ?",
+    "SELECT * FROM Exam WHERE OrganizationID = ? AND isActive = 1",
     [organID],
   );
   return result;
@@ -39,5 +39,15 @@ export async function update(ExamID, OrganID, data) {
       OrganID,
     ],
   );
+  return result;
+}
+
+export async function Delete(id) {
+  const [result] = await db.query(
+    "UPDATE Exam SET isActive = 0 WHERE ID = ?",
+    id,
+  );
+  console.log(result)
+
   return result;
 }

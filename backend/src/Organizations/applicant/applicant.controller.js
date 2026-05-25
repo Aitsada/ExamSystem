@@ -30,15 +30,63 @@ export async function findByPositionID(req, res) {
   }
 }
 
+function normalizeAppId(value) {
+  return String(value ?? "").trim();
+}
+
+function toAppIdNumber(value, fieldName = "AppId") {
+  const appId = normalizeAppId(value);
+
+  if (!appId) {
+    return null;
+  }
+  if (!/^\d+$/.test(appId)) {
+    throw new Error(`${fieldName} ต้องเป็นตัวเลข`);
+  }
+
+  return Number(appId);
+}
+
+function filterRowsByAppIdRange(rows, startAppId, endAppId) {
+  const start = toAppIdNumber(startAppId, "AppId เริ่มต้น");
+  const end = toAppIdNumber(endAppId, "AppId สิ้นสุด");
+
+  if (start !== null && end !== null && start > end) {
+    throw new Error("ช่วง AppId เริ่มต้นต้องไม่มากกว่าสิ้นสุด");
+  }
+
+  if (start === null && end === null) {
+    return rows;
+  }
+
+  return rows.filter((row) => {
+    const appId = toAppIdNumber(getValue(row, ["AppID", "AppId"]));
+
+    if (appId === null) {
+      return false;
+    }
+    if (start !== null && appId < start) {
+      return false;
+    }
+    if (end !== null && appId > end) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
 export async function importExcel(req, res) {
   try {
     const { PositionID } = req.params;
-    const rows = parseExcelRows(req.file).map((row) => ({
+    const { startAppId, endAppId } = req.body;
+    const excelRows = filterRowsByAppIdRange(parseExcelRows(req.file), startAppId, endAppId);
+    const rows = excelRows.map((row) => ({
       CreatedBy: getValue(row, "CreatedBy", "Admin"),
       Prefix: getValue(row, "Name1"),
       FirstName: getValue(row, "Name2"),
       LastName: getValue(row, "Name3"),
-      ApplicantNumber: getValue(row, "AppID"),
+      ApplicantNumber: getValue(row, ["AppID", "AppId"]),
       CitizenNumber: getValue(row, "CustomerID"),
       SeatRow: getValue(row, "SeatRow", 10),
     }));

@@ -35,6 +35,14 @@ export async function create(PositionID, data) {
   return result;
 }
 
+export async function updatePositionNumber(PositionID) {
+  const [result] = await db.query(
+    "UPDATE `Position` SET Number = (SELECT COUNT(*) FROM Applicant WHERE PositionID = ?) WHERE ID = ?",
+    [PositionID, PositionID],
+  );
+  return result;
+}
+
 export async function update(ApplicantID, PositionID, data) {
   const [result] = await db.query(
     "UPDATE Applicant SET LastModifiedDateTime = ?, Prefix = ?, FirstName = ?, LastName = ?, ApplicantNumber = ?, CitizenNumber = ?, SeatRow = ? WHERE ID = ? AND PositionID = ?",
