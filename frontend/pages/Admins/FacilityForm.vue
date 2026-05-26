@@ -409,7 +409,7 @@ export default {
       if (!result.isConfirmed) { return }
 
       try {
-        await this.$axios.$delete(this.$apiUrl(`/api/${this.facility.ID}/building/${item.ID}`))
+        await this.$axios.$delete(this.$apiUrl(`/api/${this.facility.ID}/buildings/${item.ID}`))
         this.$swal.fire({
           icon: 'success',
           text: 'ลบสำเร็จ'

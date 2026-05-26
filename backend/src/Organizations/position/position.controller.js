@@ -32,7 +32,6 @@ export async function Create(req, res) {
 }
 
 export async function Delete(req, res) {
-  console.log("positoin delete : ", req.params)
   try {
     const { id } = req.params;
     const result = await positionService.Delete(id);

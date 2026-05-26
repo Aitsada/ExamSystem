@@ -1,1 +1,20 @@
 AGENTS.md
+
+# Dependencies
+node_modules/
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Build output
+.nuxt/
+dist/
+
+# Logs and caches
+*.log
+.eslintcache
+
+# OS files
+.DS_Store

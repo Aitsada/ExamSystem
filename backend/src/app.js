@@ -16,4 +16,11 @@ app.get("/health", (req, res) => {
 });
 app.use("/", router);
 
+app.use((err, req, res, next) => {
+  return res.status(400).json({
+    status: "fail",
+    message: err.message,
+  });
+});
+
 app.listen(port);

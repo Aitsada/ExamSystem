@@ -295,7 +295,7 @@ export default {
         }
 
         if (this.isEditMode) {
-          res = await this.$axios.$patch(this.$apiUrl(`/api/${this.floor.ID}/room/update/${this.room.ID}`), payload)
+          res = await this.$axios.$patch(this.$apiUrl(`/api/${this.floor.ID}/room/${this.room.ID}`), payload)
         } else {
           res = await this.$axios.$post(this.$apiUrl(`/api/${this.floor.ID}/room`), payload)
           this.room.ID = res.data

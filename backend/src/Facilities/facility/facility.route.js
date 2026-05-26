@@ -1,9 +1,8 @@
 import { Router } from "express";
 import * as facilityController from "./facility.controller.js";
-import multer from "multer";
+import { uploadExcel } from "../../utils/excelUpload.js";
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage() });
 
 // /api
 router.get("/facilities", facilityController.FindAll);
@@ -11,7 +10,7 @@ router.get("/facility/:id", facilityController.findById);
 router.post("/facility/create", facilityController.Create);
 router.post(
   "/facility/import",
-  upload.single("file"),
+  uploadExcel.single("file"),
   facilityController.importExcel,
 );
 router.delete("/facility/:id", facilityController.Delete);

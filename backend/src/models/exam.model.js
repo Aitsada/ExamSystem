@@ -45,9 +45,8 @@ export async function update(ExamID, OrganID, data) {
 export async function Delete(id) {
   const [result] = await db.query(
     "UPDATE Exam SET isActive = 0 WHERE ID = ?",
-    id,
+    [id],
   );
-  console.log(result)
 
   return result;
 }

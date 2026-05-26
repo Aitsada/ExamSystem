@@ -41,8 +41,8 @@ export async function create(data) {
 }
 export async function update(id, data) {
   const [result] = await db.query(
-    "UPDATE Organization SET Name = COALESCE(?, Name), Description = COALESCE(?, Description) WHERE ID = ?",
-    [data.Name ?? null, data.Description ?? null, id],
+    "UPDATE Organization SET Name = COALESCE(?, Name), Description = COALESCE(?, Description), LastModifiedBy = ? WHERE ID = ?",
+    [data.Name ?? null, data.Description ?? null, "Admin-update", id],
   );
   return result;
 }

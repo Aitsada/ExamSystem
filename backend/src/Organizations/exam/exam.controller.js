@@ -40,11 +40,7 @@ export async function Update(req, res) {
   }
 }
 
-export async function test(req, res) {
-  res.json("Hello world")
-}
 export async function Delete(req, res) {
-  console.log("exam: ")
   try {
     const { id } = req.params;
     const result = await examService.Delete(id);
