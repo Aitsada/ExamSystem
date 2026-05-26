@@ -34,6 +34,7 @@
       </v-col>
       <v-col>
         <v-select
+          v-model="selectedExams"
           label="เลือกสถานที่สอบ"
           :items="selectExams"
           outlined
@@ -46,17 +47,45 @@
         <p>สอบวันที่:</p>
       </v-col>
       <v-col>
-        <v-select
-          label="เลือกสถานที่สอบ"
-          outlined
-          dense
-        />
+        <v-menu
+          ref="menu"
+          v-model="menu"
+          :close-on-content-click="false"
+          :return-value.sync="date"
+          transition="scale-transition"
+          offset-y
+          min-width="auto"
+        >
+          <template #activator="{ on, attrs }">
+            <v-text-field
+              :value="dateText"
+              label="เลือกวันที่สอบ"
+              prepend-inner-icon="mdi-calendar"
+              readonly
+              outlined
+              dense
+              v-bind="attrs"
+              v-on="on"
+            />
+          </template>
+
+          <v-date-picker v-model="date" no-title scrollable>
+            <v-spacer />
+            <v-btn text color="primary" @click="menu = false">
+              ยกเลิก
+            </v-btn>
+            <v-btn text color="primary" @click="$refs.menu.save(date)">
+              ตกลง
+            </v-btn>
+          </v-date-picker>
+        </v-menu>
       </v-col>
       <v-col>
         <p>ตั้งแต่เวลา</p>
       </v-col>
       <v-col>
         <v-select
+          v-model="selectTimeStart"
           :items="timeOptions"
           outlined
           dense
@@ -67,6 +96,7 @@
       </v-col>
       <v-col>
         <v-select
+          v-model="selectTimeEnd"
           :items="timeOptions"
           outlined
           dense
@@ -88,12 +118,13 @@ export default {
     return {
       buildings: [],
       selectBuildings: [],
-      selectedBuildings: [],
+      selectedBuildings: null,
       organizations: [],
       selectOrganizations: [],
-      selectedOrganizations: [],
+      selectedOrganizations: null,
       exams: [],
       selectExams: [],
+      selectedExams: null,
       timeOptions: ['08:00',
         '08:30',
         '09:00',
@@ -115,7 +146,14 @@ export default {
         '17:00',
         '17:30'],
       selectTimeStart: '08:00',
-      selectTimeEnd: '017:00'
+      selectTimeEnd: '17:00',
+      date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      menu: false
+    }
+  },
+  computed: {
+    dateText () {
+      return this.formatDate(this.date)
     }
   },
   watch: {
@@ -142,6 +180,7 @@ export default {
         text: b.Name,
         value: b.ID
       }))
+      this.selectedBuildings = this.selectBuildings[0]?.value || null
     },
     async fectOrganizationData () {
       const res = await this.$axios.$get(this.$apiUrl('/api/organizations'))
@@ -150,6 +189,7 @@ export default {
         text: o.Name,
         value: o.ID
       }))
+      this.selectedOrganizations = this.selectOrganizations[0]?.value || null
     },
     async fetchExamData () {
       const res = await this.$axios.$get(this.$apiUrl(`/api/${this.selectedOrganizations}/exams`))
@@ -158,6 +198,14 @@ export default {
         text: e.Name,
         value: e.ID
       }))
+      this.selectedExams = this.selectExams[0]?.value || null
+    },
+    formatDate (date) {
+      if (!date) {
+        return ''
+      }
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
     }
   }
 }
