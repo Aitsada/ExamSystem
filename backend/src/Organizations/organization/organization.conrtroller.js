@@ -1,11 +1,12 @@
 import * as organizationService from "./organization.service.js";
 
 export async function findAll(req, res) {
+  console.log("asdfasdfsadf");
   try {
     const result = await organizationService.findAll();
     res.status(200).json({ status: "success", data: result });
   } catch (err) {
-    res.status(500).json({ status: "fail" });
+    res.status(500).json({ status: "fail", message: err });
   }
 }
 export async function findById(req, res) {
