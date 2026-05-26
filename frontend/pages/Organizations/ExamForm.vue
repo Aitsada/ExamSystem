@@ -309,10 +309,10 @@ export default {
         { text: 'Canceled', value: 2 },
         { text: 'Completed', value: 3 }
       ],
-      timeOptions: ['8:00',
-        '8:30',
-        '9:00',
-        '9:30',
+      timeOptions: ['08:00',
+        '08:30',
+        '09:00',
+        '09:30',
         '10:00',
         '10:30',
         '11:00',
@@ -329,7 +329,7 @@ export default {
         '16:30',
         '17:00',
         '17:30'],
-      selectedStartTime: '8:00',
+      selectedStartTime: '08:00',
       selectedEndTime: '17:00',
       date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       menu: false,
@@ -480,9 +480,27 @@ export default {
         return { date: '', time: '' }
       }
 
-      const text = String(value).replace('T', ' ')
-      const date = text.substr(0, 10)
-      const time = text.substr(11, 5).replace(/^0/, '')
+      const text = String(value)
+      const hasTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(text)
+      if (hasTimezone) {
+        const dateTime = new Date(text)
+        if (!Number.isNaN(dateTime.getTime())) {
+          const year = dateTime.getFullYear()
+          const month = String(dateTime.getMonth() + 1).padStart(2, '0')
+          const day = String(dateTime.getDate()).padStart(2, '0')
+          const hour = String(dateTime.getHours()).padStart(2, '0')
+          const minute = String(dateTime.getMinutes()).padStart(2, '0')
+
+          return {
+            date: `${year}-${month}-${day}`,
+            time: `${hour}:${minute}`
+          }
+        }
+      }
+
+      const normalizedText = text.replace('T', ' ')
+      const date = normalizedText.substr(0, 10)
+      const time = normalizedText.substr(11, 5)
 
       return { date, time }
     },
