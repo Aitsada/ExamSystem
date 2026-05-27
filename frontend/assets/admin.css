@@ -126,42 +126,51 @@
 
 .admin-table,
 .facility-table,
-.building-table {
+.building-table,
+.bordered-table {
   overflow: hidden;
   border-radius: 8px;
   box-shadow: none !important;
 }
 
+.admin-table table,
+.facility-table table,
+.building-table table,
+.bordered-table table {
+  width: 100%;
+  border: 1px solid #CCC;
+  border-collapse: collapse;
+}
+
 .admin-table thead tr th,
 .facility-table thead tr th,
-.building-table thead tr th {
+.building-table thead tr th,
+.bordered-table thead tr th {
   height: 42px !important;
   background: #EAF4FF !important;
-  border-bottom: 1px solid #C7DCF3 !important;
+  border: 1px solid #CCC !important;
   color: #0F3D78 !important;
   font-size: 12px !important;
   font-weight: 700 !important;
+  padding: 8px !important;
   white-space: nowrap;
 }
 
 .admin-table tbody tr td,
 .facility-table tbody tr td,
-.building-table tbody tr td {
+.building-table tbody tr td,
+.bordered-table tbody tr td {
   height: 46px !important;
-  border-bottom: 1px solid #E6EEF8 !important;
+  border: 1px solid #CCC !important;
   color: #1F2937 !important;
   font-size: 13px !important;
-}
-
-.admin-table tbody tr:last-child td,
-.facility-table tbody tr:last-child td,
-.building-table tbody tr:last-child td {
-  border-bottom: none !important;
+  padding: 8px !important;
 }
 
 .admin-table tbody tr:hover td,
 .facility-table tbody tr:hover td,
-.building-table tbody tr:hover td {
+.building-table tbody tr:hover td,
+.bordered-table tbody tr:hover td {
   background: #F5FAFF !important;
 }
 

@@ -1,7 +1,7 @@
 import db from "../config/db.js";
 
 export async function findAll() {
-  const [result] = await db.query("SELECT * FROM Building");
+  const [result] = await db.query("SELECT * FROM Building WHERE IsActive = 1");
   return result;
 }
 

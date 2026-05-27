@@ -166,16 +166,3 @@ export default {
   }
 }
 </script>
-<style>
-.bordered-table table {
-  border-collapse: collapse;
-  width: 100%;
-  border: 1px solid #ccc;
-}
-
-.bordered-table th,
-.bordered-table td {
-  border: 1px solid #ccc;
-  padding: 8px;
-}
-</style>
