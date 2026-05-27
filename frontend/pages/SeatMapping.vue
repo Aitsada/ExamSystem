@@ -4,13 +4,13 @@
       <v-column>
         <p>หน่วยงาน: {{ organization.Name }}</p>
         <p>สถานที่สอบ: {{ facility.Name }}</p>
-        <p>สอบ</p>
+        <p>{{ examDateText }}</p>
       </v-column>
     </v-row>
     <v-divider class="my-5" />
     <v-row>
       <v-col>
-        <v-simple-table>
+        <v-simple-table class="bordered-table">
           <template #default>
             <thead>
               <tr>
@@ -89,12 +89,32 @@ export default {
     return {
       organization: {},
       facility: {},
+      exam: {},
+      examDate: '',
+      startTime: '',
+      endTime: '',
       drink: ['cola', 'sprite', 'soda']
+    }
+  },
+  computed: {
+    examDateText () {
+      if (!this.examDate) {
+        return 'สอบ'
+      }
+
+      return `สอบ${this.formatThaiDate(this.examDate)} เวลา ${this.startTime} - ${this.endTime} น.`
     }
   },
   mounted () {
     const facilityID = this.$route.query.FacilityID
+    const organizationID = this.$route.query.OrganizationID
+    const examID = this.$route.query.ExamID
     this.facility.ID = facilityID
+    this.organization.ID = organizationID
+    this.exam.ID = examID
+    this.examDate = this.$route.query.ExamDate || ''
+    this.startTime = this.$route.query.StartTime || ''
+    this.endTime = this.$route.query.EndTime || ''
     this.fetchOrganization()
     this.fetchFacilitByID()
   },
@@ -106,7 +126,7 @@ export default {
       })
     },
     async fetchOrganization () {
-      const res = await this.$axios.$get(this.$apiUrl(`/api/organization/${1}`))
+      const res = await this.$axios.$get(this.$apiUrl(`/api/organization/${this.organization.ID}`))
       const data = res.data
       this.organization = {
         Name: data.Name,
@@ -121,19 +141,40 @@ export default {
         ID: data.ID,
         DisplayName: data.DisplayName
       }
+    },
+    formatThaiDate (date) {
+      const [year, month, day] = date.split('-').map(Number)
+      const thaiDate = new Date(year, month - 1, day)
+      const weekdays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์']
+      const months = [
+        'มกราคม',
+        'กุมภาพันธ์',
+        'มีนาคม',
+        'เมษายน',
+        'พฤษภาคม',
+        'มิถุนายน',
+        'กรกฎาคม',
+        'สิงหาคม',
+        'กันยายน',
+        'ตุลาคม',
+        'พฤศจิกายน',
+        'ธันวาคม'
+      ]
+
+      return `วัน${weekdays[thaiDate.getDay()]}ที่ ${day} ${months[month - 1]} ${year + 543}`
     }
   }
 }
 </script>
 <style>
-::v-deep .bordered-table table {
+.bordered-table table {
   border-collapse: collapse;
   width: 100%;
   border: 1px solid #ccc;
 }
 
-::v-deep .bordered-table th,
-::v-deep .bordered-table td {
+.bordered-table th,
+.bordered-table td {
   border: 1px solid #ccc;
   padding: 8px;
 }

@@ -110,7 +110,7 @@
           dense
           depressed
           color="primary"
-          :to="{ path: '/SeatMapping' , query: { ExamID: selectedExams, FacilityID: selectedFacilities } }"
+          :to="seatMappingRoute"
         >
           จัดที่นั่งสอบ
         </v-btn>
@@ -168,12 +168,30 @@ export default {
   computed: {
     dateText () {
       return this.formatDate(this.date)
+    },
+    seatMappingRoute () {
+      return {
+        path: '/SeatMapping',
+        query: {
+          ExamID: this.selectedExams,
+          FacilityID: this.selectedFacilities,
+          OrganizationID: this.selectedOrganizations,
+          ExamDate: this.date,
+          StartTime: this.selectTimeStart,
+          EndTime: this.selectTimeEnd
+        }
+      }
     }
   },
   watch: {
     selectedOrganizations (newValue) {
       if (newValue) {
         this.fetchExamData()
+      }
+    },
+    selectedExams (newValue) {
+      if (newValue) {
+        this.setDateAndTimeFromSelectedExam()
       }
     }
   },
@@ -213,6 +231,53 @@ export default {
         value: e.ID
       }))
       this.selectedExams = this.selectExams[0]?.value || null
+    },
+    setDateAndTimeFromSelectedExam () {
+      const exam = this.exams.find(e => e.ID === this.selectedExams)
+      if (!exam) {
+        return
+      }
+
+      const start = this.parseDateTime(exam.StartDateTime)
+      const end = this.parseDateTime(exam.EndDateTime)
+      if (start.date) {
+        this.date = start.date
+      }
+      if (start.time) {
+        this.selectTimeStart = start.time
+      }
+      if (end.time) {
+        this.selectTimeEnd = end.time
+      }
+    },
+    parseDateTime (value) {
+      if (!value) {
+        return { date: '', time: '' }
+      }
+
+      const text = String(value)
+      const hasTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(text)
+      if (hasTimezone) {
+        const dateTime = new Date(text)
+        if (!Number.isNaN(dateTime.getTime())) {
+          const year = dateTime.getFullYear()
+          const month = String(dateTime.getMonth() + 1).padStart(2, '0')
+          const day = String(dateTime.getDate()).padStart(2, '0')
+          const hour = String(dateTime.getHours()).padStart(2, '0')
+          const minute = String(dateTime.getMinutes()).padStart(2, '0')
+
+          return {
+            date: `${year}-${month}-${day}`,
+            time: `${hour}:${minute}`
+          }
+        }
+      }
+
+      const normalizedText = text.replace('T', ' ')
+      return {
+        date: normalizedText.substr(0, 10),
+        time: normalizedText.substr(11, 5)
+      }
     },
     formatDate (date) {
       if (!date) {
