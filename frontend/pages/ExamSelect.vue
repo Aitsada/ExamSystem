@@ -1,14 +1,15 @@
 <template>
   <v-card>
+    <h1>{{ nameExam }}</h1>
     <v-row>
       <v-col>
         <p>สถานที่สอบ:</p>
       </v-col>
       <v-col>
         <v-select
-          v-model="selectedBuildings"
+          v-model="selectedFacilities"
           label="เลือกสถานที่สอบ"
-          :items="selectBuildings"
+          :items="selectFacilities"
           outlined
           dense
         />
@@ -105,6 +106,18 @@
     </v-row>
     <v-row>
       <v-col>
+        <v-btn
+          dense
+          depressed
+          color="primary"
+          :to="{ path: '/SeatMapping' , query: { ExamID: selectedExams, FacilityID: selectedFacilities } }"
+        >
+          จัดที่นั่งสอบ
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         <v-btn dense depressed color="warning" @click="testBtn">
           testBtn
         </v-btn>
@@ -116,9 +129,9 @@
 export default {
   data () {
     return {
-      buildings: [],
-      selectBuildings: [],
-      selectedBuildings: null,
+      facilities: [],
+      selectFacilities: [],
+      selectedFacilities: null,
       organizations: [],
       selectOrganizations: [],
       selectedOrganizations: null,
@@ -148,7 +161,8 @@ export default {
       selectTimeStart: '08:00',
       selectTimeEnd: '17:00',
       date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      menu: false
+      menu: false,
+      drinks: [{ text: 'cola', value: 1 }, { text: 'soda', value: 2 }]
     }
   },
   computed: {
@@ -164,7 +178,7 @@ export default {
     }
   },
   mounted () {
-    this.fetchBuildingsData()
+    this.fetchFacilitiesData()
     this.fectOrganizationData()
   },
   methods: {
@@ -173,14 +187,14 @@ export default {
         text: `testBtn : ${this.selectedOrganizations}`
       })
     },
-    async fetchBuildingsData () {
-      const res = await this.$axios.$get(this.$apiUrl('/api/buildings'))
-      this.buildings = res.data || []
-      this.selectBuildings = this.buildings.map(b => ({
+    async fetchFacilitiesData () {
+      const res = await this.$axios.$get(this.$apiUrl('/api/facilities'))
+      this.facilities = res.data || []
+      this.selectFacilities = this.facilities.map(b => ({
         text: b.Name,
         value: b.ID
       }))
-      this.selectedBuildings = this.selectBuildings[0]?.value || null
+      this.selectedFacilities = this.selectFacilities[0]?.value || null
     },
     async fectOrganizationData () {
       const res = await this.$axios.$get(this.$apiUrl('/api/organizations'))
