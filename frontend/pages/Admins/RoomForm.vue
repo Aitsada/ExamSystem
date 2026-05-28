@@ -91,16 +91,6 @@
             <v-text-field v-model.trim="room.No" outlined dense hide-details="auto" class="form-field" />
           </v-col>
         </v-row>
-
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">Template ID :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field v-model.trim="room.TemplateID" outlined dense hide-details="auto" class="form-field" />
-          </v-col>
-        </v-row>
-
         <v-btn
           color="primary"
           class="btn-save mt-4"
@@ -290,7 +280,7 @@ export default {
           Description: this.room.Description,
           Rows: this.room.Rows,
           Columns: this.room.Columns,
-          TemplateID: this.room.TemplateID || 0,
+          TemplateID: this.room.Rows * this.room.Columns,
           CreatedBy: 'Admin'
         }
 

@@ -1,6 +1,5 @@
 <template>
   <v-card>
-    <h1>{{ nameExam }}</h1>
     <v-row>
       <v-col>
         <p>สถานที่สอบ:</p>

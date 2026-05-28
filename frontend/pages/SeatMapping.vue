@@ -1,20 +1,20 @@
 <template>
-  <v-card>
-    <v-row style="text-align: center; justify-content: center;">
-      <v-column>
-        <p>หน่วยงาน: {{ organization.Name }}</p>
-        <p>สถานที่สอบ: {{ facility.Name }}</p>
+  <v-card class="seat-mapping-card">
+    <v-row class="seat-mapping-header">
+      <v-col>
+        <p>หน่วยงาน: {{ organization.Name || '-' }}</p>
+        <p>สถานที่สอบ: {{ facility.Name || '-' }}</p>
         <p>{{ examDateText }}</p>
-      </v-column>
+      </v-col>
     </v-row>
     <v-divider class="my-5" />
     <v-row>
-      <v-col>
+      <v-col cols="12" md="7">
         <v-simple-table class="bordered-table">
           <template #default>
             <thead>
               <tr>
-                <th class="text-left" />
+                <th class="select-col" />
                 <th class="text-left">
                   ลำดับ
                 </th>
@@ -34,42 +34,108 @@
             </thead>
             <tbody>
               <tr
-                v-for="item in drink"
-                :key="item.name"
+                v-for="(item, index) in position"
+                :key="item.ID"
               >
-                <td>{{ item }}</td>
-                <td>{{ item }}</td>
-                <td>{{ item }}</td>
-                <td>{{ item }}</td>
-                <td>{{ item }}</td>
-                <td>{{ item }}</td>
+                <td class="select-col">
+                  <v-checkbox dense hide-details />
+                </td>
+                <td>{{ index + 1 }}</td>
+                <td>{{ item.Name }}</td>
+                <td>{{ positionApplicantCount(item) }}</td>
+                <td>{{ positionApplicantCount(item) }}</td>
+                <td>0</td>
+              </tr>
+              <tr v-if="!position.length">
+                <td colspan="6" class="empty-cell">
+                  ไม่พบข้อมูลตำแหน่ง
+                </td>
               </tr>
             </tbody>
           </template>
         </v-simple-table>
       </v-col>
-      <v-col cols="4">
-        <v-simple-table class="bordered-table">
+      <v-col cols="12" md="5">
+        <v-simple-table class="bordered-table facility-table">
           <template #default>
             <thead>
               <tr>
-                <th class="text-left" />
+                <th class="expand-col" />
                 <th class="text-left">
-                  ลำดับ
-                </th>
-                <th class="text-left">
-                  ชื่อตำแหน่ง
+                  สถานที่สอบ/อาคาร
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr
-                v-for="item in drink"
-                :key="item.name"
+                v-for="floorItem in floorRows"
+                :key="floorItem.key"
               >
-                <td>{{ item }}</td>
-                <td>{{ item }}</td>
-                <td>{{ item }}</td>
+                <td class="expand-col">
+                  <v-btn
+                    icon
+                    x-small
+                    class="expand-button"
+                    @click="toggleFloor(floorItem.key)"
+                  >
+                    <v-icon small>
+                      {{ isFloorExpanded(floorItem.key) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
+                    </v-icon>
+                  </v-btn>
+                </td>
+                <td>
+                  <p class="floor-title">
+                    {{ floorTitle(floorItem) }}
+                  </p>
+                  <v-simple-table
+                    v-if="isFloorExpanded(floorItem.key)"
+                    class="bordered-table room-table"
+                  >
+                    <template #default>
+                      <thead>
+                        <tr>
+                          <th class="select-col" />
+                          <th class="text-left">
+                            ห้อง
+                          </th>
+                          <th class="text-left">
+                            จำนวนที่นั่งสอบ
+                          </th>
+                          <th class="text-left">
+                            มีผู้สอบ
+                          </th>
+                          <th class="text-left">
+                            ไม่มีผู้สอบ
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          v-for="room in floorItem.rooms"
+                          :key="room.ID"
+                        >
+                          <td class="select-col">
+                            <v-checkbox dense hide-details />
+                          </td>
+                          <td>{{ room.Name || room.No || '-' }}</td>
+                          <td>{{ roomSeatCount(room) }}</td>
+                          <td>{{ roomSeatCount(room) }}</td>
+                          <td>0</td>
+                        </tr>
+                        <tr v-if="!floorItem.rooms.length">
+                          <td colspan="5" class="empty-cell">
+                            ไม่พบข้อมูลห้อง
+                          </td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </td>
+              </tr>
+              <tr v-if="!floorRows.length">
+                <td colspan="2" class="empty-cell">
+                  ไม่พบข้อมูลอาคาร/ชั้น
+                </td>
               </tr>
             </tbody>
           </template>
@@ -82,6 +148,7 @@
     </v-btn>
   </v-card>
 </template>
+
 <script>
 export default {
   name: 'SeatMapping',
@@ -93,7 +160,10 @@ export default {
       examDate: '',
       startTime: '',
       endTime: '',
-      drink: ['cola', 'sprite', 'soda']
+      buildings: [],
+      floorRows: [],
+      position: [],
+      expandedFloors: {}
     }
   },
   computed: {
@@ -101,7 +171,6 @@ export default {
       if (!this.examDate) {
         return 'สอบ'
       }
-
       return `สอบ${this.formatThaiDate(this.examDate)} เวลา ${this.startTime} - ${this.endTime} น.`
     }
   },
@@ -117,15 +186,26 @@ export default {
     this.endTime = this.$route.query.EndTime || ''
     this.fetchOrganization()
     this.fetchFacilitByID()
+    this.fetchBuildingByFacilityID()
+    this.fetchPositionByExamID()
   },
   methods: {
     testBtn () {
       this.$swal.fire({
         icon: 'success',
-        text: `text : ${this.facility.DisplayName}`
+        text: `จำนวนตำแหน่ง : ${this.position.length}`
       })
     },
+    toggleFloor (key) {
+      this.$set(this.expandedFloors, key, !this.expandedFloors[key])
+    },
+    isFloorExpanded (key) {
+      return !!this.expandedFloors[key]
+    },
     async fetchOrganization () {
+      if (!this.organization.ID) {
+        return
+      }
       const res = await this.$axios.$get(this.$apiUrl(`/api/organization/${this.organization.ID}`))
       const data = res.data
       this.organization = {
@@ -134,6 +214,9 @@ export default {
       }
     },
     async fetchFacilitByID () {
+      if (!this.facility.ID) {
+        return
+      }
       const res = await this.$axios.$get(this.$apiUrl(`/api/facility/${this.facility.ID}`))
       const data = res.data
       this.facility = {
@@ -141,6 +224,53 @@ export default {
         ID: data.ID,
         DisplayName: data.DisplayName
       }
+    },
+    async fetchBuildingByFacilityID () {
+      if (!this.facility.ID) {
+        return
+      }
+      const res = await this.$axios.$get(this.$apiUrl(`/api/${this.facility.ID}/buildings`))
+      this.buildings = res.data || []
+      await this.fetchFloorsAndRooms()
+    },
+    async fetchFloorsAndRooms () {
+      const floorGroups = await Promise.all(this.buildings.map(async (building) => {
+        const floorRes = await this.$axios.$get(this.$apiUrl(`/api/${building.ID}/floors`))
+        const floors = floorRes.data || []
+        return Promise.all(floors.map(async (floor) => {
+          const roomRes = await this.$axios.$get(this.$apiUrl(`/api/${floor.ID}/rooms`))
+          return {
+            key: `${building.ID}-${floor.ID}`,
+            building,
+            floor,
+            rooms: roomRes.data || []
+          }
+        }))
+      }))
+      this.floorRows = floorGroups.flat()
+      if (this.floorRows[0]) {
+        this.$set(this.expandedFloors, this.floorRows[0].key, true)
+      }
+    },
+    async fetchPositionByExamID () {
+      if (!this.exam.ID) {
+        return
+      }
+      const res = await this.$axios.$get(this.$apiUrl(`/api/${this.exam.ID}/positions`))
+      this.position = res.data || []
+    },
+    floorTitle (floorItem) {
+      const buildingName = floorItem.building.Name || '-'
+      const floorNumber = floorItem.floor.Number || floorItem.floor.Name || '-'
+      return `${buildingName} ชั้น ${floorNumber}`
+    },
+    roomSeatCount (room) {
+      const rows = Number(room.Rows) || 0
+      const columns = Number(room.Columns) || 0
+      return rows * columns
+    },
+    positionApplicantCount (position) {
+      return Number(position.Number) || 0
     },
     formatThaiDate (date) {
       const [year, month, day] = date.split('-').map(Number)
@@ -166,3 +296,80 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.seat-mapping-card {
+  padding: 16px;
+}
+
+.seat-mapping-header {
+  text-align: center;
+  justify-content: center;
+}
+
+.seat-mapping-header p {
+  color: #424242;
+  font-size: 20px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.bordered-table {
+  border: 1px solid #dcdcdc;
+}
+
+.bordered-table ::v-deep table {
+  border-collapse: collapse;
+}
+
+.bordered-table ::v-deep th,
+.bordered-table ::v-deep td {
+  border: 1px solid #dcdcdc;
+  color: #424242;
+  font-size: 18px;
+  height: 52px;
+  padding: 10px 16px;
+  vertical-align: top;
+}
+
+.bordered-table ::v-deep th {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.facility-table ::v-deep td {
+  height: 74px;
+}
+
+.room-table {
+  margin: 8px 0 16px;
+  width: calc(100% - 16px);
+}
+
+.room-table ::v-deep th,
+.room-table ::v-deep td {
+  font-size: 16px;
+  height: 48px;
+}
+
+.select-col,
+.expand-col {
+  text-align: center;
+  width: 48px;
+}
+
+.floor-title {
+  font-size: 18px;
+  line-height: 1.4;
+  margin: 0 0 6px;
+}
+
+.expand-button {
+  margin-top: 6px;
+}
+
+.empty-cell {
+  color: #777;
+  text-align: center;
+}
+</style>
