@@ -12,4 +12,5 @@ router.post("/:FloorID/rooms/import",uploadExcel.single("file"),roomController.i
 router.delete("/:FloorID/room/:RoomID", roomController.Delete);
 router.patch("/:FloorID/room/:RoomID", roomController.update);
 
+router.post("/:FloorID/roomConn", roomController.createRoomWithSeats)
 export default router;

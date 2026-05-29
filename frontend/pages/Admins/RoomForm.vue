@@ -287,7 +287,7 @@ export default {
         if (this.isEditMode) {
           res = await this.$axios.$patch(this.$apiUrl(`/api/${this.floor.ID}/room/${this.room.ID}`), payload)
         } else {
-          res = await this.$axios.$post(this.$apiUrl(`/api/${this.floor.ID}/room`), payload)
+          res = await this.$axios.$post(this.$apiUrl(`/api/${this.floor.ID}/roomConn`), payload)
           this.room.ID = res.data
           this.isEditMode = true
           this.breadcrumbs[2].text = 'แก้ไขห้องสอบ'

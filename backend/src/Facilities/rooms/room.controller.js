@@ -87,3 +87,15 @@ export async function update(req, res) {
     res.status(500).json({ status: "fail", message: err });
   }
 }
+
+// createRoomWithSeats
+export async function createRoomWithSeats(req, res) {
+  try {
+    const { FloorID } = req.params;
+    const data = req.body;
+    const result = await roomController.createRoomWithSeats(FloorID, data);
+    res.status(201).json({ status: "success", data: result });
+  } catch (err) {
+    res.status(500).json({ status: "fail", message: err.message });
+  }
+}

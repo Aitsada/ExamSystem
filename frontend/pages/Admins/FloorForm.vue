@@ -120,8 +120,8 @@
           <span class="text-body-2 font-weight-medium">{{ item.Name }}</span>
         </template>
 
-        <template #[`item.Description`]="{ item }">
-          <span class="text-body-2 text-medium-emphasis">{{ item.Description || '-' }}</span>
+        <template #[`item.TemplateID`]="{ item }">
+          <span class="text-body-2 text-medium-emphasis">{{ item.TemplateID || '-' }}</span>
         </template>
 
         <template #[`item.edit`]="{ item }">
@@ -231,7 +231,7 @@ export default {
         { text: 'ห้องสอบที่', value: 'No', align: 'start' },
         { text: 'จำนวนแถว', value: 'Rows', align: 'start' },
         { text: 'จำนวนคนในแถว', value: 'Columns', align: 'start' },
-        { text: 'รายละเอียด', value: 'Description', align: 'start' },
+        { text: 'จำนวน', value: 'TemplateID', align: 'start' },
         { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center' },
         { text: 'ลบข้อมูล', value: 'delete', sortable: false, align: 'center' }
       ],

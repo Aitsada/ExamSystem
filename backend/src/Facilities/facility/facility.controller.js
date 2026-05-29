@@ -12,7 +12,6 @@ export async function FindAll(req, res) {
 }
 
 export async function findById(req, res) {
-  console.log(req.params)
   try {
     const { id } = req.params;
     const data = await facilityService.findById(id);
