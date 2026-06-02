@@ -38,7 +38,12 @@
                 :key="item.ID"
               >
                 <td class="select-col">
-                  <v-checkbox dense hide-details />
+                  <v-checkbox
+                    dense
+                    hide-details
+                    :input-value="selectedPositionID === item.ID"
+                    @change="togglePosition(item.ID)"
+                  />
                 </td>
                 <td>{{ index + 1 }}</td>
                 <td>{{ item.Name }}</td>
@@ -115,7 +120,13 @@
                           :key="room.ID"
                         >
                           <td class="select-col">
-                            <v-checkbox dense hide-details />
+                            <v-checkbox
+                              dense
+                              hide-details
+                              :input-value="isRoomSelected(room.ID)"
+                              :disabled="!selectedPositionID || mappingLoading"
+                              @change="toggleRoom(room.ID)"
+                            />
                           </td>
                           <td>{{ room.Name || room.No || '-' }}</td>
                           <td>{{ roomSeatCount(room) }}</td>
@@ -143,7 +154,11 @@
       </v-col>
     </v-row>
     <v-divider class="my-5" />
-    <v-btn @click="testBtn">
+    <v-btn
+      :loading="mappingLoading"
+      :disabled="!selectedPositionID || !selectedRoomIDs.length"
+      @click="saveSeatMapping"
+    >
       จัดที่นั่งสอบ
     </v-btn>
   </v-card>
@@ -163,7 +178,10 @@ export default {
       buildings: [],
       floorRows: [],
       position: [],
-      expandedFloors: {}
+      expandedFloors: {},
+      selectedPositionID: null,
+      selectedRoomIDs: [],
+      mappingLoading: false
     }
   },
   computed: {
@@ -190,11 +208,58 @@ export default {
     this.fetchPositionByExamID()
   },
   methods: {
-    testBtn () {
-      this.$swal.fire({
-        icon: 'success',
-        text: `จำนวนตำแหน่ง : ${this.position.length}`
-      })
+    togglePosition (positionID) {
+      if (this.selectedPositionID === positionID) {
+        this.selectedPositionID = null
+        this.selectedRoomIDs = []
+        return
+      }
+
+      this.selectedPositionID = positionID
+      this.selectedRoomIDs = []
+    },
+    isRoomSelected (roomID) {
+      return this.selectedRoomIDs.includes(roomID)
+    },
+    async toggleRoom (roomID) {
+      if (!this.selectedPositionID) {
+        this.showError('จัดที่นั่งสอบไม่สำเร็จ', 'กรุณาเลือกตำแหน่งก่อนเลือกห้องสอบ')
+        return
+      }
+
+      if (this.isRoomSelected(roomID)) {
+        this.selectedRoomIDs = this.selectedRoomIDs.filter(id => id !== roomID)
+      } else {
+        this.selectedRoomIDs = [...this.selectedRoomIDs, roomID]
+      }
+
+      if (this.selectedRoomIDs.length) {
+        await this.saveSeatMapping()
+      }
+    },
+    async saveSeatMapping () {
+      if (!this.selectedPositionID || !this.selectedRoomIDs.length) {
+        this.showError('จัดที่นั่งสอบไม่สำเร็จ', 'กรุณาเลือกตำแหน่งและห้องสอบ')
+        return
+      }
+
+      this.mappingLoading = true
+      try {
+        const res = await this.$axios.$post(this.$apiUrl('/api/seatMapping/map'), {
+          PositionID: this.selectedPositionID,
+          RoomIDs: this.selectedRoomIDs
+        })
+        const data = res.data || {}
+        this.$swal.fire({
+          icon: 'success',
+          title: 'จัดที่นั่งสอบสำเร็จ',
+          text: `จัดที่นั่ง ${data.mapped || 0} คน เหลือผู้สมัครไม่มีที่นั่ง ${data.unmappedApplicants || 0} คน`
+        })
+      } catch (err) {
+        this.showError('จัดที่นั่งสอบไม่สำเร็จ', err?.response?.data?.message || 'กรุณาลองใหม่อีกครั้ง')
+      } finally {
+        this.mappingLoading = false
+      }
     },
     toggleFloor (key) {
       this.$set(this.expandedFloors, key, !this.expandedFloors[key])
@@ -292,6 +357,13 @@ export default {
       ]
 
       return `วัน${weekdays[thaiDate.getDay()]}ที่ ${day} ${months[month - 1]} ${year + 543}`
+    },
+    showError (title, text) {
+      this.$swal.fire({
+        icon: 'error',
+        title,
+        text
+      })
     }
   }
 }

@@ -9,6 +9,8 @@ import organizationRoute from "./Organizations/organization/organization.route.j
 import examRoute from "./Organizations/exam/exam.route.js";
 import positionRoute from "./Organizations/position/position.route.js";
 import applicantRoute from "./Organizations/applicant/applicant.route.js";
+
+import seatMappingRoute from "./seatMapping/seatMapping.route.js";
 const router = Router();
 
 // Facility
@@ -23,5 +25,8 @@ router.use("/api", organizationRoute);
 router.use("/api", examRoute);
 router.use("/api", positionRoute);
 router.use("/api", applicantRoute);
+
+// Seat Mapping
+router.use("/api", seatMappingRoute);
 
 export default router;
