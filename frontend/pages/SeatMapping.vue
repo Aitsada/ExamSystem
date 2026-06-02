@@ -130,8 +130,8 @@
                           </td>
                           <td>{{ room.Name || room.No || '-' }}</td>
                           <td>{{ roomSeatCount(room) }}</td>
-                          <td>{{ roomSeatCount(room) }}</td>
-                          <td>0</td>
+                          <td>{{ roomApplicantCount(room) }}</td>
+                          <td>{{ roomAvailableSeatCount(room) }}</td>
                         </tr>
                         <tr v-if="!floorItem.rooms.length">
                           <td colspan="5" class="empty-cell">
@@ -181,6 +181,7 @@ export default {
       expandedFloors: {},
       selectedPositionID: null,
       selectedRoomIDs: [],
+      roomMappingCounts: {},
       mappingLoading: false
     }
   },
@@ -221,7 +222,7 @@ export default {
     isRoomSelected (roomID) {
       return this.selectedRoomIDs.includes(roomID)
     },
-    async toggleRoom (roomID) {
+    toggleRoom (roomID) {
       if (!this.selectedPositionID) {
         this.showError('จัดที่นั่งสอบไม่สำเร็จ', 'กรุณาเลือกตำแหน่งก่อนเลือกห้องสอบ')
         return
@@ -231,10 +232,6 @@ export default {
         this.selectedRoomIDs = this.selectedRoomIDs.filter(id => id !== roomID)
       } else {
         this.selectedRoomIDs = [...this.selectedRoomIDs, roomID]
-      }
-
-      if (this.selectedRoomIDs.length) {
-        await this.saveSeatMapping()
       }
     },
     async saveSeatMapping () {
@@ -255,6 +252,7 @@ export default {
           title: 'จัดที่นั่งสอบสำเร็จ',
           text: `จัดที่นั่ง ${data.mapped || 0} คน เหลือผู้สมัครไม่มีที่นั่ง ${data.unmappedApplicants || 0} คน`
         })
+        await this.fetchRoomMappingCounts()
       } catch (err) {
         this.showError('จัดที่นั่งสอบไม่สำเร็จ', err?.response?.data?.message || 'กรุณาลองใหม่อีกครั้ง')
       } finally {
@@ -316,6 +314,26 @@ export default {
       if (this.floorRows[0]) {
         this.$set(this.expandedFloors, this.floorRows[0].key, true)
       }
+      await this.fetchRoomMappingCounts()
+    },
+    async fetchRoomMappingCounts () {
+      const roomIDs = this.floorRows.flatMap(floorItem => floorItem.rooms.map(room => room.ID))
+      if (!roomIDs.length) {
+        this.roomMappingCounts = {}
+        return
+      }
+
+      const res = await this.$axios.$get(this.$apiUrl('/api/seatMapping/room-counts'), {
+        params: {
+          RoomIDs: roomIDs.join(',')
+        }
+      })
+      const counts = {}
+      const mappingRows = res.data || []
+      mappingRows.forEach((item) => {
+        counts[item.RoomID] = Number(item.ApplicantCount) || 0
+      })
+      this.roomMappingCounts = counts
     },
     async fetchPositionByExamID () {
       if (!this.exam.ID) {
@@ -333,6 +351,12 @@ export default {
       const rows = Number(room.Rows) || 0
       const columns = Number(room.Columns) || 0
       return rows * columns
+    },
+    roomApplicantCount (room) {
+      return this.roomMappingCounts[room.ID] || 0
+    },
+    roomAvailableSeatCount (room) {
+      return Math.max(this.roomSeatCount(room) - this.roomApplicantCount(room), 0)
     },
     positionApplicantCount (position) {
       return Number(position.Number) || 0

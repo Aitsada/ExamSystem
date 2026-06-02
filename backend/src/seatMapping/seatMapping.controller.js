@@ -9,6 +9,18 @@ export async function findAll(req, res) {
   }
 }
 
+export async function findRoomMappingCounts(req, res) {
+  try {
+    const RoomIDs = String(req.query.RoomIDs || "")
+      .split(",")
+      .filter((RoomID) => RoomID);
+    const result = await seatMappingService.findRoomMappingCounts(RoomIDs);
+    res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+}
+
 export async function mapPositionToRooms(req, res) {
   try {
     const { PositionID, RoomIDs } = req.body;
