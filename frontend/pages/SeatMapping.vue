@@ -46,10 +46,15 @@
                   />
                 </td>
                 <td>{{ index + 1 }}</td>
-                <td>{{ item.Name }}</td>
+                <td>
+                  {{ item.Name }}
+                  <p v-if="selectedPositionID === item.ID" class="selected-room-text">
+                    {{ selectedRoomNamesText() }}
+                  </p>
+                </td>
                 <td>{{ positionApplicantCount(item) }}</td>
-                <td>{{ positionApplicantCount(item) }}</td>
-                <td>0</td>
+                <td>{{ positionMappedCount(item) }}</td>
+                <td>{{ positionUnmappedCount(item) }}</td>
               </tr>
               <tr v-if="!position.length">
                 <td colspan="6" class="empty-cell">
@@ -182,6 +187,7 @@ export default {
       selectedPositionID: null,
       selectedRoomIDs: [],
       roomMappingCounts: {},
+      positionRoomMappingCounts: {},
       mappingLoading: false
     }
   },
@@ -217,7 +223,7 @@ export default {
       }
 
       this.selectedPositionID = positionID
-      this.selectedRoomIDs = []
+      this.selectedRoomIDs = this.positionRoomIDs(positionID)
     },
     isRoomSelected (roomID) {
       return this.selectedRoomIDs.includes(roomID)
@@ -253,6 +259,8 @@ export default {
           text: `จัดที่นั่ง ${data.mapped || 0} คน เหลือผู้สมัครไม่มีที่นั่ง ${data.unmappedApplicants || 0} คน`
         })
         await this.fetchRoomMappingCounts()
+        await this.fetchPositionRoomMappingCounts()
+        this.selectedRoomIDs = this.positionRoomIDs(this.selectedPositionID)
       } catch (err) {
         this.showError('จัดที่นั่งสอบไม่สำเร็จ', err?.response?.data?.message || 'กรุณาลองใหม่อีกครั้ง')
       } finally {
@@ -315,6 +323,7 @@ export default {
         this.$set(this.expandedFloors, this.floorRows[0].key, true)
       }
       await this.fetchRoomMappingCounts()
+      await this.fetchPositionRoomMappingCounts()
     },
     async fetchRoomMappingCounts () {
       const roomIDs = this.floorRows.flatMap(floorItem => floorItem.rooms.map(room => room.ID))
@@ -334,6 +343,30 @@ export default {
         counts[item.RoomID] = Number(item.ApplicantCount) || 0
       })
       this.roomMappingCounts = counts
+    },
+    async fetchPositionRoomMappingCounts () {
+      const roomIDs = this.floorRows.flatMap(floorItem => floorItem.rooms.map(room => room.ID))
+      if (!roomIDs.length) {
+        this.positionRoomMappingCounts = {}
+        return
+      }
+
+      const res = await this.$axios.$get(this.$apiUrl('/api/seatMapping/position-room-counts'), {
+        params: {
+          RoomIDs: roomIDs.join(',')
+        }
+      })
+      const counts = {}
+      const mappingRows = res.data || []
+      mappingRows.forEach((item) => {
+        const positionID = Number(item.PositionID)
+        const roomID = Number(item.RoomID)
+        if (!counts[positionID]) {
+          counts[positionID] = {}
+        }
+        counts[positionID][roomID] = Number(item.ApplicantCount) || 0
+      })
+      this.positionRoomMappingCounts = counts
     },
     async fetchPositionByExamID () {
       if (!this.exam.ID) {
@@ -360,6 +393,58 @@ export default {
     },
     positionApplicantCount (position) {
       return Number(position.Number) || 0
+    },
+    positionMappedCount (position) {
+      const applicantCount = this.positionApplicantCount(position)
+      if (this.selectedPositionID === position.ID && this.selectedRoomIDs.length) {
+        return Math.min(applicantCount, this.selectedRoomAvailableSeatCount(position.ID))
+      }
+
+      const roomCounts = this.positionRoomMappingCounts[position.ID] || {}
+      const mappedCount = Object.values(roomCounts).reduce((sum, count) => sum + count, 0)
+      return Math.min(applicantCount, mappedCount)
+    },
+    positionUnmappedCount (position) {
+      return Math.max(this.positionApplicantCount(position) - this.positionMappedCount(position), 0)
+    },
+    positionRoomCount (positionID, roomID) {
+      const roomCounts = this.positionRoomMappingCounts[positionID] || {}
+      return roomCounts[roomID] || 0
+    },
+    positionRoomIDs (positionID) {
+      const roomCounts = this.positionRoomMappingCounts[positionID] || {}
+      return Object.keys(roomCounts)
+        .filter(roomID => roomCounts[roomID] > 0)
+        .map(roomID => Number(roomID))
+    },
+    selectedRoomAvailableSeatCount (positionID) {
+      return this.selectedRoomIDs.reduce((sum, roomID) => {
+        const room = this.findRoom(roomID)
+        if (!room) {
+          return sum
+        }
+        const occupiedByOtherPositions = Math.max(this.roomApplicantCount(room) - this.positionRoomCount(positionID, roomID), 0)
+        return sum + Math.max(this.roomSeatCount(room) - occupiedByOtherPositions, 0)
+      }, 0)
+    },
+    findRoom (roomID) {
+      for (const floorItem of this.floorRows) {
+        const room = floorItem.rooms.find(item => item.ID === roomID)
+        if (room) {
+          return room
+        }
+      }
+      return null
+    },
+    selectedRoomNamesText () {
+      if (!this.selectedRoomIDs.length) {
+        return 'ยังไม่ได้เลือกห้องสอบ'
+      }
+      const roomNames = this.selectedRoomIDs.map((roomID) => {
+        const room = this.findRoom(roomID)
+        return room ? (room.Name || room.No || '-') : '-'
+      })
+      return `เลือกห้องสอบ: ${roomNames.join(', ')}`
     },
     formatThaiDate (date) {
       const [year, month, day] = date.split('-').map(Number)
@@ -458,6 +543,13 @@ export default {
   font-size: 18px;
   line-height: 1.4;
   margin: 0 0 6px;
+}
+
+.selected-room-text {
+  color: #616161;
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 4px 0 0;
 }
 
 .expand-button {

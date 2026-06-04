@@ -13,6 +13,10 @@ export async function findRoomMappingCounts(RoomIDs) {
   return await seatMappingModel.findRoomMappingCounts(RoomIDs);
 }
 
+export async function findPositionRoomMappingCounts(RoomIDs) {
+  return await seatMappingModel.findPositionRoomMappingCounts(RoomIDs);
+}
+
 async function ensureRoomSeats(RoomIDs, conn) {
   const rooms = await seatMappingModel.findRoomsByIDs(RoomIDs, conn);
   const seatRows = await seatMappingModel.findSeatRowsByRoomIDs(RoomIDs, conn);
@@ -72,8 +76,13 @@ export async function mapPositionToRooms(PositionID, RoomIDs) {
     await conn.beginTransaction();
 
     const applicants = await seatMappingModel.findApplicantsByPositionID(normalizedPositionID, conn);
+    await seatMappingModel.deleteByApplicantIDsOrSeatIDs(
+      applicants.map((applicant) => applicant.ID),
+      [],
+      conn,
+    );
     await ensureRoomSeats(normalizedRoomIDs, conn);
-    const seats = await seatMappingModel.findSeatsByRoomIDs(normalizedRoomIDs, conn);
+    const seats = await seatMappingModel.findAvailableSeatsByRoomIDs(normalizedRoomIDs, conn);
     const mappingCount = Math.min(applicants.length, seats.length);
     const mappings = [];
 
@@ -84,11 +93,6 @@ export async function mapPositionToRooms(PositionID, RoomIDs) {
       });
     }
 
-    await seatMappingModel.deleteByApplicantIDsOrSeatIDs(
-      applicants.map((applicant) => applicant.ID),
-      seats.map((seat) => seat.ID),
-      conn,
-    );
     await seatMappingModel.createMany(mappings, conn);
 
     await conn.commit();

@@ -26,7 +26,7 @@
           outlined
           dense
         />
-      </v-col>
+      </v-col>2
     </v-row>
     <v-row>
       <v-col>
@@ -71,6 +71,9 @@
 
           <v-date-picker v-model="date" no-title scrollable>
             <v-spacer />
+            <v-btn text color="primary" @click="setToday">
+              วันนี้
+            </v-btn>
             <v-btn text color="primary" @click="menu = false">
               ยกเลิก
             </v-btn>
@@ -125,6 +128,31 @@
   </v-card>
 </template>
 <script>
+const getCurrentDate = () => {
+  return (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
+}
+
+const timeOptions = ['08:00',
+  '08:30',
+  '09:00',
+  '09:30',
+  '10:00',
+  '10:30',
+  '11:00',
+  '11:30',
+  '12:00',
+  '12:30',
+  '13:00',
+  '13:30',
+  '14:00',
+  '14:30',
+  '15:00',
+  '15:30',
+  '16:00',
+  '16:30',
+  '17:00',
+  '17:30']
+
 export default {
   data () {
     return {
@@ -137,29 +165,10 @@ export default {
       exams: [],
       selectExams: [],
       selectedExams: null,
-      timeOptions: ['08:00',
-        '08:30',
-        '09:00',
-        '09:30',
-        '10:00',
-        '10:30',
-        '11:00',
-        '11:30',
-        '12:00',
-        '12:30',
-        '13:00',
-        '13:30',
-        '14:00',
-        '14:30',
-        '15:00',
-        '15:30',
-        '16:00',
-        '16:30',
-        '17:00',
-        '17:30'],
-      selectTimeStart: '08:00',
-      selectTimeEnd: '17:00',
-      date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      timeOptions,
+      selectTimeStart: timeOptions[0],
+      selectTimeEnd: timeOptions[timeOptions.length - 1],
+      date: getCurrentDate(),
       menu: false,
       drinks: [{ text: 'cola', value: 1 }, { text: 'soda', value: 2 }]
     }
@@ -187,11 +196,6 @@ export default {
       if (newValue) {
         this.fetchExamData()
       }
-    },
-    selectedExams (newValue) {
-      if (newValue) {
-        this.setDateAndTimeFromSelectedExam()
-      }
     }
   },
   mounted () {
@@ -203,6 +207,9 @@ export default {
       this.$swal.fire({
         text: `testBtn : ${this.selectedOrganizations}`
       })
+    },
+    setToday () {
+      this.date = getCurrentDate()
     },
     async fetchFacilitiesData () {
       const res = await this.$axios.$get(this.$apiUrl('/api/facilities'))
@@ -230,53 +237,6 @@ export default {
         value: e.ID
       }))
       this.selectedExams = this.selectExams[0]?.value || null
-    },
-    setDateAndTimeFromSelectedExam () {
-      const exam = this.exams.find(e => e.ID === this.selectedExams)
-      if (!exam) {
-        return
-      }
-
-      const start = this.parseDateTime(exam.StartDateTime)
-      const end = this.parseDateTime(exam.EndDateTime)
-      if (start.date) {
-        this.date = start.date
-      }
-      if (start.time) {
-        this.selectTimeStart = start.time
-      }
-      if (end.time) {
-        this.selectTimeEnd = end.time
-      }
-    },
-    parseDateTime (value) {
-      if (!value) {
-        return { date: '', time: '' }
-      }
-
-      const text = String(value)
-      const hasTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(text)
-      if (hasTimezone) {
-        const dateTime = new Date(text)
-        if (!Number.isNaN(dateTime.getTime())) {
-          const year = dateTime.getFullYear()
-          const month = String(dateTime.getMonth() + 1).padStart(2, '0')
-          const day = String(dateTime.getDate()).padStart(2, '0')
-          const hour = String(dateTime.getHours()).padStart(2, '0')
-          const minute = String(dateTime.getMinutes()).padStart(2, '0')
-
-          return {
-            date: `${year}-${month}-${day}`,
-            time: `${hour}:${minute}`
-          }
-        }
-      }
-
-      const normalizedText = text.replace('T', ' ')
-      return {
-        date: normalizedText.substr(0, 10),
-        time: normalizedText.substr(11, 5)
-      }
     },
     formatDate (date) {
       if (!date) {

@@ -13,7 +13,7 @@ export async function findApplicantsByPositionID(PositionID, conn = db) {
   return result;
 }
 
-export async function findSeatsByRoomIDs(RoomIDs, conn = db) {
+export async function findAvailableSeatsByRoomIDs(RoomIDs, conn = db) {
   if (!RoomIDs.length) {
     return [];
   }
@@ -23,7 +23,9 @@ export async function findSeatsByRoomIDs(RoomIDs, conn = db) {
     `SELECT Seat.*
      FROM Seat
      INNER JOIN SeatRow ON Seat.SeatRowID = SeatRow.ID
+     LEFT JOIN SeatMapping ON Seat.ID = SeatMapping.SeatID
      WHERE SeatRow.RoomID IN (${roomPlaceholders})
+       AND SeatMapping.ID IS NULL
      ORDER BY FIELD(SeatRow.RoomID, ${roomPlaceholders}), SeatRow.Name, LENGTH(Seat.Name), Seat.Name`,
     [...RoomIDs, ...RoomIDs],
   );
@@ -93,6 +95,27 @@ export async function findRoomMappingCounts(RoomIDs = []) {
      INNER JOIN SeatRow ON Seat.SeatRowID = SeatRow.ID
      ${where}
      GROUP BY SeatRow.RoomID`,
+    normalizedRoomIDs,
+  );
+  return result;
+}
+
+export async function findPositionRoomMappingCounts(RoomIDs = []) {
+  const normalizedRoomIDs = RoomIDs
+    .map((RoomID) => Number(RoomID))
+    .filter((RoomID) => Number.isInteger(RoomID) && RoomID > 0);
+  const where = normalizedRoomIDs.length
+    ? `WHERE SeatRow.RoomID IN (${normalizedRoomIDs.map(() => "?").join(",")})`
+    : "";
+
+  const [result] = await db.query(
+    `SELECT Applicant.PositionID, SeatRow.RoomID, COUNT(SeatMapping.ID) AS ApplicantCount
+     FROM SeatMapping
+     INNER JOIN Applicant ON SeatMapping.ApplicantID = Applicant.ID
+     INNER JOIN Seat ON SeatMapping.SeatID = Seat.ID
+     INNER JOIN SeatRow ON Seat.SeatRowID = SeatRow.ID
+     ${where}
+     GROUP BY Applicant.PositionID, SeatRow.RoomID`,
     normalizedRoomIDs,
   );
   return result;
