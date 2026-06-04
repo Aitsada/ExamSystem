@@ -1,4 +1,4 @@
-import * as seatMappingModel from "../models/seatMapping.js";
+import * as seatMappingModel from "../models/seatMapping.model.js";
 import db from "../config/db.js";
 
 export async function findAll() {
