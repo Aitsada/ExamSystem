@@ -161,10 +161,10 @@
     <v-divider class="my-5" />
     <v-btn
       :loading="mappingLoading"
-      :disabled="!selectedPositionID || !selectedRoomIDs.length"
+      :disabled="!selectedPositionID"
       @click="saveSeatMapping"
     >
-      จัดที่นั่งสอบ
+      {{ selectedRoomIDs.length ? 'จัดที่นั่งสอบ' : 'ล้างที่นั่งสอบ' }}
     </v-btn>
   </v-container>
 </template>
@@ -241,8 +241,8 @@ export default {
       }
     },
     async saveSeatMapping () {
-      if (!this.selectedPositionID || !this.selectedRoomIDs.length) {
-        this.showError('จัดที่นั่งสอบไม่สำเร็จ', 'กรุณาเลือกตำแหน่งและห้องสอบ')
+      if (!this.selectedPositionID) {
+        this.showError('จัดที่นั่งสอบไม่สำเร็จ', 'กรุณาเลือกตำแหน่ง')
         return
       }
 
@@ -253,10 +253,13 @@ export default {
           RoomIDs: this.selectedRoomIDs
         })
         const data = res.data || {}
+        const isClearingMapping = !this.selectedRoomIDs.length
         this.$swal.fire({
           icon: 'success',
-          title: 'จัดที่นั่งสอบสำเร็จ',
-          text: `จัดที่นั่ง ${data.mapped || 0} คน เหลือผู้สมัครไม่มีที่นั่ง ${data.unmappedApplicants || 0} คน`
+          title: isClearingMapping ? 'ล้างที่นั่งสอบสำเร็จ' : 'จัดที่นั่งสอบสำเร็จ',
+          text: isClearingMapping
+            ? `นำผู้สมัคร ${data.totalApplicants || 0} คนออกจากที่นั่งสอบแล้ว`
+            : `จัดที่นั่ง ${data.mapped || 0} คน เหลือผู้สมัครไม่มีที่นั่ง ${data.unmappedApplicants || 0} คน`
         })
         await this.fetchRoomMappingCounts()
         await this.fetchPositionRoomMappingCounts()
@@ -396,7 +399,7 @@ export default {
     },
     positionMappedCount (position) {
       const applicantCount = this.positionApplicantCount(position)
-      if (this.selectedPositionID === position.ID && this.selectedRoomIDs.length) {
+      if (this.selectedPositionID === position.ID) {
         return Math.min(applicantCount, this.selectedRoomAvailableSeatCount(position.ID))
       }
 

@@ -13,7 +13,6 @@
         </p>
       </v-col>
     </v-row>
-
     <v-row dense>
       <v-col
         v-for="item in adminLinks"

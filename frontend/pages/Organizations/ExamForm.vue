@@ -475,6 +475,44 @@ export default {
         this.selectedEndTime = end.time
       }
     },
+    formatBangkokDateTime (dateTime) {
+      const bangkokTime = new Date(dateTime.getTime() + (7 * 60 * 60 * 1000))
+      const year = bangkokTime.getUTCFullYear()
+      const month = String(bangkokTime.getUTCMonth() + 1).padStart(2, '0')
+      const day = String(bangkokTime.getUTCDate()).padStart(2, '0')
+      const hour = String(bangkokTime.getUTCHours()).padStart(2, '0')
+      const minute = String(bangkokTime.getUTCMinutes()).padStart(2, '0')
+
+      return {
+        date: `${year}-${month}-${day}`,
+        time: `${hour}:${minute}`
+      }
+    },
+    normalizeDateTimeForSelect (dateTime) {
+      const bangkokDateTime = this.formatBangkokDateTime(dateTime)
+      if (this.timeOptions.includes(bangkokDateTime.time)) {
+        return bangkokDateTime
+      }
+
+      return this.formatBangkokDateTime(new Date(dateTime.getTime() + (7 * 60 * 60 * 1000)))
+    },
+    parseSqlDateTime (text) {
+      const sqlDateTime = text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?$/)
+      if (!sqlDateTime) {
+        return null
+      }
+
+      const [, year, month, day, hour, minute, second = '00'] = sqlDateTime
+      const date = `${year}-${month}-${day}`
+      const time = `${hour}:${minute}`
+
+      if (this.timeOptions.includes(time)) {
+        return { date, time }
+      }
+
+      const utcDateTime = new Date(Date.UTC(year, Number(month) - 1, day, hour, minute, second))
+      return this.normalizeDateTimeForSelect(utcDateTime)
+    },
     parseDateTime (value) {
       if (!value) {
         return { date: '', time: '' }
@@ -485,17 +523,13 @@ export default {
       if (hasTimezone) {
         const dateTime = new Date(text)
         if (!Number.isNaN(dateTime.getTime())) {
-          const year = dateTime.getFullYear()
-          const month = String(dateTime.getMonth() + 1).padStart(2, '0')
-          const day = String(dateTime.getDate()).padStart(2, '0')
-          const hour = String(dateTime.getHours()).padStart(2, '0')
-          const minute = String(dateTime.getMinutes()).padStart(2, '0')
-
-          return {
-            date: `${year}-${month}-${day}`,
-            time: `${hour}:${minute}`
-          }
+          return this.normalizeDateTimeForSelect(dateTime)
         }
+      }
+
+      const sqlDateTime = this.parseSqlDateTime(text)
+      if (sqlDateTime) {
+        return sqlDateTime
       }
 
       const normalizedText = text.replace('T', ' ')

@@ -66,9 +66,6 @@ export async function mapPositionToRooms(PositionID, RoomIDs) {
   if (!Number.isInteger(normalizedPositionID) || normalizedPositionID <= 0) {
     throw new Error("PositionID is invalid");
   }
-  if (!normalizedRoomIDs.length) {
-    throw new Error("RoomIDs is required");
-  }
 
   let conn;
   try {
@@ -81,6 +78,19 @@ export async function mapPositionToRooms(PositionID, RoomIDs) {
       [],
       conn,
     );
+
+    if (!normalizedRoomIDs.length) {
+      await conn.commit();
+
+      return {
+        mapped: 0,
+        totalApplicants: applicants.length,
+        totalSeats: 0,
+        unmappedApplicants: applicants.length,
+        unusedSeats: 0,
+      };
+    }
+
     await ensureRoomSeats(normalizedRoomIDs, conn);
     const seats = await seatMappingModel.findAvailableSeatsByRoomIDs(normalizedRoomIDs, conn);
     const mappingCount = Math.min(applicants.length, seats.length);

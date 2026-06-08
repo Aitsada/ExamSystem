@@ -233,6 +233,11 @@ export default {
       if (newValue) {
         this.fetchExamData()
       }
+    },
+    selectedExams (newValue) {
+      if (newValue) {
+        this.setDateAndTimeFromExam(newValue)
+      }
     }
   },
   mounted () {
@@ -269,6 +274,91 @@ export default {
         value: e.ID
       }))
       this.selectedExams = this.selectExams[0]?.value || null
+      if (this.selectedExams) {
+        this.setDateAndTimeFromExam(this.selectedExams)
+      }
+    },
+    setDateAndTimeFromExam (examID) {
+      const exam = this.exams.find(e => String(e.ID) === String(examID))
+      if (!exam) {
+        return
+      }
+
+      const start = this.parseDateTime(exam.StartDateTime)
+      const end = this.parseDateTime(exam.EndDateTime)
+
+      if (start.date) {
+        this.date = start.date
+      }
+      if (start.time) {
+        this.selectTimeStart = start.time
+      }
+      if (end.time) {
+        this.selectTimeEnd = end.time
+      }
+    },
+    formatBangkokDateTime (dateTime) {
+      const bangkokTime = new Date(dateTime.getTime() + (7 * 60 * 60 * 1000))
+      const year = bangkokTime.getUTCFullYear()
+      const month = String(bangkokTime.getUTCMonth() + 1).padStart(2, '0')
+      const day = String(bangkokTime.getUTCDate()).padStart(2, '0')
+      const hour = String(bangkokTime.getUTCHours()).padStart(2, '0')
+      const minute = String(bangkokTime.getUTCMinutes()).padStart(2, '0')
+
+      return {
+        date: `${year}-${month}-${day}`,
+        time: `${hour}:${minute}`
+      }
+    },
+    normalizeDateTimeForSelect (dateTime) {
+      const bangkokDateTime = this.formatBangkokDateTime(dateTime)
+      if (this.timeOptions.includes(bangkokDateTime.time)) {
+        return bangkokDateTime
+      }
+
+      return this.formatBangkokDateTime(new Date(dateTime.getTime() + (7 * 60 * 60 * 1000)))
+    },
+    parseSqlDateTime (text) {
+      const sqlDateTime = text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?$/)
+      if (!sqlDateTime) {
+        return null
+      }
+
+      const [, year, month, day, hour, minute, second = '00'] = sqlDateTime
+      const date = `${year}-${month}-${day}`
+      const time = `${hour}:${minute}`
+
+      if (this.timeOptions.includes(time)) {
+        return { date, time }
+      }
+
+      const utcDateTime = new Date(Date.UTC(year, Number(month) - 1, day, hour, minute, second))
+      return this.normalizeDateTimeForSelect(utcDateTime)
+    },
+    parseDateTime (value) {
+      if (!value) {
+        return { date: '', time: '' }
+      }
+
+      const text = String(value)
+      const hasTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(text)
+      if (hasTimezone) {
+        const dateTime = new Date(text)
+        if (!Number.isNaN(dateTime.getTime())) {
+          return this.normalizeDateTimeForSelect(dateTime)
+        }
+      }
+
+      const sqlDateTime = this.parseSqlDateTime(text)
+      if (sqlDateTime) {
+        return sqlDateTime
+      }
+
+      const normalizedText = text.replace('T', ' ')
+      const date = normalizedText.substr(0, 10)
+      const time = normalizedText.substr(11, 5)
+
+      return { date, time }
     },
     formatDate (date) {
       if (!date) {
