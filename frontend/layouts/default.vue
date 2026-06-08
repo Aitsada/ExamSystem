@@ -1,61 +1,32 @@
 <template>
   <v-app class="app-shell">
-    <v-navigation-drawer
-      v-model="drawer"
-      :mini-variant="miniVariant"
-      :width="260"
-      mini-variant-width="72"
-      fixed
-      app
-      class="app-sidebar"
-    >
-      <div class="sidebar-header">
-        <v-btn icon class="sidebar-menu-btn" @click.stop="miniVariant = !miniVariant">
-          <v-icon>{{ miniVariant ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
-        </v-btn>
-        <div v-if="!miniVariant" class="sidebar-title">
-          <div class="sidebar-title-main">
-            {{ title }}
-          </div>
-          <div class="sidebar-title-sub">
-            ระบบจัดการสอบ
-          </div>
-        </div>
-      </div>
-
-      <v-divider />
-
-      <v-list nav dense class="sidebar-list">
-        <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
-          router
-          exact
-          active-class="sidebar-item-active"
-          class="sidebar-item"
-        >
-          <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-
     <v-app-bar
       fixed
       app
       flat
-      height="64"
-      color="white"
+      height="49"
+      color="#222222"
       class="app-topbar"
     >
-      <v-toolbar-title class="topbar-title" v-text="pageTitle" />
-      <v-spacer />
-      <span class="topbar-caption">Admin workspace</span>
+      <v-container class="topbar-container">
+        <v-toolbar-items class="topbar-menu">
+          <v-btn
+            v-for="item in items"
+            :key="item.to"
+            text
+            exact
+            router
+            :to="item.to"
+            class="topbar-link"
+            active-class="topbar-link-active"
+          >
+            {{ item.title }}
+          </v-btn>
+          <v-btn text class="topbar-link">
+            Logout
+          </v-btn>
+        </v-toolbar-items>
+      </v-container>
     </v-app-bar>
 
     <v-main class="app-main">
@@ -63,10 +34,6 @@
         <Nuxt />
       </v-container>
     </v-main>
-
-    <v-footer app inset height="40" class="app-footer">
-      <span>&copy; {{ new Date().getFullYear() }} Tock3yrs</span>
-    </v-footer>
   </v-app>
 </template>
 
@@ -74,42 +41,24 @@
 export default {
   data () {
     return {
-      drawer: true,
       items: [
         {
-          icon: 'mdi-view-dashboard-outline',
-          title: 'Welcome',
-          to: '/'
-        },
-        {
-          icon: 'mdi-home-outline',
           title: 'หน้าหลัก',
           to: '/Home'
         },
         {
-          icon: 'mdi-seat-outline',
           title: 'จัดห้องสอบ',
           to: '/ExamSelect'
         },
         {
-          icon: 'mdi-history',
           title: 'ประวัติการจัดสอบ',
           to: '/ExamHistory'
         },
         {
-          icon: 'mdi-cog-outline',
           title: 'จัดการหลังบ้าน',
           to: '/Admin'
         }
-      ],
-      miniVariant: false,
-      title: 'Tock3yrs'
-    }
-  },
-  computed: {
-    pageTitle () {
-      const currentItem = this.items.find(item => item.to === this.$route.path)
-      return currentItem ? currentItem.title : this.title
+      ]
     }
   }
 }
@@ -117,86 +66,56 @@ export default {
 
 <style scoped>
 .app-shell {
-  background: #F5F7FB !important;
-}
-
-.app-sidebar {
-  border-right: 1px solid #E3E8F0 !important;
   background: #FFFFFF !important;
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  min-height: 72px;
-  padding: 12px 14px;
-}
-
-.sidebar-menu-btn {
-  color: #1A237E !important;
-}
-
-.sidebar-title {
-  min-width: 0;
-  margin-left: 10px;
-}
-
-.sidebar-title-main {
-  color: #1A237E;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-.sidebar-title-sub {
-  color: #607D8B;
-  font-size: 12px;
-  line-height: 1.3;
-}
-
-.sidebar-list {
-  padding: 10px 8px !important;
-}
-
-.sidebar-item {
-  min-height: 44px;
-  margin-bottom: 4px;
-  border-radius: 8px;
-  color: #455A64 !important;
-}
-
-.sidebar-item-active {
-  background: #E8EAF6 !important;
-  color: #1A237E !important;
 }
 
 .app-topbar {
-  border-bottom: 1px solid #E3E8F0 !important;
+  border-bottom: 1px solid #111111 !important;
 }
 
-.topbar-title {
-  color: #263238;
-  font-size: 18px;
-  font-weight: 700;
+.topbar-container {
+  display: flex;
+  justify-content: center;
+  max-width: 1140px;
+  padding: 0 !important;
 }
 
-.topbar-caption {
-  color: #78909C;
-  font-size: 12px;
+.topbar-menu {
+  min-width: 0;
+  min-height: 50px;
+  overflow-x: auto;
+}
+.topbar-link {
+  min-width: 92px !important;
+  padding: 0 16px !important;
+  color: #BDBDBD !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.topbar-link-active,
+.topbar-link:hover {
+  color: #FFFFFF !important;
 }
 
 .app-main {
-  background: #F5F7FB;
+  background: #FFFFFF;
 }
 
 .page-container {
-  padding: 24px;
+  padding: 0 !important;
 }
 
-.app-footer {
-  border-top: 1px solid #E3E8F0 !important;
-  background: #FFFFFF !important;
-  color: #78909C;
-  font-size: 12px;
+@media (max-width: 600px) {
+  .topbar-container {
+    justify-content: flex-start;
+  }
+
+  .topbar-link {
+    min-width: auto !important;
+    padding: 0 12px !important;
+  }
 }
 </style>

@@ -27,7 +27,7 @@
       </v-col>
     </v-row>
 
-    <v-card elevation="0" rounded="lg" border color="white" class="admin-card">
+    <v-card elevation="0" rounded="lg" border color="gray" class="admin-card">
       <v-card-text class="px-5 py-4">
         <v-row align="center" class="compact-row" no-gutters>
           <v-col cols="12" md="3">
@@ -67,7 +67,7 @@
 
         <v-row align="center" class="compact-row" no-gutters>
           <v-col cols="12" md="3">
-            <span class="field-label">จำนวนแถว :</span>
+            <span class="field-label">จำนวนแถว(row) :</span>
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field v-model.trim="room.Rows" outlined dense hide-details="auto" class="form-field" />
@@ -76,19 +76,33 @@
 
         <v-row align="center" class="compact-row" no-gutters>
           <v-col cols="12" md="3">
-            <span class="field-label">จำนวนคนในแถว :</span>
+            <span class="field-label">จำนวนคนในแถว(column) :</span>
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field v-model.trim="room.Columns" outlined dense hide-details="auto" class="form-field" />
           </v-col>
         </v-row>
-
         <v-row align="center" class="compact-row" no-gutters>
           <v-col cols="12" md="3">
             <span class="field-label">ห้องสอบที่ :</span>
           </v-col>
           <v-col cols="12" md="6">
             <v-text-field v-model.trim="room.No" outlined dense hide-details="auto" class="form-field" />
+          </v-col>
+        </v-row>
+        <v-row align="center" class="compact-row" no-gutters>
+          <v-col cols="12" md="3">
+            <span class="field-label">จำนวนผู้สอบในห้อง :</span>
+          </v-col>
+          <v-col cols="12" md="6">
+            <v-text-field
+              v-model.trim="room.TemplateID"
+              outlined
+              dense
+              hide-details="auto"
+              class="form-field"
+              :placeholder="amountOfSeats"
+            />
           </v-col>
         </v-row>
         <v-btn
@@ -149,6 +163,13 @@ export default {
   computed: {
     pageTitle () {
       return this.isEditMode ? 'แก้ไขห้องสอบ' : 'เพิ่มห้องสอบ'
+    },
+    amountOfSeats () {
+      if (!this.room.TemplateID) {
+        return this.room.Rows * this.room.Columns
+      } else {
+        return this.room.TemplateID
+      }
     }
   },
   mounted () {
@@ -170,6 +191,12 @@ export default {
     }
   },
   methods: {
+    testBtn () {
+      this.$swal.fire({
+        icon: 'success',
+        text: `จำนวนที่นั่งในห้องสอบนี้คือ ${this.amountOfSeats} ที่นั่ง`
+      })
+    },
     async fetchFactilityData (id) {
       try {
         const res = await this.$axios.$get(this.$apiUrl(`/api/facility/${id}`))
@@ -280,7 +307,7 @@ export default {
           Description: this.room.Description,
           Rows: this.room.Rows,
           Columns: this.room.Columns,
-          TemplateID: this.room.Rows * this.room.Columns,
+          TemplateID: this.amountOfSeats,
           CreatedBy: 'Admin'
         }
 
@@ -305,7 +332,7 @@ export default {
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
-          text: `บันทึกข้อมูลไม่สำเร็จ ${err.message}`
+          text: 'บันทึกข้อมูลไม่สำเร็จ'
         })
       }
     },

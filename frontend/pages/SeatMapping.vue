@@ -1,5 +1,5 @@
 <template>
-  <v-card class="seat-mapping-card">
+  <v-container class="admin-page admin-page-wide">
     <v-row class="seat-mapping-header">
       <v-col>
         <p>หน่วยงาน: {{ organization.Name || '-' }}</p>
@@ -166,7 +166,7 @@
     >
       จัดที่นั่งสอบ
     </v-btn>
-  </v-card>
+  </v-container>
 </template>
 
 <script>
@@ -479,24 +479,20 @@ export default {
 </script>
 
 <style scoped>
-.seat-mapping-card {
-  padding: 16px;
-}
-
 .seat-mapping-header {
   text-align: center;
   justify-content: center;
 }
 
 .seat-mapping-header p {
-  color: #424242;
-  font-size: 20px;
-  line-height: 1.5;
-  margin-bottom: 10px;
+  color: #333333;
+  font-size: 14px;
+  line-height: 1.45;
+  margin-bottom: 4px;
 }
 
 .bordered-table {
-  border: 1px solid #dcdcdc;
+  border: 1px solid #CCCCCC;
 }
 
 .bordered-table ::v-deep table {
@@ -505,11 +501,11 @@ export default {
 
 .bordered-table ::v-deep th,
 .bordered-table ::v-deep td {
-  border: 1px solid #dcdcdc;
-  color: #424242;
-  font-size: 18px;
-  height: 52px;
-  padding: 10px 16px;
+  border: 1px solid #CCCCCC;
+  color: #222222;
+  font-size: 13px;
+  height: 38px;
+  padding: 6px 8px;
   vertical-align: top;
 }
 
@@ -519,7 +515,7 @@ export default {
 }
 
 .facility-table ::v-deep td {
-  height: 74px;
+  height: 44px;
 }
 
 .room-table {
@@ -529,8 +525,8 @@ export default {
 
 .room-table ::v-deep th,
 .room-table ::v-deep td {
-  font-size: 16px;
-  height: 48px;
+  font-size: 13px;
+  height: 36px;
 }
 
 .select-col,
@@ -540,7 +536,7 @@ export default {
 }
 
 .floor-title {
-  font-size: 18px;
+  font-size: 13px;
   line-height: 1.4;
   margin: 0 0 6px;
 }

@@ -31,7 +31,7 @@
       </v-col>
     </v-row>
 
-    <v-card elevation="0" rounded="lg" border color="white" class="admin-card admin-form-card mb-5">
+    <v-card elevation="0" rounded="lg" border color="gray" class="admin-card admin-form-card mb-5">
       <v-card-text>
         <v-form ref="form">
           <v-row align="center" class="compact-row" no-gutters>

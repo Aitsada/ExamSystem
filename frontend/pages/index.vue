@@ -1,5 +1,7 @@
 <template>
-  <div>
-    <h1>Aitsada</h1>
-  </div>
+  <v-container class="admin-page">
+    <p class="page-title mb-0">
+      หน้าหลัก
+    </p>
+  </v-container>
 </template>

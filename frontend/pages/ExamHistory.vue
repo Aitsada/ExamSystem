@@ -1,5 +1,7 @@
 <template>
-  <div>
-    <h1>ExamHistory</h1>
-  </div>
+  <v-container class="admin-page">
+    <p class="page-title mb-0">
+      ประวัติการจัดสอบ
+    </p>
+  </v-container>
 </template>

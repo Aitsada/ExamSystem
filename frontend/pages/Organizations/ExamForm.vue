@@ -31,7 +31,7 @@
       </v-col>
     </v-row>
 
-    <v-card elevation="0" rounded="lg" border color="white" class="admin-card admin-form-card mb-5">
+    <v-card elevation="0" rounded="lg" border color="gray" class="admin-card admin-form-card mb-5">
       <v-card-text>
         <v-form ref="form">
           <v-row align="center" class="compact-row" no-gutters>
@@ -167,7 +167,7 @@
         </v-col>
       </v-row>
 
-      <v-card elevation="0" rounded="lg" border color="white" class="admin-card admin-form-card mb-5">
+      <v-card elevation="0" rounded="lg" border color="gray" class="admin-card admin-form-card mb-5">
         <v-card-text>
           <v-row align="center" class="compact-row" no-gutters>
             <v-col cols="12" md="3">
@@ -265,7 +265,7 @@
         </v-card-text>
       </v-card>
 
-      <v-card elevation="0" rounded="lg" border color="white" class="admin-card">
+      <v-card elevation="0" rounded="lg" border color="gray" class="admin-card">
         <v-data-table
           :headers="positionHeaders"
           :items="positions"

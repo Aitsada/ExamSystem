@@ -27,7 +27,7 @@
       </v-col>
     </v-row>
 
-    <v-card elevation="0" rounded="lg" border color="white" class="admin-card mb-4">
+    <v-card elevation="0" rounded="lg" border color="gray" class="admin-card mb-4">
       <v-card-text class="px-5 py-4">
         <v-row align="center" class="compact-row" no-gutters>
           <v-col cols="12" md="3">

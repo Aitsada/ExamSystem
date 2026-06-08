@@ -51,7 +51,7 @@
     </v-row>
 
     <!-- Main Card -->
-    <v-card elevation="0" rounded="lg" border color="white" class="admin-card">
+    <v-card elevation="0" rounded="lg" border color="gray" class="admin-card">
       <!-- Data Table -->
       <v-data-table
         :headers="headers"
@@ -146,7 +146,7 @@
             <v-btn
               small
               class="admin-template-btn mr-2"
-              :href="$apiUrl('/api/template/facility')"
+              :href="$apiUrl('/api/template/facility.xls')"
             >
               ดาวโหลดตัวอย่างไฟล์
             </v-btn>

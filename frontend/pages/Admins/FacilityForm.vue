@@ -34,7 +34,7 @@
         </v-btn>
       </v-col>
     </v-row>
-    <v-card elevation="0" rounded="lg" border color="white" class="admin-card mb-4">
+    <v-card elevation="0" rounded="lg" border color="gray" class="admin-card mb-4">
       <v-card-text class="px-5 py-4">
         <v-form ref="form">
           <v-row align="center" class="compact-row" no-gutters>
@@ -129,7 +129,7 @@
       elevation="0"
       rounded="lg"
       border
-      color="white"
+      color="gray"
       class="admin-card mb-5"
     >
       <v-data-table

@@ -28,8 +28,8 @@
         >
           <v-card-text class="pa-5">
             <div class="dashboard-card-content">
-              <v-avatar color="#EAF4FF" size="44">
-                <v-icon color="#1976D2">
+              <v-avatar color="#FFFFFF" size="40">
+                <v-icon color="#555555">
                   {{ item.icon }}
                 </v-icon>
               </v-avatar>
@@ -41,7 +41,7 @@
                   {{ item.description }}
                 </p>
               </div>
-              <v-icon color="#94A3B8">
+              <v-icon color="#777777">
                 mdi-chevron-right
               </v-icon>
             </div>
@@ -78,12 +78,11 @@ export default {
 
 <style scoped>
 .admin-dashboard-card {
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  border-bottom: 1px solid #DDDDDD !important;
 }
 
 .admin-dashboard-card:hover {
-  border-color: #9CC5F2 !important;
-  transform: translateY(-1px);
+  background: #F5F5F5 !important;
 }
 
 .dashboard-card-content {
@@ -98,13 +97,13 @@ export default {
 }
 
 .dashboard-card-title {
-  color: #0F3D78;
-  font-size: 15px;
-  font-weight: 700;
+  color: #333333;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .dashboard-card-description {
-  color: #64748B;
+  color: #666666;
   font-size: 13px;
   line-height: 1.45;
 }
