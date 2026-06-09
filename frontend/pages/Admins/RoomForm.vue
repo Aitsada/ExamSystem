@@ -312,7 +312,6 @@ export default {
             query: { FacilityID: this.facility.ID, BuildingID: this.building.ID, FloorID: this.floor.ID, RoomID: this.room.ID }
           })
         }
-
         this.$swal.fire({
           icon: 'success',
           text: 'บันทึกข้อมูลสำเร็จ'

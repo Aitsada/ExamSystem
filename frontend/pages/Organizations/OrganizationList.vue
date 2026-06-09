@@ -60,7 +60,7 @@ export default {
       organ: [],
       headers: [
         { text: 'ชื่อหน่วยงาน', value: 'Name', align: 'start', styled: {} },
-        { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center' }
+        { text: 'รายละเอียด', value: 'edit', sortable: false, align: 'start' }
       ]
     }
   },
