@@ -104,7 +104,7 @@
                   Example Excel File: ต้องมีคอลัมน์ Name และ DisplayName
                 </p>
               </v-col>
-              <v-col cols="12" md="5" class="text-md-right mt-3 mt-md-0">
+              <v-col cols="12" md="5" class="text-md-right mt-md-0">
                 <v-btn
                   small
                   class="admin-template-btn mr-2"
@@ -120,7 +120,7 @@
                   prepend-icon="mdi-database-import-outline"
                   @click="importFacilities"
                 >
-                  บันทึกข้อมูลสถานที่สอบ »
+                  บันทึกข้อมูลสถานที่สอย
                 </v-btn>
               </v-col>
             </v-row>

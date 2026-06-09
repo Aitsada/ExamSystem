@@ -1,3 +1,17 @@
+.v-application,
+.v-application .body-1,
+.v-application .body-2,
+.v-application .caption,
+.v-application input,
+.v-application textarea,
+.v-application button {
+  font-family: 'Sarabun', sans-serif !important;
+}
+
+.v-application {
+  font-size: 15px;
+}
+
 .admin-page {
   width: 100%;
   max-width: 1140px;
@@ -26,14 +40,14 @@
 
 .admin-eyebrow {
   color: #555555;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
 }
 
 .admin-page-title,
 .page-title {
   color: #333333 !important;
-  font-size: 18px !important;
+  font-size: 20px !important;
   font-weight: 600 !important;
   letter-spacing: 0 !important;
   line-height: 1.4 !important;
@@ -64,7 +78,7 @@
 
 .section-title {
   color: #333333 !important;
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 600 !important;
   letter-spacing: 0 !important;
 }
@@ -81,7 +95,7 @@
 
 .field-label {
   color: #333333 !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 400 !important;
 }
 
@@ -94,7 +108,7 @@
   align-items: center;
   min-height: 28px;
   color: #222222;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .form-field .v-input__slot {
@@ -105,11 +119,11 @@
 .form-field input,
 .form-field textarea,
 .form-field .v-select__selection {
-  font-size: 13px !important;
+  font-size: 14px !important;
 }
 
 .form-field .v-label {
-  font-size: 13px !important;
+  font-size: 14px !important;
 }
 
 .form-field fieldset {
@@ -146,7 +160,7 @@
   background: #E6E6E6 !important;
   border: 1px solid #CCCCCC !important;
   color: #333333 !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
   padding: 6px 8px !important;
   white-space: nowrap;
@@ -159,7 +173,7 @@
   height: 36px !important;
   border: 1px solid #CCCCCC !important;
   color: #222222 !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
   padding: 6px 8px !important;
 }
 
@@ -183,7 +197,7 @@
 .btn-save {
   min-height: 44px !important;
   border-radius: 6px !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
   font-weight: 600 !important;
 }
 
@@ -191,12 +205,12 @@
   min-height: 28px !important;
   border-color: #AAAAAA !important;
   color: #333333 !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
 }
 
 .btn-cancel {
   color: #475569 !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
 }
 
 .admin-template-btn {
@@ -204,18 +218,18 @@
   border-radius: 6px !important;
   background: #FFFFFF !important;
   color: #333333 !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
 }
 
 .admin-helper-text {
   color: #666666 !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
 }
 
 .admin-muted-text {
   color: #666666 !important;
-  font-size: 13px !important;
+  font-size: 14px !important;
 }
 
 .admin-actions-row {
@@ -227,7 +241,7 @@
 
 .admin-empty-note {
   color: #666666;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 @media (max-width: 600px) {
@@ -237,7 +251,7 @@
 
   .admin-page-title,
   .page-title {
-    font-size: 16px !important;
+    font-size: 18px !important;
   }
 
   .admin-header-actions,
