@@ -105,13 +105,12 @@
                 </p>
               </v-col>
               <v-col cols="12" md="5" class="text-md-right mt-md-0">
-                <v-btn
-                  small
-                  class="admin-template-btn mr-2"
+                <a
+                  class="admin-template-link mr-2"
                   :href="$apiUrl('/api/template/facility.xls')"
                 >
-                  ดาวโหลดตัวอย่างไฟล์
-                </v-btn>
+                  ดาวน์โหลดตัวอย่างไฟล์
+                </a>
                 <v-btn
                   color="primary"
                   class="btn-save"

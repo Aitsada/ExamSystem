@@ -133,13 +133,12 @@
                 </p>
               </v-col>
               <v-col cols="12" md="5" class="text-md-right mt-3 mt-md-0">
-                <v-btn
-                  small
-                  class="admin-template-btn"
+                <a
+                  class="admin-template-link"
                   :href="$apiUrl('/api/template/floor.xls')"
                 >
-                  ดาวโหลดตัวอย่างไฟล์
-                </v-btn>
+                  ดาวน์โหลดตัวอย่างไฟล์
+                </a>
                 <v-btn
                   color="primary"
                   class="btn-save mr-2"

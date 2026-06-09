@@ -213,13 +213,15 @@
   font-size: 14px !important;
 }
 
-.admin-template-btn {
-  min-height: 30px !important;
-  border-radius: 6px !important;
-  background: #FFFFFF !important;
-  color: #333333 !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
+.admin-template-link {
+  color: #1976D2 !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  text-decoration: none;
+}
+
+.admin-template-link:hover {
+  text-decoration: underline;
 }
 
 .admin-helper-text {
