@@ -14,6 +14,7 @@ export async function findRoomMappingCounts(req, res) {
     const RoomIDs = String(req.query.RoomIDs || "")
       .split(",")
       .filter((RoomID) => RoomID);
+    console.log("Received RoomIDs:", RoomIDs);
     const result = await seatMappingService.findRoomMappingCounts(RoomIDs);
     res.status(200).json({ status: "success", data: result });
   } catch (error) {
@@ -34,6 +35,7 @@ export async function findPositionRoomMappingCounts(req, res) {
 }
 
 export async function mapPositionToRooms(req, res) {
+  console.log("Received request body:", req.body);
   try {
     const { PositionID, RoomIDs } = req.body;
     const result = await seatMappingService.mapPositionToRooms(PositionID, RoomIDs);

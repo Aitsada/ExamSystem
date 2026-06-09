@@ -1,122 +1,118 @@
 <template>
-  <v-container class="admin-page">
-    <v-breadcrumbs :items="breadcrumbs" density="compact" class="admin-breadcrumbs pa-0 mb-4">
-      <template #divider>
-        <v-icon size="14" color="grey">
-          mdi-chevron-right
-        </v-icon>
-      </template>
-    </v-breadcrumbs>
-
-    <v-row align="center" class="admin-page-header mb-5" no-gutters>
-      <v-col cols="auto" class="mr-3">
-        <div class="admin-title-marker" />
-      </v-col>
-      <v-col>
-        <p class="admin-eyebrow mb-0">
-          ระบบจัดการสถานที่สอบ
-        </p>
-        <p class="text-h6 font-weight-bold mb-0 page-title">
-          {{ pageTitle }}
-        </p>
-      </v-col>
-      <v-col cols="auto">
-        <v-btn variant="text" class="btn-cancel" @click="backBtn">
-          ยกเลิก
-        </v-btn>
-      </v-col>
-    </v-row>
-
-    <v-card elevation="0" rounded="lg" border color="gray" class="admin-card">
-      <v-card-text class="px-5 py-4">
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">สถานที่สอบ :</span>
+  <v-row style="justify-content: center;" no-gutters>
+    <v-col cols="8">
+      <v-container class="admin-page">
+        <v-row align="center" class="admin-page-header mb-5" no-gutters>
+          <v-col cols="auto" class="mr-3">
+            <div class="admin-title-marker" />
           </v-col>
-          <v-col cols="12" md="6">
-            <span class="readonly-text">{{ facility.Name || '-' }}</span>
+          <v-col>
+            <p class="admin-eyebrow mb-0">
+              ระบบจัดการสถานที่สอบ
+            </p>
+            <p class="text-h6 font-weight-bold mb-0 page-title">
+              {{ pageTitle }}
+            </p>
+          </v-col>
+          <v-col cols="auto">
+            <v-btn variant="text" class="btn-cancel" @click="backBtn">
+              ยกเลิก
+            </v-btn>
           </v-col>
         </v-row>
 
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">อาคารสอบ/ชั้น :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <span class="readonly-text">{{ building.Name || '-' }} ชั้น {{ floor.Number || '-' }}</span>
-          </v-col>
-        </v-row>
+        <v-card elevation="0" rounded="lg" border color="gray" class="admin-card">
+          <v-card-text class="px-5 py-4">
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">สถานที่สอบ :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <span class="readonly-text">{{ facility.Name || '-' }}</span>
+              </v-col>
+            </v-row>
 
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">ชื่อห้องสอบ :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field v-model.trim="room.Name" outlined dense hide-details="auto" class="form-field" />
-          </v-col>
-        </v-row>
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">อาคารสอบ/ชั้น :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <span class="readonly-text">{{ building.Name || '-' }} ชั้น {{ floor.Number || '-' }}</span>
+              </v-col>
+            </v-row>
 
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">รายละเอียด :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field v-model.trim="room.Description" outlined dense hide-details class="form-field" />
-          </v-col>
-        </v-row>
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">ชื่อห้องสอบ :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model.trim="room.Name" outlined dense hide-details="auto" class="form-field" />
+              </v-col>
+            </v-row>
 
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">จำนวนแถว(row) :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field v-model.trim="room.Rows" outlined dense hide-details="auto" class="form-field" />
-          </v-col>
-        </v-row>
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">รายละเอียด :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model.trim="room.Description" outlined dense hide-details class="form-field" />
+              </v-col>
+            </v-row>
 
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">จำนวนคนในแถว(column) :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field v-model.trim="room.Columns" outlined dense hide-details="auto" class="form-field" />
-          </v-col>
-        </v-row>
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">ห้องสอบที่ :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field v-model.trim="room.No" outlined dense hide-details="auto" class="form-field" />
-          </v-col>
-        </v-row>
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">จำนวนผู้สอบในห้อง :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model.trim="room.TemplateID"
-              outlined
-              dense
-              hide-details="auto"
-              class="form-field"
-              :placeholder="amountOfSeats"
-            />
-          </v-col>
-        </v-row>
-        <v-btn
-          color="primary"
-          class="btn-save mt-4"
-          :loading="loading"
-          prepend-icon="mdi-content-save-outline"
-          @click="saveRoom"
-        >
-          {{ isEditMode ? 'บันทึกการแก้ไขข้อมูลห้องสอบ' : 'บันทึกข้อมูลห้องสอบ' }}
-        </v-btn>
-      </v-card-text>
-    </v-card>
-  </v-container>
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">จำนวนแถว(row) :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model.trim="room.Rows" outlined dense hide-details="auto" class="form-field" />
+              </v-col>
+            </v-row>
+
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">จำนวนคนในแถว(column) :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model.trim="room.Columns" outlined dense hide-details="auto" class="form-field" />
+              </v-col>
+            </v-row>
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">ห้องสอบที่ :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model.trim="room.No" outlined dense hide-details="auto" class="form-field" />
+              </v-col>
+            </v-row>
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">จำนวนผู้สอบในห้อง :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field
+                  v-model.trim="room.TemplateID"
+                  outlined
+                  dense
+                  hide-details="auto"
+                  class="form-field"
+                  :placeholder="amountOfSeats"
+                />
+              </v-col>
+            </v-row>
+            <v-btn
+              color="primary"
+              class="btn-save mt-4"
+              :loading="loading"
+              prepend-icon="mdi-content-save-outline"
+              @click="saveRoom"
+            >
+              {{ isEditMode ? 'บันทึกการแก้ไขข้อมูลห้องสอบ' : 'บันทึกข้อมูลห้องสอบ' }}
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-container>
+    </v-col>
+  </v-row>
 </template>
 <script>
 export default {
@@ -152,11 +148,6 @@ export default {
         TemplateID: '',
         Description: ''
       },
-      breadcrumbs: [
-        { text: 'หน้าหลัก', href: '/Admin', disabled: false },
-        { text: 'สถานที่สอบ', href: '/Admins/FacilityList', disabled: false },
-        { text: 'เพิ่มห้องสอบ', disabled: true }
-      ],
       isEditMode: false
     }
   },
@@ -185,7 +176,6 @@ export default {
     this.fetchFloorData(floorId)
     if (roomId) {
       this.isEditMode = true
-      this.breadcrumbs[2].text = 'แก้ไขห้องสอบ'
       this.room.ID = roomId
       this.fetchRoomData(roomId)
     }
@@ -317,7 +307,6 @@ export default {
           res = await this.$axios.$post(this.$apiUrl(`/api/${this.floor.ID}/roomConn`), payload)
           this.room.ID = res.data
           this.isEditMode = true
-          this.breadcrumbs[2].text = 'แก้ไขห้องสอบ'
           this.$router.replace({
             path: '/Admins/RoomForm',
             query: { FacilityID: this.facility.ID, BuildingID: this.building.ID, FloorID: this.floor.ID, RoomID: this.room.ID }

@@ -1,203 +1,171 @@
 <template>
-  <v-container class="admin-page admin-page-wide">
-    <v-breadcrumbs :items="breadcrumbs" density="compact" class="admin-breadcrumbs pa-0 mb-4">
-      <template #divider>
-        <v-icon size="14" color="grey">
-          mdi-chevron-right
-        </v-icon>
-      </template>
-    </v-breadcrumbs>
+  <v-row style="justify-content: center;" no-gutters>
+    <v-col cols="8">
+      <v-container class="admin-page admin-page-wide">
+        <v-card elevation="0" rounded="lg" border color="gray" class="admin-card mb-4">
+          <v-card-text class="px-5 py-4">
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">สถานที่สอบ :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <span class="readonly-text">{{ facility.Name || '-' }}</span>
+              </v-col>
+            </v-row>
 
-    <v-row align="center" class="admin-page-header mb-5" no-gutters>
-      <v-col cols="auto" class="mr-3">
-        <div class="admin-title-marker" />
-      </v-col>
-      <v-col>
-        <p class="admin-eyebrow mb-0">
-          ระบบจัดการสถานที่สอบ
-        </p>
-        <p class="text-h6 font-weight-bold mb-0 page-title">
-          {{ pageTitle }}
-        </p>
-      </v-col>
-      <v-col cols="auto">
-        <v-btn variant="text" class="btn-cancel" @click="backBtn">
-          ยกเลิก
-        </v-btn>
-      </v-col>
-    </v-row>
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">อาคารสอบ :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <span class="readonly-text">{{ building.Name || '-' }}</span>
+              </v-col>
+            </v-row>
 
-    <v-card elevation="0" rounded="lg" border color="gray" class="admin-card mb-4">
-      <v-card-text class="px-5 py-4">
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">สถานที่สอบ :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <span class="readonly-text">{{ facility.Name || '-' }}</span>
-          </v-col>
-        </v-row>
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">เลขชั้นสอบ :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model.trim="floor.Number" outlined dense hide-details="auto" class="form-field" />
+              </v-col>
+            </v-row>
 
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">อาคารสอบ :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <span class="readonly-text">{{ building.Name || '-' }}</span>
-          </v-col>
-        </v-row>
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">ชื่อชั้นสอบ :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model.trim="floor.Name" outlined dense hide-details="auto" class="form-field" />
+              </v-col>
+            </v-row>
 
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">เลขชั้นสอบ :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field v-model.trim="floor.Number" outlined dense hide-details="auto" class="form-field" />
-          </v-col>
-        </v-row>
+            <v-row align="center" class="compact-row" no-gutters>
+              <v-col cols="12" md="3">
+                <span class="field-label">รายละเอียด :</span>
+              </v-col>
+              <v-col cols="12" md="6">
+                <v-text-field v-model.trim="floor.Description" outlined dense hide-details class="form-field" />
+              </v-col>
+            </v-row>
 
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">ชื่อชั้นสอบ :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field v-model.trim="floor.Name" outlined dense hide-details="auto" class="form-field" />
-          </v-col>
-        </v-row>
-
-        <v-row align="center" class="compact-row" no-gutters>
-          <v-col cols="12" md="3">
-            <span class="field-label">รายละเอียด :</span>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-text-field v-model.trim="floor.Description" outlined dense hide-details class="form-field" />
-          </v-col>
-        </v-row>
-
-        <v-btn
-          color="primary"
-          class="btn-save mt-4"
-          :loading="loading"
-          prepend-icon="mdi-content-save-outline"
-          @click="saveFloor"
-        >
-          {{ isEditMode ? 'บันทึกการแก้ไขข้อมูลชั้นสอบ' : 'บันทึกข้อมูลชั้นสอบ' }}
-        </v-btn>
-      </v-card-text>
-    </v-card>
-
-    <v-row align="center" class="admin-section-header mb-3" no-gutters>
-      <v-col>
-        <p class="section-title mb-0">
-          ห้องสอบ
-        </p>
-      </v-col>
-      <v-col cols="auto">
-        <v-btn
-          color="primary"
-          class="btn-add mr-2"
-          prepend-icon="mdi-plus"
-          :disabled="!floor.ID"
-          :to="{ path: '/Admins/RoomForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: floor.ID } }"
-        >
-          เพิ่มห้องสอบ
-        </v-btn>
-      </v-col>
-    </v-row>
-
-    <v-card elevation="0" rounded="lg" border color="white" class="admin-card mb-5">
-      <v-data-table
-        :headers="roomHeaders"
-        :items="rooms"
-        :items-per-page="-1"
-        :loading="loading"
-        no-data-text="ยังไม่มีข้อมูลห้องสอบ"
-        loading-text="กำลังโหลดข้อมูลห้องสอบ..."
-        class="admin-table"
-        hide-default-footer
-      >
-        <template #[`item.Name`]="{ item }">
-          <span class="text-body-2 font-weight-medium">{{ item.Name }}</span>
-        </template>
-
-        <template #[`item.TemplateID`]="{ item }">
-          <span class="text-body-2 text-medium-emphasis">{{ item.TemplateID || '-' }}</span>
-        </template>
-
-        <template #[`item.edit`]="{ item }">
-          <v-btn
-            small
-            outlined
-            class="btn-action"
-            prepend-icon="mdi-pencil-outline"
-            :to="{ path: '/Admins/RoomForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: floor.ID, RoomID: item.ID }}"
-          >
-            แก้ไข
-          </v-btn>
-        </template>
-
-        <template #[`item.delete`]="{ item }">
-          <v-btn
-            small
-            outlined
-            color="error"
-            class="btn-action"
-            prepend-icon="mdi-delete-outline"
-            @click="deleteRoomData(item.ID, item.Name)"
-          >
-            ลบ
-          </v-btn>
-        </template>
-      </v-data-table>
-    </v-card>
-
-    <v-card elevation="0" rounded="lg" border color="white" class="admin-card admin-import-card">
-      <v-card-text class="px-5 py-3">
-        <v-row align="center" no-gutters>
-          <v-col cols="12" md="2">
-            <span class="field-label">ห้องสอบ :</span>
-          </v-col>
-          <v-col cols="12" md="5">
-            <v-file-input
-              ref="roomFileInput"
-              v-model="roomFile"
-              dense
-              outlined
-              hide-details
-              show-size
-              accept=".xls,.xlsx"
-              placeholder="เลือกไฟล์ Excel..."
-              prepend-icon=""
-              prepend-inner-icon="mdi-upload-outline"
-              class="form-field"
-            />
-            <p class="admin-helper-text mt-1 mb-0">
-              Example Excel File: ต้องมีคอลัมน์ No, Name, Rows, Columns และ TemplateID
-            </p>
-          </v-col>
-          <v-col cols="12" md="5" class="text-md-right mt-3 mt-md-0">
-            <v-btn
-              small
-              class="admin-template-btn"
-              :href="$apiUrl('/api/template/room.xls')"
-            >
-              ดาวโหลดตัวอย่างไฟล์
-            </v-btn>
             <v-btn
               color="primary"
-              class="btn-save mr-2"
+              class="btn-save mt-4"
               :loading="loading"
-              :disabled="!floor.ID || !roomFile"
-              prepend-icon="mdi-database-import-outline"
-              @click="importRooms"
+              prepend-icon="mdi-content-save-outline"
+              @click="saveFloor"
             >
-              บันทึกข้อมูลห้องสอบ »
+              {{ isEditMode ? 'บันทึกการแก้ไขข้อมูลชั้นสอบ' : 'บันทึกข้อมูลชั้นสอบ' }}
+            </v-btn>
+          </v-card-text>
+        </v-card>
+        <v-card elevation="0" rounded="lg" border color="white" class="admin-card mb-5">
+          <v-data-table
+            :headers="roomHeaders"
+            :items="rooms"
+            :items-per-page="-1"
+            :loading="loading"
+            no-data-text="ยังไม่มีข้อมูลห้องสอบ"
+            loading-text="กำลังโหลดข้อมูลห้องสอบ..."
+            class="admin-table"
+            hide-default-footer
+          >
+            <template #[`item.Name`]="{ item }">
+              <span class="text-body-2 font-weight-medium">{{ item.Name }}</span>
+            </template>
+
+            <template #[`item.TemplateID`]="{ item }">
+              <span class="text-body-2 text-medium-emphasis">{{ item.TemplateID || '-' }}</span>
+            </template>
+
+            <template #[`item.edit`]="{ item }">
+              <v-btn
+                small
+                outlined
+                class="btn-action"
+                prepend-icon="mdi-pencil-outline"
+                :to="{ path: '/Admins/RoomForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: floor.ID, RoomID: item.ID }}"
+              >
+                แก้ไข
+              </v-btn>
+            </template>
+
+            <template #[`item.delete`]="{ item }">
+              <v-btn
+                small
+                outlined
+                class="btn-action"
+                prepend-icon="mdi-delete-outline"
+                @click="deleteRoomData(item.ID, item.Name)"
+              >
+                ลบ
+              </v-btn>
+            </template>
+          </v-data-table>
+        </v-card>
+        <v-row class="mt-10 mb-4">
+          <v-col cols="auto">
+            <v-btn
+              color="primary"
+              class="btn-add mr-2"
+              prepend-icon="mdi-plus"
+              :disabled="!floor.ID"
+              :to="{ path: '/Admins/RoomForm', query: { FacilityID: facility.ID, BuildingID: building.ID, FloorID: floor.ID } }"
+            >
+              เพิ่มห้องสอบ
             </v-btn>
           </v-col>
         </v-row>
-      </v-card-text>
-    </v-card>
-  </v-container>
+        <v-card elevation="0" rounded="lg" border color="white" class="admin-card admin-import-card">
+          <v-card-text class="px-5 py-3">
+            <v-row align="center" no-gutters>
+              <v-col cols="12" md="2">
+                <span class="field-label">ห้องสอบ :</span>
+              </v-col>
+              <v-col cols="12" md="5">
+                <v-file-input
+                  ref="roomFileInput"
+                  v-model="roomFile"
+                  dense
+                  outlined
+                  hide-details
+                  show-size
+                  accept=".xls,.xlsx"
+                  placeholder="เลือกไฟล์ Excel..."
+                  prepend-icon=""
+                  prepend-inner-icon="mdi-upload-outline"
+                  class="form-field"
+                />
+                <p class="admin-helper-text mt-1 mb-0">
+                  Example Excel File: ต้องมีคอลัมน์ No, Name, Rows, Columns และ TemplateID
+                </p>
+              </v-col>
+              <v-col cols="12" md="5" class="text-md-right mt-3 mt-md-0">
+                <v-btn
+                  small
+                  class="admin-template-btn"
+                  :href="$apiUrl('/api/template/room.xls')"
+                >
+                  ดาวโหลดตัวอย่างไฟล์
+                </v-btn>
+                <v-btn
+                  color="primary"
+                  class="btn-save mr-2"
+                  :loading="loading"
+                  :disabled="!floor.ID || !roomFile"
+                  prepend-icon="mdi-database-import-outline"
+                  @click="importRooms"
+                >
+                  บันทึกข้อมูลห้องสอบ »
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-container>
+    </v-col>
+  </v-row>
 </template>
 <script>
 export default {
@@ -235,11 +203,6 @@ export default {
         { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center' },
         { text: 'ลบข้อมูล', value: 'delete', sortable: false, align: 'center' }
       ],
-      breadcrumbs: [
-        { text: 'หน้าหลัก', href: '/Admin', disabled: false },
-        { text: 'สถานที่สอบ', href: '/Admins/FacilityList', disabled: false },
-        { text: 'เพิ่มชั้นสอบ', disabled: true }
-      ],
       isEditMode: false
     }
   },
@@ -262,7 +225,6 @@ export default {
     this.fetchBuildingData(buildingId)
     if (floorId) {
       this.isEditMode = true
-      this.breadcrumbs[2].text = 'แก้ไขชั้นสอบ'
       this.fetchFloorData(floorId)
       this.fetchRoomsData(floorId)
     }
@@ -377,7 +339,6 @@ export default {
           res = await this.$axios.$post(this.$apiUrl(`/api/${this.building.ID}/floor`), payload)
           this.floor.ID = res.data
           this.isEditMode = true
-          this.breadcrumbs[2].text = 'แก้ไขชั้นสอบ'
           this.$router.replace({
             path: '/Admins/FloorForm',
             query: { FacilityID: this.facility.ID, BuildingID: this.building.ID, FloorID: this.floor.ID }

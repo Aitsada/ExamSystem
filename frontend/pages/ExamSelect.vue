@@ -1,159 +1,163 @@
 <template>
-  <v-container class="admin-page exam-select-page">
-    <v-row align="center" class="admin-page-header mb-5" no-gutters>
-      <v-col cols="auto" class="mr-3">
-        <div class="admin-title-marker" />
-      </v-col>
-      <v-col>
-        <p class="admin-eyebrow mb-0">
-          ระบบจัดห้องสอบ
-        </p>
-        <p class="admin-page-title mb-0">
-          เลือกรอบสอบสำหรับจัดที่นั่ง
-        </p>
-      </v-col>
-    </v-row>
+  <v-row style="justify-content: center;" no-gutters>
+    <v-col cols="8">
+      <v-container class="admin-page exam-select-page">
+        <v-row align="center" class="admin-page-header mb-5" no-gutters>
+          <v-col cols="auto" class="mr-3">
+            <div class="admin-title-marker" />
+          </v-col>
+          <v-col>
+            <p class="admin-eyebrow mb-0">
+              ระบบจัดห้องสอบ
+            </p>
+            <p class="admin-page-title mb-0">
+              เลือกรอบสอบสำหรับจัดที่นั่ง
+            </p>
+          </v-col>
+        </v-row>
 
-    <v-card elevation="0" rounded="lg" border color="gray" class="admin-card admin-form-card">
-      <v-card-text>
-        <v-row no-gutters>
-          <v-col cols="12">
-            <v-row align="center" class="compact-row" no-gutters>
-              <v-col cols="12" sm="2">
-                <span class="field-label">สถานที่สอบ :</span>
-              </v-col>
-              <v-col cols="12" sm="8" md="4" class="field-col">
-                <v-select
-                  v-model="selectedFacilities"
-                  label="เลือกสถานที่สอบ"
-                  :items="selectFacilities"
-                  outlined
-                  dense
-                  hide-details="auto"
-                  class="form-field"
-                />
-              </v-col>
-            </v-row>
-
-            <v-row align="center" class="compact-row" no-gutters>
-              <v-col cols="12" sm="2">
-                <span class="field-label">หน่วยงาน :</span>
-              </v-col>
-              <v-col cols="12" sm="8" md="4" class="field-col">
-                <v-select
-                  v-model="selectedOrganizations"
-                  label="เลือกหน่วยงาน"
-                  :items="selectOrganizations"
-                  outlined
-                  dense
-                  hide-details="auto"
-                  class="form-field"
-                />
-              </v-col>
-            </v-row>
-
-            <v-row align="center" class="compact-row" no-gutters>
-              <v-col cols="12" sm="2">
-                <span class="field-label">รอบสอบ :</span>
-              </v-col>
-              <v-col cols="12" sm="8" md="4" class="field-col">
-                <v-select
-                  v-model="selectedExams"
-                  label="เลือกรอบสอบ"
-                  :items="selectExams"
-                  outlined
-                  dense
-                  hide-details="auto"
-                  class="form-field"
-                />
-              </v-col>
-            </v-row>
-
-            <v-row align="center" class="compact-row" no-gutters>
-              <v-col cols="12" sm="2">
-                <span class="field-label">วันที่สอบ :</span>
-              </v-col>
-              <v-col cols="12" sm="3" class="field-col">
-                <v-menu
-                  ref="menu"
-                  v-model="menu"
-                  :close-on-content-click="false"
-                  :return-value.sync="date"
-                  transition="scale-transition"
-                  offset-y
-                  min-width="auto"
-                >
-                  <template #activator="{ on, attrs }">
-                    <v-text-field
-                      :value="dateText"
-                      label="เลือกวันที่สอบ"
-                      prepend-inner-icon="mdi-calendar"
-                      readonly
+        <v-card elevation="0" rounded="lg" border color="gray" class="admin-card admin-form-card">
+          <v-card-text>
+            <v-row no-gutters>
+              <v-col cols="12">
+                <v-row align="center" class="compact-row" no-gutters>
+                  <v-col cols="12" sm="2">
+                    <span class="field-label">สถานที่สอบ :</span>
+                  </v-col>
+                  <v-col cols="12" sm="8" md="4" class="field-col">
+                    <v-select
+                      v-model="selectedFacilities"
+                      label="เลือกสถานที่สอบ"
+                      :items="selectFacilities"
                       outlined
                       dense
                       hide-details="auto"
                       class="form-field"
-                      v-bind="attrs"
-                      v-on="on"
                     />
-                  </template>
+                  </v-col>
+                </v-row>
 
-                  <v-date-picker v-model="date" no-title scrollable>
-                    <v-spacer />
-                    <v-btn text color="primary" @click="setToday">
-                      วันนี้
-                    </v-btn>
-                    <v-btn text color="primary" @click="menu = false">
-                      ยกเลิก
-                    </v-btn>
-                    <v-btn text color="primary" @click="$refs.menu.save(date)">
-                      ตกลง
-                    </v-btn>
-                  </v-date-picker>
-                </v-menu>
-              </v-col>
-              <v-col cols="12" sm="auto" class="time-label">
-                <span class="field-label">ตั้งแต่เวลา :</span>
-              </v-col>
-              <v-col cols="12" sm="2" md="1" class="time-col">
-                <v-select
-                  v-model="selectTimeStart"
-                  :items="timeOptions"
-                  outlined
-                  dense
-                  hide-details="auto"
-                  class="form-field"
-                />
-              </v-col>
-              <v-col cols="12" sm="auto" class="time-label">
-                <span class="field-label">ถึงเวลา :</span>
-              </v-col>
-              <v-col cols="12" sm="2" md="1" class="time-col">
-                <v-select
-                  v-model="selectTimeEnd"
-                  :items="timeOptions"
-                  outlined
-                  dense
-                  hide-details="auto"
-                  class="form-field"
-                />
+                <v-row align="center" class="compact-row" no-gutters>
+                  <v-col cols="12" sm="2">
+                    <span class="field-label">หน่วยงาน :</span>
+                  </v-col>
+                  <v-col cols="12" sm="8" md="4" class="field-col">
+                    <v-select
+                      v-model="selectedOrganizations"
+                      label="เลือกหน่วยงาน"
+                      :items="selectOrganizations"
+                      outlined
+                      dense
+                      hide-details="auto"
+                      class="form-field"
+                    />
+                  </v-col>
+                </v-row>
+
+                <v-row align="center" class="compact-row" no-gutters>
+                  <v-col cols="12" sm="2">
+                    <span class="field-label">รอบสอบ :</span>
+                  </v-col>
+                  <v-col cols="12" sm="8" md="4" class="field-col">
+                    <v-select
+                      v-model="selectedExams"
+                      label="เลือกรอบสอบ"
+                      :items="selectExams"
+                      outlined
+                      dense
+                      hide-details="auto"
+                      class="form-field"
+                    />
+                  </v-col>
+                </v-row>
+
+                <v-row align="center" class="compact-row" no-gutters>
+                  <v-col cols="12" sm="2">
+                    <span class="field-label">วันที่สอบ :</span>
+                  </v-col>
+                  <v-col cols="12" sm="3" class="field-col">
+                    <v-menu
+                      ref="menu"
+                      v-model="menu"
+                      :close-on-content-click="false"
+                      :return-value.sync="date"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="auto"
+                    >
+                      <template #activator="{ on, attrs }">
+                        <v-text-field
+                          :value="dateText"
+                          label="เลือกวันที่สอบ"
+                          prepend-inner-icon="mdi-calendar"
+                          readonly
+                          outlined
+                          dense
+                          hide-details="auto"
+                          class="form-field"
+                          v-bind="attrs"
+                          v-on="on"
+                        />
+                      </template>
+
+                      <v-date-picker v-model="date" no-title scrollable>
+                        <v-spacer />
+                        <v-btn text color="primary" @click="setToday">
+                          วันนี้
+                        </v-btn>
+                        <v-btn text color="primary" @click="menu = false">
+                          ยกเลิก
+                        </v-btn>
+                        <v-btn text color="primary" @click="$refs.menu.save(date)">
+                          ตกลง
+                        </v-btn>
+                      </v-date-picker>
+                    </v-menu>
+                  </v-col>
+                  <v-col cols="12" sm="auto" class="time-label">
+                    <span class="field-label">ตั้งแต่เวลา :</span>
+                  </v-col>
+                  <v-col cols="12" sm="2" md="1" class="time-col">
+                    <v-select
+                      v-model="selectTimeStart"
+                      :items="timeOptions"
+                      outlined
+                      dense
+                      hide-details="auto"
+                      class="form-field"
+                    />
+                  </v-col>
+                  <v-col cols="12" sm="auto" class="time-label">
+                    <span class="field-label">ถึงเวลา :</span>
+                  </v-col>
+                  <v-col cols="12" sm="2" md="1" class="time-col">
+                    <v-select
+                      v-model="selectTimeEnd"
+                      :items="timeOptions"
+                      outlined
+                      dense
+                      hide-details="auto"
+                      class="form-field"
+                    />
+                  </v-col>
+                </v-row>
+
+                <v-btn
+                  depressed
+                  color="primary"
+                  class="btn-save mt-8"
+                  :disabled="!canStartMapping"
+                  :to="seatMappingRoute"
+                >
+                  จัดที่นั่งสอบ »
+                </v-btn>
               </v-col>
             </v-row>
-
-            <v-btn
-              depressed
-              color="primary"
-              class="btn-save mt-8"
-              :disabled="!canStartMapping"
-              :to="seatMappingRoute"
-            >
-              จัดที่นั่งสอบ »
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-text>
-    </v-card>
-  </v-container>
+          </v-card-text>
+        </v-card>
+      </v-container>
+    </v-col>
+  </v-row>
 </template>
 <script>
 const getCurrentDate = () => {

@@ -1,172 +1,176 @@
 <template>
-  <v-container class="admin-page admin-page-wide">
-    <v-row class="seat-mapping-header">
-      <v-col>
-        <p>หน่วยงาน: {{ organization.Name || '-' }}</p>
-        <p>สถานที่สอบ: {{ facility.Name || '-' }}</p>
-        <p>{{ examDateText }}</p>
-      </v-col>
-    </v-row>
-    <v-divider class="my-5" />
-    <v-row>
-      <v-col cols="12" md="7">
-        <v-simple-table class="bordered-table">
-          <template #default>
-            <thead>
-              <tr>
-                <th class="select-col" />
-                <th class="text-left">
-                  ลำดับ
-                </th>
-                <th class="text-left">
-                  ชื่อตำแหน่ง
-                </th>
-                <th class="text-left">
-                  จำนวนผู้สมัคร
-                </th>
-                <th class="text-left">
-                  มีที่นั่งสอบ
-                </th>
-                <th class="text-left">
-                  ไม่มีที่นั่งสอบ
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(item, index) in position"
-                :key="item.ID"
-              >
-                <td class="select-col">
-                  <v-checkbox
-                    dense
-                    hide-details
-                    :input-value="selectedPositionID === item.ID"
-                    @change="togglePosition(item.ID)"
-                  />
-                </td>
-                <td>{{ index + 1 }}</td>
-                <td>
-                  {{ item.Name }}
-                  <p v-if="selectedPositionID === item.ID" class="selected-room-text">
-                    {{ selectedRoomNamesText() }}
-                  </p>
-                </td>
-                <td>{{ positionApplicantCount(item) }}</td>
-                <td>{{ positionMappedCount(item) }}</td>
-                <td>{{ positionUnmappedCount(item) }}</td>
-              </tr>
-              <tr v-if="!position.length">
-                <td colspan="6" class="empty-cell">
-                  ไม่พบข้อมูลตำแหน่ง
-                </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      </v-col>
-      <v-col cols="12" md="5">
-        <v-simple-table class="bordered-table facility-table">
-          <template #default>
-            <thead>
-              <tr>
-                <th class="expand-col" />
-                <th class="text-left">
-                  สถานที่สอบ/อาคาร
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="floorItem in floorRows"
-                :key="floorItem.key"
-              >
-                <td class="expand-col">
-                  <v-btn
-                    icon
-                    x-small
-                    class="expand-button"
-                    @click="toggleFloor(floorItem.key)"
+  <v-row style="justify-content: center;" no-gutters>
+    <v-col cols="8">
+      <v-container class="admin-page admin-page-wide">
+        <v-row class="seat-mapping-header">
+          <v-col>
+            <p>หน่วยงาน: {{ organization.Name || '-' }}</p>
+            <p>สถานที่สอบ: {{ facility.Name || '-' }}</p>
+            <p>{{ examDateText }}</p>
+          </v-col>
+        </v-row>
+        <v-divider class="my-5" />
+        <v-row>
+          <v-col cols="12" md="7">
+            <v-simple-table class="bordered-table">
+              <template #default>
+                <thead>
+                  <tr>
+                    <th class="select-col" />
+                    <th class="text-left">
+                      ลำดับ
+                    </th>
+                    <th class="text-left">
+                      ชื่อตำแหน่ง
+                    </th>
+                    <th class="text-left">
+                      จำนวนผู้สมัคร
+                    </th>
+                    <th class="text-left">
+                      มีที่นั่งสอบ
+                    </th>
+                    <th class="text-left">
+                      ไม่มีที่นั่งสอบ
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(item, index) in position"
+                    :key="item.ID"
                   >
-                    <v-icon small>
-                      {{ isFloorExpanded(floorItem.key) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
-                    </v-icon>
-                  </v-btn>
-                </td>
-                <td>
-                  <p class="floor-title">
-                    {{ floorTitle(floorItem) }}
-                  </p>
-                  <v-simple-table
-                    v-if="isFloorExpanded(floorItem.key)"
-                    class="bordered-table room-table"
+                    <td class="select-col">
+                      <v-checkbox
+                        dense
+                        hide-details
+                        :input-value="selectedPositionID === item.ID"
+                        @change="togglePosition(item.ID)"
+                      />
+                    </td>
+                    <td>{{ index + 1 }}</td>
+                    <td>
+                      {{ item.Name }}
+                      <p v-if="selectedPositionID === item.ID" class="selected-room-text">
+                        {{ selectedRoomNamesText() }}
+                      </p>
+                    </td>
+                    <td>{{ positionApplicantCount(item) }}</td>
+                    <td>{{ positionMappedCount(item) }}</td>
+                    <td>{{ positionUnmappedCount(item) }}</td>
+                  </tr>
+                  <tr v-if="!position.length">
+                    <td colspan="6" class="empty-cell">
+                      ไม่พบข้อมูลตำแหน่ง
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-col>
+          <v-col cols="12" md="5">
+            <v-simple-table class="bordered-table facility-table">
+              <template #default>
+                <thead>
+                  <tr>
+                    <th class="expand-col" />
+                    <th class="text-left">
+                      สถานที่สอบ/อาคาร
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="floorItem in floorRows"
+                    :key="floorItem.key"
                   >
-                    <template #default>
-                      <thead>
-                        <tr>
-                          <th class="select-col" />
-                          <th class="text-left">
-                            ห้อง
-                          </th>
-                          <th class="text-left">
-                            จำนวนที่นั่งสอบ
-                          </th>
-                          <th class="text-left">
-                            มีผู้สอบ
-                          </th>
-                          <th class="text-left">
-                            ไม่มีผู้สอบ
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="room in floorItem.rooms"
-                          :key="room.ID"
-                        >
-                          <td class="select-col">
-                            <v-checkbox
-                              dense
-                              hide-details
-                              :input-value="isRoomSelected(room.ID)"
-                              :disabled="!selectedPositionID || mappingLoading"
-                              @change="toggleRoom(room.ID)"
-                            />
-                          </td>
-                          <td>{{ room.Name || room.No || '-' }}</td>
-                          <td>{{ roomSeatCount(room) }}</td>
-                          <td>{{ roomApplicantCount(room) }}</td>
-                          <td>{{ roomAvailableSeatCount(room) }}</td>
-                        </tr>
-                        <tr v-if="!floorItem.rooms.length">
-                          <td colspan="5" class="empty-cell">
-                            ไม่พบข้อมูลห้อง
-                          </td>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                </td>
-              </tr>
-              <tr v-if="!floorRows.length">
-                <td colspan="2" class="empty-cell">
-                  ไม่พบข้อมูลอาคาร/ชั้น
-                </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      </v-col>
-    </v-row>
-    <v-divider class="my-5" />
-    <v-btn
-      :loading="mappingLoading"
-      :disabled="!selectedPositionID"
-      @click="saveSeatMapping"
-    >
-      {{ selectedRoomIDs.length ? 'จัดที่นั่งสอบ' : 'ล้างที่นั่งสอบ' }}
-    </v-btn>
-  </v-container>
+                    <td class="expand-col">
+                      <v-btn
+                        icon
+                        x-small
+                        class="expand-button"
+                        @click="toggleFloor(floorItem.key)"
+                      >
+                        <v-icon small>
+                          {{ isFloorExpanded(floorItem.key) ? 'mdi-minus-box-outline' : 'mdi-plus-box-outline' }}
+                        </v-icon>
+                      </v-btn>
+                    </td>
+                    <td>
+                      <p class="floor-title">
+                        {{ floorTitle(floorItem) }}
+                      </p>
+                      <v-simple-table
+                        v-if="isFloorExpanded(floorItem.key)"
+                        class="bordered-table room-table"
+                      >
+                        <template #default>
+                          <thead>
+                            <tr>
+                              <th class="select-col" />
+                              <th class="text-left">
+                                ห้อง
+                              </th>
+                              <th class="text-left">
+                                จำนวนที่นั่งสอบ
+                              </th>
+                              <th class="text-left">
+                                มีผู้สอบ
+                              </th>
+                              <th class="text-left">
+                                ไม่มีผู้สอบ
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              v-for="room in floorItem.rooms"
+                              :key="room.ID"
+                            >
+                              <td class="select-col">
+                                <v-checkbox
+                                  dense
+                                  hide-details
+                                  :input-value="isRoomSelected(room.ID)"
+                                  :disabled="!selectedPositionID || mappingLoading"
+                                  @change="toggleRoom(room.ID)"
+                                />
+                              </td>
+                              <td>{{ room.Name || room.No || '-' }}</td>
+                              <td>{{ roomSeatCount(room) }}</td>
+                              <td>{{ roomApplicantCount(room) }}</td>
+                              <td>{{ roomAvailableSeatCount(room) }}</td>
+                            </tr>
+                            <tr v-if="!floorItem.rooms.length">
+                              <td colspan="5" class="empty-cell">
+                                ไม่พบข้อมูลห้อง
+                              </td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-simple-table>
+                    </td>
+                  </tr>
+                  <tr v-if="!floorRows.length">
+                    <td colspan="2" class="empty-cell">
+                      ไม่พบข้อมูลอาคาร/ชั้น
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-col>
+        </v-row>
+        <v-divider class="my-5" />
+        <v-btn
+          :loading="mappingLoading"
+          :disabled="!selectedPositionID"
+          @click="saveSeatMapping"
+        >
+          {{ selectedRoomIDs.length ? 'จัดที่นั่งสอบ' : 'ล้างที่นั่งสอบ' }}
+        </v-btn>
+      </v-container>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -210,7 +214,7 @@ export default {
     this.startTime = this.$route.query.StartTime || ''
     this.endTime = this.$route.query.EndTime || ''
     this.fetchOrganization()
-    this.fetchFacilitByID()
+    this.fetchFacilityByID()
     this.fetchBuildingByFacilityID()
     this.fetchPositionByExamID()
   },
@@ -287,7 +291,7 @@ export default {
         ID: data.ID
       }
     },
-    async fetchFacilitByID () {
+    async fetchFacilityByID () {
       if (!this.facility.ID) {
         return
       }
@@ -334,7 +338,6 @@ export default {
         this.roomMappingCounts = {}
         return
       }
-
       const res = await this.$axios.$get(this.$apiUrl('/api/seatMapping/room-counts'), {
         params: {
           RoomIDs: roomIDs.join(',')

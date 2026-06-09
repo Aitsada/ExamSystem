@@ -133,6 +133,7 @@ export async function deleteByApplicantIDsOrSeatIDs(ApplicantIDs, SeatIDs, conn 
     where.push(`ApplicantID IN (${ApplicantIDs.map(() => "?").join(",")})`);
     params.push(...ApplicantIDs);
   }
+
   if (SeatIDs.length) {
     where.push(`SeatID IN (${SeatIDs.map(() => "?").join(",")})`);
     params.push(...SeatIDs);

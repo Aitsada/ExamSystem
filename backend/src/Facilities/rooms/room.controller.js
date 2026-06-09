@@ -54,7 +54,7 @@ export async function importExcel(req, res) {
       Description: getValue(row, ["Description", "รายละเอียด"]),
       Rows: toNumber(getValue(row, ["Rows", "จำนวนแถว"]), 0),
       Columns: toNumber(getValue(row, ["Columns", "จำนวนคนในแถว"]), 0),
-      TemplateID: toNumber(getValue(row, ["TemplateID", "Template"], 0), 0),
+      TemplateID: toNumber(getValue(row, ["Capacity", "Template"], 0), 0),
     }));
     const imported = await roomController.importFromRows(FloorID, rows);
 
