@@ -263,7 +263,7 @@
           </v-card>
           <v-row class="mt-10">
             <v-col cols="auto">
-              <v-btn color="primary" class="btn-add" prepend-icon="mdi-seat-outline">
+              <v-btn color="primary" class="btn-add" prepend-icon="mdi-seat-outline" :to="{path:'/ExamSelect', query: {OrganID: organ.ID, ExamID: exam.ID}}">
                 จัดที่นั่งสอบ
               </v-btn>
             </v-col>

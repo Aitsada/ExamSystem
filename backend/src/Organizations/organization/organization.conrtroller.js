@@ -9,6 +9,7 @@ export async function findAll(req, res) {
   }
 }
 export async function findById(req, res) {
+  console.log(req.params)
   try {
     const { id } = req.params;
     const result = await organizationService.findById(id);
@@ -28,9 +29,9 @@ export async function Create(req, res) {
       Description: req.body.Description,
       CreatedBy: req.body.CreatedBy,
     };
-    if (!logo) {
-      return res.status(500).json({ message: "กรุณาอัพโหลดรูปภาพโลโก้" });
-    }
+    // if (!logo) {
+    //   return res.status(500).json({ message: "กรุณาอัพโหลดรูปภาพโลโก้" });
+    // }
     if (logo) {
       const allowedMimeTypes = ["image/png", "image/jpeg", "image/webp"];
 

@@ -155,10 +155,10 @@ export default {
       organ: { ID: '', Name: '', Description: '' },
       exam: [],
       examHeaders: [
-        { text: 'ชื่อรอบสอบ', value: 'Name', align: 'start', width: '55%' },
-        { text: 'สถานะ', value: 'StatusID', align: 'start', width: '25%' },
-        { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center', width: '10%' },
-        { text: 'ลบข้อมูล', value: 'delete', sortable: false, align: 'center', width: '10%' }
+        { text: 'ชื่อรอบสอบ', value: 'Name', align: 'start', width: '60%' },
+        { text: 'สถานะ', value: 'StatusID', align: 'start', width: '10%' },
+        { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'start', width: '15%' },
+        { text: '', value: 'delete', sortable: false, align: 'start', width: '15%' }
       ]
     }
   },

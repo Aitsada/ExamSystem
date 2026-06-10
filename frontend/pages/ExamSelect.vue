@@ -191,10 +191,12 @@ export default {
       facilities: [],
       selectFacilities: [],
       selectedFacilities: null,
+      organID: null,
       organizations: [],
       selectOrganizations: [],
       selectedOrganizations: null,
       exams: [],
+      examID: null,
       selectExams: [],
       selectedExams: null,
       timeOptions,
@@ -244,9 +246,11 @@ export default {
       }
     }
   },
-  mounted () {
+  async mounted () {
+    this.organID = this.$route.query.OrganID
+    this.examID = this.$route.query.ExamID
     this.fetchFacilitiesData()
-    this.fectOrganizationData()
+    await this.fectOrganizationData()
   },
   methods: {
     setToday () {
@@ -268,16 +272,25 @@ export default {
         text: o.Name,
         value: o.ID
       }))
-      this.selectedOrganizations = this.selectOrganizations[0]?.value || null
+      const selectedOrg = this.selectOrganizations.find(o => String(o.value) === String(this.organID))
+      this.selectedOrganizations = selectedOrg?.value || this.selectOrganizations[0]?.value || null
     },
     async fetchExamData () {
+      if (!this.selectedOrganizations) {
+        this.exams = []
+        this.selectExams = []
+        this.selectedExams = null
+        return
+      }
+
       const res = await this.$axios.$get(this.$apiUrl(`/api/${this.selectedOrganizations}/exams`))
       this.exams = res.data || []
       this.selectExams = this.exams.map(e => ({
         text: e.Name,
         value: e.ID
       }))
-      this.selectedExams = this.selectExams[0]?.value || null
+      const selectedExam = this.selectExams.find(e => String(e.value) === String(this.examID))
+      this.selectedExams = selectedExam?.value || this.selectExams[0]?.value || null
       if (this.selectedExams) {
         this.setDateAndTimeFromExam(this.selectedExams)
       }

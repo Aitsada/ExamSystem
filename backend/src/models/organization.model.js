@@ -1,7 +1,7 @@
 import db from "../config/db.js";
 
 export async function findAll() {
-  const [result] = await db.query("SELECT * FROM Organization");
+  const [result] = await db.query("SELECT * FROM Organization WHERE isActive = 1");
   return result;
 }
 
@@ -29,7 +29,7 @@ export async function create(data) {
     [
       data.Name,
       data.Description,
-      data.CreatedBy ?? "Ait",
+      data.CreatedBy ?? "Admin",
       data.Logo ?? null,
       data.LogoMimeType ?? null,
       data.LogoOriginalName ?? null,
