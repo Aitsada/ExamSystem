@@ -347,7 +347,7 @@ export default {
         { text: 'ลำดับ', value: 'numberOrder', align: 'start', width: '20%' },
         { text: 'ตำแหน่ง', value: 'Name', align: 'start', width: '50%' },
         { text: 'จำนวน', value: 'Number', align: 'start', width: '15%' },
-        { text: '', value: 'delete', sortable: false, align: 'center', width: '15%' }
+        { text: '', value: 'delete', sortable: false, align: 'start', width: '15%' }
       ],
       numberOrder: []
     }
