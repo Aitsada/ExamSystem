@@ -317,6 +317,7 @@ export default {
           text: 'บันทึกข้อมูลสำเร็จ'
         })
         await this.fetchRoomData(this.room.ID)
+        this.$router.back()
       } catch (err) {
         this.$swal.fire({
           icon: 'error',

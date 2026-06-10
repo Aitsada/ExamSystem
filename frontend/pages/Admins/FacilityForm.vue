@@ -65,6 +65,7 @@
           </v-card-text>
         </v-card>
         <v-card
+          v-if="isEditMode"
           elevation="0"
           rounded="lg"
           border

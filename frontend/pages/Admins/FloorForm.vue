@@ -60,7 +60,14 @@
             </v-btn>
           </v-card-text>
         </v-card>
-        <v-card elevation="0" rounded="lg" border color="white" class="admin-card mb-5">
+        <v-card
+          v-if="isEditMode"
+          elevation="0"
+          rounded="lg"
+          border
+          color="white"
+          class="admin-card mb-5"
+        >
           <v-data-table
             :headers="roomHeaders"
             :items="rooms"
@@ -194,13 +201,13 @@ export default {
       roomFile: null,
       rooms: [],
       roomHeaders: [
-        { text: 'ห้องสอบ', value: 'Name', align: 'start' },
-        { text: 'ห้องสอบที่', value: 'No', align: 'start' },
-        { text: 'จำนวนแถว', value: 'Rows', align: 'start' },
-        { text: 'จำนวนคนในแถว', value: 'Columns', align: 'start' },
-        { text: 'จำนวน', value: 'TemplateID', align: 'start' },
-        { text: 'แก้ไขข้อมูล', value: 'edit', sortable: false, align: 'center' },
-        { text: 'ลบข้อมูล', value: 'delete', sortable: false, align: 'center' }
+        { text: 'ห้องสอบ', value: 'Name', align: 'start', width: '10%' },
+        { text: 'ห้องสอบที่', value: 'No', align: 'start', width: '10%' },
+        { text: 'จำนวนแถว', value: 'Rows', align: 'start', width: '10%' },
+        { text: 'จำนวนคนในแถว', value: 'Columns', align: 'start', width: '10%' },
+        { text: 'จำนวน', value: 'TemplateID', align: 'start', width: '10%' },
+        { text: 'รายละเอียด', value: 'edit', sortable: false, align: 'center', width: '10%' },
+        { text: '', value: 'delete', sortable: false, align: 'center', width: '10%' }
       ],
       isEditMode: false
     }
