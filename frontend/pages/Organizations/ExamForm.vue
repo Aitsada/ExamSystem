@@ -640,7 +640,7 @@ export default {
           await this.$axios.$patch(this.$apiUrl(`/api/${this.organ.ID}/exam/${this.exam.ID}`), payload)
         } else {
           const result = await this.$axios.$post(this.$apiUrl(`/api/${this.organ.ID}/exam`), payload)
-          const newId = result?.data || result?.id
+          const newId = result?.data?.insertId || result?.data?.ID || result?.id
           if (newId) {
             this.exam.ID = newId
             this.isEditMode = true
