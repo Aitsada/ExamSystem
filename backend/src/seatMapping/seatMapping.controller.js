@@ -9,6 +9,15 @@ export async function findAll(req, res) {
   }
 }
 
+export async function findHistory(req, res) {
+  try {
+    const result = await seatMappingService.findHistory();
+    res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+}
+
 export async function findRoomMappingCounts(req, res) {
   try {
     const RoomIDs = String(req.query.RoomIDs || "")

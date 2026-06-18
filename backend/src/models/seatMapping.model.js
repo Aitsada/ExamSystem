@@ -5,6 +5,47 @@ export async function findAll() {
   return result;
 }
 
+export async function findHistory() {
+  const [result] = await db.query(
+    `SELECT
+       Exam.ID AS ExamID,
+       Exam.OrganizationID,
+       Organization.Name AS OrganizationName,
+       Exam.Name AS ExamName,
+       Exam.StatusID,
+       Exam.StartDateTime,
+       Exam.EndDateTime,
+       Facility.ID AS FacilityID,
+       Facility.Name AS FacilityName,
+       Facility.DisplayName AS FacilityDisplayName,
+       COUNT(SeatMapping.ID) AS ApplicantCount
+     FROM SeatMapping
+     INNER JOIN Applicant ON SeatMapping.ApplicantID = Applicant.ID
+     INNER JOIN Position ON Applicant.PositionID = Position.ID
+     INNER JOIN Exam ON Position.ExamID = Exam.ID
+     INNER JOIN Organization ON Exam.OrganizationID = Organization.ID
+     INNER JOIN Seat ON SeatMapping.SeatID = Seat.ID
+     INNER JOIN SeatRow ON Seat.SeatRowID = SeatRow.ID
+     INNER JOIN Room ON SeatRow.RoomID = Room.ID
+     INNER JOIN Floor ON Room.FloorID = Floor.ID
+     INNER JOIN Building ON Floor.BuildingID = Building.ID
+     INNER JOIN Facility ON Building.FacilityID = Facility.ID
+     GROUP BY
+       Exam.ID,
+       Exam.OrganizationID,
+       Organization.Name,
+       Exam.Name,
+       Exam.StatusID,
+       Exam.StartDateTime,
+       Exam.EndDateTime,
+       Facility.ID,
+       Facility.Name,
+       Facility.DisplayName
+     ORDER BY Exam.StartDateTime DESC, Exam.ID DESC, Facility.Name ASC`,
+  );
+  return result;
+}
+
 export async function findApplicantsByPositionID(PositionID, conn = db) {
   const [result] = await conn.query(
     "SELECT * FROM Applicant WHERE PositionID = ? ORDER BY CAST(ApplicantNumber AS UNSIGNED), ID",

@@ -5,6 +5,10 @@ export async function findAll() {
   return await seatMappingModel.findAll();
 }
 
+export async function findHistory() {
+  return await seatMappingModel.findHistory();
+}
+
 export async function Create(SeatID, ApplicantID) {
   return await seatMappingModel.Create(SeatID, ApplicantID);
 }

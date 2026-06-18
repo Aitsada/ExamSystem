@@ -32,11 +32,21 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item) in data" :key="item.name">
-                <td>{{ item.name }}</td>
-                <td>{{ item.exam }}</td>
-                <td>{{ item.facility }}</td>
-                <td>{{ item.status }}</td>
+              <tr v-if="loading">
+                <td colspan="7" class="text-center">
+                  กำลังโหลดข้อมูลประวัติการสอบ...
+                </td>
+              </tr>
+              <tr v-else-if="!data.length">
+                <td colspan="7" class="text-center">
+                  ยังไม่มีข้อมูลประวัติการสอบ
+                </td>
+              </tr>
+              <tr v-for="item in data" v-else :key="`${item.ExamID}-${item.FacilityID}`">
+                <td>{{ item.OrganizationName }}</td>
+                <td>{{ examText(item) }}</td>
+                <td>{{ facilityText(item) }}</td>
+                <td>{{ getStatusName(item.StatusID) }}</td>
                 <td>
                   <v-btn
                     small
@@ -44,7 +54,7 @@
                     class="btn-action"
                     prepend-icon="mdi-chart-box-outline"
                   >
-                    {{ item.summary }}
+                    สรุปภาพรวม
                   </v-btn>
                 </td>
                 <td>
@@ -53,8 +63,9 @@
                     outlined
                     class="btn-action"
                     prepend-icon="mdi-pencil-outline"
+                    :to="seatMappingRoute(item)"
                   >
-                    {{ item.edit }}
+                    จัดใหม่
                   </v-btn>
                 </td>
                 <td>
@@ -64,7 +75,7 @@
                     class="btn-action"
                     prepend-icon="mdi-delete-outline"
                   >
-                    {{ item.delete }}
+                    ลบ
                   </v-btn>
                 </td>
               </tr>
@@ -80,13 +91,124 @@ export default {
   name: 'ExamHistory',
   data () {
     return {
-      data: [
-        { name: 'สำนักงาน ป.ป.ช.', exam: 'สอบวันอาทิตย์ที่ 22 มีนาคม 2569 เวลา 09:00 - 12:00 น.', facility: 'มหาวิทยาลัยสวนดุสิต_nacc', status: 'Opened', summary: 'สรุปภาพรวม', edit: 'จัดใหม่', delete: 'ลบ' },
-        { name: 'กรมท่าอากาศยาน', exam: 'สอบวันเสาร์ที่ 14 มีนาคม 2569 เวลา 09:00 - 12:00 น.', facility: 'มหาวิทยาลัยราชภัฏสวนสุนันทา_airport', status: 'Opened', summary: 'สรุปภาพรวม', edit: 'จัดใหม่', delete: 'ลบ' },
-        { name: 'กรมท่าอากาศยาน', exam: 'สอบวันเสาร์ที่ 14 มีนาคม 2569 เวลา 09:00 - 12:00 น.', facility: 'มหาวิทยาลัยราชภัฏสวนสุนันทา_airport', status: 'Opened', summary: 'สรุปภาพรวม', edit: 'จัดใหม่', delete: 'ลบ' },
-        { name: 'องค์การเภสัชกรรม', exam: 'สอบวันอาทิตย์ที่ 1 มีนาคม 2569 เวลา 09:00 - 11:00 น.', facility: 'มหาวิทยาลัยสวนดุสิต_GPO', status: 'Opened', summary: 'สรุปภาพรวม', edit: 'จัดใหม่', delete: 'ลบ' },
-        { name: 'สำนักงานปลัดกระทรวงคมนาคม', exam: 'สอบวันอังคารที่ 3 มีนาคม 2569 เวลา 08:00 - 08:30 น.', facility: 'มหาวิทยาลัยราชภัฏสวนสุนันทา_MOI', status: 'Opened', summary: 'สรุปภาพรวม', edit: 'จัดใหม่', delete: 'ลบ' }
+      loading: false,
+      data: [],
+      statusMap: {
+        0: 'None',
+        1: 'Opened',
+        2: 'Canceled',
+        3: 'Completed'
+      }
+    }
+  },
+  mounted () {
+    this.fetchHistory()
+  },
+  methods: {
+    async fetchHistory () {
+      this.loading = true
+      try {
+        const res = await this.$axios.$get(this.$apiUrl('/api/seatMapping/history'))
+        this.data = res.data || []
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `ดึงข้อมูลประวัติการสอบไม่สำเร็จ ${err.message}`
+        })
+      } finally {
+        this.loading = false
+      }
+    },
+    getStatusName (statusID) {
+      return this.statusMap[Number(statusID)] || '-'
+    },
+    facilityText (item) {
+      return item.FacilityDisplayName || item.FacilityName || '-'
+    },
+    examText (item) {
+      const start = this.parseDateTime(item.StartDateTime)
+      const end = this.parseDateTime(item.EndDateTime)
+      if (!start.date) {
+        return item.ExamName || '-'
+      }
+
+      return `สอบ${this.formatThaiDate(start.date)} เวลา ${start.time || '-'} - ${end.time || '-'} น.`
+    },
+    seatMappingRoute (item) {
+      const start = this.parseDateTime(item.StartDateTime)
+      const end = this.parseDateTime(item.EndDateTime)
+      return {
+        path: '/SeatMapping',
+        query: {
+          ExamID: item.ExamID,
+          FacilityID: item.FacilityID,
+          OrganizationID: item.OrganizationID,
+          ExamDate: start.date,
+          StartTime: start.time,
+          EndTime: end.time
+        }
+      }
+    },
+    parseDateTime (value) {
+      if (!value) {
+        return { date: '', time: '' }
+      }
+
+      const text = String(value)
+      const hasTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/.test(text)
+      if (hasTimezone) {
+        return this.formatBangkokDateTime(new Date(text))
+      }
+
+      const sqlDateTime = text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/)
+      if (sqlDateTime) {
+        const [, year, month, day, hour, minute] = sqlDateTime
+        return {
+          date: `${year}-${month}-${day}`,
+          time: `${hour}:${minute}`
+        }
+      }
+
+      const dateTime = new Date(text)
+      return this.formatBangkokDateTime(dateTime)
+    },
+    formatBangkokDateTime (dateTime) {
+      if (Number.isNaN(dateTime.getTime())) {
+        return { date: '', time: '' }
+      }
+
+      const bangkokTime = new Date(dateTime.getTime() + (7 * 60 * 60 * 1000))
+      const year = bangkokTime.getUTCFullYear()
+      const month = String(bangkokTime.getUTCMonth() + 1).padStart(2, '0')
+      const day = String(bangkokTime.getUTCDate()).padStart(2, '0')
+      const hour = String(bangkokTime.getUTCHours()).padStart(2, '0')
+      const minute = String(bangkokTime.getUTCMinutes()).padStart(2, '0')
+
+      return {
+        date: `${year}-${month}-${day}`,
+        time: `${hour}:${minute}`
+      }
+    },
+    formatThaiDate (date) {
+      const [year, month, day] = date.split('-').map(Number)
+      const thaiDate = new Date(year, month - 1, day)
+      const weekdays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์']
+      const months = [
+        'มกราคม',
+        'กุมภาพันธ์',
+        'มีนาคม',
+        'เมษายน',
+        'พฤษภาคม',
+        'มิถุนายน',
+        'กรกฎาคม',
+        'สิงหาคม',
+        'กันยายน',
+        'ตุลาคม',
+        'พฤศจิกายน',
+        'ธันวาคม'
       ]
+
+      return `วัน${weekdays[thaiDate.getDay()]}ที่ ${day} ${months[month - 1]} ${year + 543}`
     }
   }
 }
