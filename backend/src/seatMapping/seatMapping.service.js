@@ -9,6 +9,51 @@ export async function findHistory() {
   return await seatMappingModel.findHistory();
 }
 
+export async function findSummary(ExamID, FacilityID) {
+  if (!ExamID) {
+    throw new Error("ExamID is required");
+  }
+  if (!FacilityID) {
+    throw new Error("FacilityID is required");
+  }
+
+  const meta = await seatMappingModel.findSummaryMeta(ExamID, FacilityID);
+  const detailRows = await seatMappingModel.findSummaryRows(ExamID, FacilityID);
+  const groupedRows = [];
+  const rowMap = new Map();
+
+  detailRows.forEach((item) => {
+    const key = `${item.PositionID}-${item.RoomID}`;
+    if (!rowMap.has(key)) {
+      const summaryRow = {
+        PositionID: item.PositionID,
+        PositionName: item.PositionName,
+        BuildingName: item.BuildingName,
+        FloorNumber: item.FloorNumber,
+        FloorName: item.FloorName,
+        RoomID: item.RoomID,
+        RoomName: item.RoomName,
+        RoomNo: item.RoomNo,
+        ApplicantNumbers: [],
+      };
+      rowMap.set(key, summaryRow);
+      groupedRows.push(summaryRow);
+    }
+
+    rowMap.get(key).ApplicantNumbers.push(item.ApplicantNumber);
+  });
+
+  return {
+    meta,
+    rows: groupedRows.map((item) => ({
+      ...item,
+      ApplicantNumberStart: item.ApplicantNumbers[0] || "",
+      ApplicantNumberEnd: item.ApplicantNumbers[item.ApplicantNumbers.length - 1] || "",
+      ApplicantCount: item.ApplicantNumbers.length,
+    })),
+  };
+}
+
 export async function Create(SeatID, ApplicantID) {
   return await seatMappingModel.Create(SeatID, ApplicantID);
 }

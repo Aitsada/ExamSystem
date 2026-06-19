@@ -18,6 +18,16 @@ export async function findHistory(req, res) {
   }
 }
 
+export async function findSummary(req, res) {
+  try {
+    const { ExamID, FacilityID } = req.query;
+    const result = await seatMappingService.findSummary(ExamID, FacilityID);
+    res.status(200).json({ status: "success", data: result });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+}
+
 export async function findRoomMappingCounts(req, res) {
   try {
     const RoomIDs = String(req.query.RoomIDs || "")

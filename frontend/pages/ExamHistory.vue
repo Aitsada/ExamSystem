@@ -53,6 +53,7 @@
                     outlined
                     class="btn-action"
                     prepend-icon="mdi-chart-box-outline"
+                    :to="summaryRoute(item)"
                   >
                     สรุปภาพรวม
                   </v-btn>
@@ -146,6 +147,15 @@ export default {
           ExamDate: start.date,
           StartTime: start.time,
           EndTime: end.time
+        }
+      }
+    },
+    summaryRoute (item) {
+      return {
+        path: '/Pages/Summary',
+        query: {
+          ExamID: item.ExamID,
+          FacilityID: item.FacilityID
         }
       }
     },

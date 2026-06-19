@@ -46,6 +46,65 @@ export async function findHistory() {
   return result;
 }
 
+export async function findSummaryMeta(ExamID, FacilityID) {
+  const [result] = await db.query(
+    `SELECT
+       Exam.ID AS ExamID,
+       Exam.Name AS ExamName,
+       Exam.StartDateTime,
+       Exam.EndDateTime,
+       Organization.ID AS OrganizationID,
+       Organization.Name AS OrganizationName,
+       Facility.ID AS FacilityID,
+       Facility.Name AS FacilityName,
+       Facility.DisplayName AS FacilityDisplayName
+     FROM Exam
+     INNER JOIN Organization ON Exam.OrganizationID = Organization.ID
+     INNER JOIN Facility ON Facility.ID = ?
+     WHERE Exam.ID = ?`,
+    [FacilityID, ExamID],
+  );
+  return result[0] || null;
+}
+
+export async function findSummaryRows(ExamID, FacilityID) {
+  const [result] = await db.query(
+    `SELECT
+       Position.ID AS PositionID,
+       Position.Name AS PositionName,
+       Applicant.ApplicantNumber,
+       Building.Name AS BuildingName,
+       Floor.Number AS FloorNumber,
+       Floor.Name AS FloorName,
+       Room.ID AS RoomID,
+       Room.Name AS RoomName,
+       Room.No AS RoomNo
+     FROM SeatMapping
+     INNER JOIN Applicant ON SeatMapping.ApplicantID = Applicant.ID
+     INNER JOIN Position ON Applicant.PositionID = Position.ID
+     INNER JOIN Exam ON Position.ExamID = Exam.ID
+     INNER JOIN Seat ON SeatMapping.SeatID = Seat.ID
+     INNER JOIN SeatRow ON Seat.SeatRowID = SeatRow.ID
+     INNER JOIN Room ON SeatRow.RoomID = Room.ID
+     INNER JOIN Floor ON Room.FloorID = Floor.ID
+     INNER JOIN Building ON Floor.BuildingID = Building.ID
+     WHERE Exam.ID = ?
+       AND Building.FacilityID = ?
+     ORDER BY
+       Position.ID,
+       Building.Name,
+       Floor.Number,
+       Floor.Name,
+       Room.Name,
+       Room.No,
+       CAST(Applicant.ApplicantNumber AS UNSIGNED),
+       Applicant.ApplicantNumber,
+       Applicant.ID`,
+    [ExamID, FacilityID],
+  );
+  return result;
+}
+
 export async function findApplicantsByPositionID(PositionID, conn = db) {
   const [result] = await conn.query(
     "SELECT * FROM Applicant WHERE PositionID = ? ORDER BY CAST(ApplicantNumber AS UNSIGNED), ID",
