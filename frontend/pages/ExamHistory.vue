@@ -64,7 +64,7 @@
                     outlined
                     class="btn-action"
                     prepend-icon="mdi-pencil-outline"
-                    :to="seatMappingRoute(item)"
+                    :to="seatCloningRoute(item)"
                   >
                     จัดใหม่
                   </v-btn>
@@ -135,24 +135,17 @@ export default {
 
       return `สอบ${this.formatThaiDate(start.date)} เวลา ${start.time || '-'} - ${end.time || '-'} น.`
     },
-    seatMappingRoute (item) {
-      const start = this.parseDateTime(item.StartDateTime)
-      const end = this.parseDateTime(item.EndDateTime)
+    seatCloningRoute (item) {
       return {
-        path: '/SeatMapping',
+        path: '/SeatCloning',
         query: {
-          ExamID: item.ExamID,
-          FacilityID: item.FacilityID,
-          OrganizationID: item.OrganizationID,
-          ExamDate: start.date,
-          StartTime: start.time,
-          EndTime: end.time
+          ExamID: item.ExamID
         }
       }
     },
     summaryRoute (item) {
       return {
-        path: '/Pages/Summary',
+        path: '/Summary',
         query: {
           ExamID: item.ExamID,
           FacilityID: item.FacilityID
