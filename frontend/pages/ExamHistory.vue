@@ -10,7 +10,7 @@
           </v-col>
         </v-row>
         <v-divider class="my-3" />
-        <v-simple-table>
+        <v-simple-table class="facility-table">
           <template #default>
             <thead>
               <tr>
