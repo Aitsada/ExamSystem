@@ -62,7 +62,7 @@
                 v-else
                 :key="`${item.PositionID}-${item.RoomID}`"
               >
-                <td>{{ item.ExamID }}</td>
+                <td>{{ item.PositionID }}</td>
                 <td>{{ item.PositionName || '-' }}</td>
                 <td>{{ applicantNumberText(item) }}</td>
                 <td>{{ buildingText(item) }}</td>

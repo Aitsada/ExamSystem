@@ -259,7 +259,6 @@ export default {
       const result = await this.$swal.fire({
         icon: 'warning',
         title: 'ยืนยันการลบรอบสอบ',
-        text: `คุณต้องการลบรอบสอบ "${item.Name}" ใช่หรือไม่?`,
         showCancelButton: true,
         confirmButtonText: 'ยืนยันลบ',
         cancelButtonText: 'ยกเลิก',
@@ -279,7 +278,7 @@ export default {
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
-          text: `ไม่สามารถลบข้อมูลรอบสอบได้ ${err}`
+          text: 'ไม่สามารถลบข้อมูลรอบสอบได้ เนื่องจากมีผู้สมัครจัดที่นั่งแล้ว'
         })
       }
     }

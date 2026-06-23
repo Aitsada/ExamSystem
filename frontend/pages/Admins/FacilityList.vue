@@ -223,7 +223,7 @@ export default {
       const result = await this.$swal.fire({
         icon: 'warning',
         title: 'ยืนยันการลบข้อมูล',
-        text: `คุณต้องการลบสถานที่สอบ "${item.Name}" ออกจากระบบใช่หรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้`,
+        text: `สถานที่สอบ: "${item.Name}"`,
         showCancelButton: true,
         confirmButtonText: 'ยืนยันลบ',
         cancelButtonText: 'ยกเลิก',

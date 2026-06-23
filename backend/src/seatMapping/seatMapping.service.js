@@ -26,7 +26,6 @@ export async function findSummary(ExamID, FacilityID) {
     const key = `${item.PositionID}-${item.RoomID}`;
     if (!rowMap.has(key)) {
       const summaryRow = {
-        ExamID: item.ExamID,
         PositionID: item.PositionID,
         PositionName: item.PositionName,
         BuildingName: item.BuildingName,

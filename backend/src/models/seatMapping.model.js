@@ -70,7 +70,6 @@ export async function findSummaryMeta(ExamID, FacilityID) {
 export async function findSummaryRows(ExamID, FacilityID) {
   const [result] = await db.query(
     `SELECT
-       Exam.ID AS ExamID,
        Position.ID AS PositionID,
        Position.Name AS PositionName,
        Applicant.ApplicantNumber,

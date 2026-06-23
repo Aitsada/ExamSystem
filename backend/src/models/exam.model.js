@@ -44,6 +44,5 @@ export async function update(ExamID, OrganID, data) {
 
 export async function Delete(id) {
   const [result] = await db.query("DELETE FROM Exam WHERE ID = ?", [id]);
-
   return result;
 }

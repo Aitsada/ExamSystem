@@ -369,7 +369,6 @@ export default {
       if (!this.selectedPosition || !this.selectedApplicantFile) {
         return false
       }
-
       return !this.isNewPosition || !!this.newPositionName
     }
   },
@@ -675,7 +674,7 @@ export default {
       const result = await this.$swal.fire({
         icon: 'warning',
         title: 'ยืนยันการลบตำแหน่ง',
-        text: `คุณต้องการลบตำแหน่ง "${item.Name}" ใช่หรือไม่?`,
+        text: `ตำแหน่ง: ${item.Name}`,
         showCancelButton: true,
         confirmButtonText: 'ยืนยันลบ',
         cancelButtonText: 'ยกเลิก',
@@ -695,7 +694,7 @@ export default {
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
-          text: `ไม่สามารถลบตำแหน่งได้ ${err}`
+          text: 'ไม่สามารถลบตำแหน่งได้ เนื่องจากมีผู้สมัครจัดที่นั่งแล้ว'
         })
       }
     }
