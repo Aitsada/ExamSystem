@@ -47,6 +47,13 @@ export async function update(id, data) {
   return result;
 }
 
+export async function Delete(id) {
+  const [result] = await db.query("DELETE FROM Organization WHERE ID = ?", [
+    id,
+  ]);
+  return result;
+}
+
 // Upload LOGO file
 
 export async function findLogoById(id) {

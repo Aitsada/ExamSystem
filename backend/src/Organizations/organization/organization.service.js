@@ -17,6 +17,10 @@ export async function update(id, data) {
   return await organizationModel.update(id, data);
 }
 
+export async function Delete(id) {
+  return await organizationModel.Delete(id);
+}
+
 // Upload LOGO File
 export async function findLogoById(id) {
   return await organizationModel.findLogoById(id);

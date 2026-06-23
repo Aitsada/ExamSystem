@@ -270,7 +270,7 @@ export default {
       if (!result.isConfirmed) { return }
 
       try {
-        await this.$axios.delete(this.$apiUrl(`/api/exam/${item.ID}`))
+        await this.$axios.$delete(this.$apiUrl(`/api/exam/${item.ID}`))
         this.$swal.fire({
           icon: 'success',
           text: 'ลบข้อมูลรอบสอบสำเร็จ'

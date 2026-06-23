@@ -59,3 +59,8 @@ export async function update(ApplicantID, PositionID, data) {
   );
   return result;
 }
+
+export async function Delete(id) {
+  const [result] = await db.query("DELETE FROM Applicant WHERE ID = ?", [id]);
+  return result;
+}

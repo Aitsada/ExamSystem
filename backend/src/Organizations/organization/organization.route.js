@@ -15,6 +15,7 @@ router.get("/organizations", organizationController.findAll);
 router.get("/organization/:id", organizationController.findById);
 router.post("/organization", upload, organizationController.Create);
 router.patch("/organization/:id", organizationController.Update);
+router.delete("/organization/:id", organizationController.Delete);
 
 // Upload LOGO file
 router.get("/organization/:id/logo", organizationController.getLogo);

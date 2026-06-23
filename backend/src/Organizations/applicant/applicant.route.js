@@ -10,5 +10,6 @@ router.get("/:PositionID/applicants",applicantController.findByPositionID,);
 router.post("/:PositionID/applicant", applicantController.Create);
 router.post("/:PositionID/applicants/import",uploadExcel.single("file"),applicantController.importExcel);
 router.patch("/:PositionID/applicants/:ApplicantID",applicantController.Update);
+router.delete("/applicant/:id", applicantController.Delete);
 
 export default router;

@@ -27,9 +27,6 @@ export async function create(ExamID, data) {
 }
 
 export async function Delete(id) {
-  const [result] = await db.query(
-    "UPDATE Position SET isActive = 0 WHERE ID = ?",
-    [id],
-  );
+  const [result] = await db.query("DELETE FROM Position WHERE ID = ?", [id]);
   return result;
 }

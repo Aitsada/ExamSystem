@@ -50,3 +50,14 @@ export async function update(ApplicantID, PositionID, data) {
   await applicantModel.updatePositionNumber(PositionID);
   return result;
 }
+
+export async function Delete(id) {
+  const applicant = await applicantModel.findById(id);
+  const result = await applicantModel.Delete(id);
+
+  if (applicant) {
+    await applicantModel.updatePositionNumber(applicant.PositionID);
+  }
+
+  return result;
+}

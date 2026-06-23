@@ -73,6 +73,16 @@ export async function Update(req, res) {
   }
 }
 
+export async function Delete(req, res) {
+  try {
+    const { id } = req.params;
+    const result = await organizationService.Delete(id);
+    res.status(200).json({ status: "success", data: result });
+  } catch (err) {
+    res.status(500).json({ status: "fail", message: err.message });
+  }
+}
+
 // Upload LOGO file
 
 export async function getLogo(req, res) {

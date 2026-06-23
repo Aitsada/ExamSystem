@@ -43,10 +43,7 @@ export async function update(ExamID, OrganID, data) {
 }
 
 export async function Delete(id) {
-  const [result] = await db.query(
-    "UPDATE Exam SET isActive = 0 WHERE ID = ?",
-    [id],
-  );
+  const [result] = await db.query("DELETE FROM Exam WHERE ID = ?", [id]);
 
   return result;
 }

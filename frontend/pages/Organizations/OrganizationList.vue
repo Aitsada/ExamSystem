@@ -38,6 +38,19 @@
                 แก้ไข
               </v-btn>
             </template>
+
+            <template #[`item.delete`]="{ item }">
+              <v-btn
+                small
+                outlined
+                color="error"
+                class="btn-action"
+                prepend-icon="mdi-delete-outline"
+                @click="confirmDeleteOrganization(item)"
+              >
+                ลบ
+              </v-btn>
+            </template>
           </v-data-table>
         </v-card>
         <v-row class="mt-10">
@@ -60,7 +73,8 @@ export default {
       organ: [],
       headers: [
         { text: 'ชื่อหน่วยงาน', value: 'Name', align: 'start', styled: {} },
-        { text: 'รายละเอียด', value: 'edit', sortable: false, align: 'start' }
+        { text: 'รายละเอียด', value: 'edit', sortable: false, align: 'start' },
+        { text: '', value: 'delete', sortable: false, align: 'start' }
       ]
     }
   },
@@ -80,6 +94,35 @@ export default {
         })
       } finally {
         this.loading = false
+      }
+    },
+    async confirmDeleteOrganization (item) {
+      const result = await this.$swal.fire({
+        icon: 'warning',
+        title: 'ยืนยันการลบหน่วยงาน',
+        text: `คุณต้องการลบหน่วยงาน "${item.Name}" ใช่หรือไม่?`,
+        showCancelButton: true,
+        confirmButtonText: 'ยืนยันลบ',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#D32F2F',
+        cancelButtonColor: '#757575'
+      })
+
+      if (!result.isConfirmed) { return }
+
+      try {
+        await this.$axios.$delete(this.$apiUrl(`/api/organization/${item.ID}`))
+        this.$swal.fire({
+          icon: 'success',
+          text: 'ลบข้อมูลหน่วยงานสำเร็จ'
+        })
+        await this.fetchData()
+      } catch (err) {
+        const message = err.response?.data?.message || err.message
+        this.$swal.fire({
+          icon: 'error',
+          text: `ไม่สามารถลบข้อมูลหน่วยงานได้ ${message}`
+        })
       }
     }
   }
