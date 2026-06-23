@@ -129,6 +129,7 @@ export default {
         const data = res.data || {}
         this.meta = data.meta || {}
         this.summaryRows = data.rows || []
+        console.log('summaryRows : ', this.summaryRows)
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
