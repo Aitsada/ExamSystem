@@ -7,7 +7,7 @@ export async function findById(id) {
 
 export async function findByOrganID(organID) {
   const [result] = await db.query(
-    "SELECT * FROM Exam WHERE OrganizationID = ? AND isActive = 1",
+    "SELECT * FROM Exam WHERE OrganizationID = ?",
     [organID],
   );
   return result;

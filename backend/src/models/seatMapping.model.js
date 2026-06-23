@@ -138,7 +138,7 @@ export async function findRoomsByIDs(RoomIDs, conn = db) {
   }
 
   const [result] = await conn.query(
-    `SELECT * FROM Room WHERE ID IN (${RoomIDs.map(() => "?").join(",")}) AND IsActive = 1`,
+    `SELECT * FROM Room WHERE ID IN (${RoomIDs.map(() => "?").join(",")})`,
     RoomIDs,
   );
   return result;

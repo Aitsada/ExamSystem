@@ -6,7 +6,7 @@ export async function findById(id) {
 }
 
 export async function findByExamID(ExamID) {
-  const [result] = await db.query(`SELECT * FROM Position WHERE ExamID = ? AND isActive = 1`, [
+  const [result] = await db.query(`SELECT * FROM Position WHERE ExamID = ?`, [
     ExamID,
   ]);
   return result;
