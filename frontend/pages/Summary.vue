@@ -58,11 +58,11 @@
                 </td>
               </tr>
               <tr
-                v-for="(item, index) in summaryRows"
+                v-for="(item) in summaryRows"
                 v-else
                 :key="`${item.PositionID}-${item.RoomID}`"
               >
-                <td>{{ index + 1 }}</td>
+                <td>{{ item.ExamID }}</td>
                 <td>{{ item.PositionName || '-' }}</td>
                 <td>{{ applicantNumberText(item) }}</td>
                 <td>{{ buildingText(item) }}</td>

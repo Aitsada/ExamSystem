@@ -124,7 +124,7 @@ export default {
       return this.statusMap[Number(statusID)] || '-'
     },
     facilityText (item) {
-      return item.FacilityDisplayName || item.FacilityName || '-'
+      return item.FacilityName || '-'
     },
     examText (item) {
       const start = this.parseDateTime(item.StartDateTime)

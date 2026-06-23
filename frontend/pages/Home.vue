@@ -15,7 +15,7 @@
             <h1 class="mb-0">
               ประวัติการจัดห้องสอบ
             </h1>
-            <v-btn href="http://203.151.187.127/nacc/Pages/Home.aspx" target="_blank" color="primary">
+            <v-btn :to="'/ExamHistory'" color="primary">
               Go
             </v-btn>
           </v-col>
