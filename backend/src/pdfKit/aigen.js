@@ -1,13 +1,21 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
+import { findAll } from "../models/applicant.model.js";
 
-export const pdfFile = () => {
+export const pdfFile = async () => {
   const doc = new PDFDocument({
     size: "A4",
     margin: 30,
   });
 
   doc.pipe(fs.createWriteStream("./src/pdfKit/aigen.pdf"));
+
+  const FONT_REGULAR = "./src/fonts/Sarabun-Regular.ttf";
+  const FONT_BOLD = "./src/fonts/Sarabun-SemiBold.ttf";
+
+  const applicantsModel = await findAll();
+
+  const result = applicantsModel.forEach((a, index) => console.log(a.ID, "⭕️", index));
 
   const applicants = Array.from({ length: 30 }, (_, i) => ({
     seatNo: i + 1,
@@ -16,13 +24,10 @@ export const pdfFile = () => {
     lastName: `สุวรรณโต`,
   }));
 
-  const FONT_REGULAR = "./src/fonts/Sarabun-Regular.ttf";
-  const FONT_BOLD = "./src/fonts/Sarabun-Regular.ttf";
-
   const drawHeader = () => {
     doc.font(FONT_BOLD);
     doc.fontSize(16);
-    const y = 0.4;
+    const md = 0.4;
     doc.text("ห้องสอบที่ 31", {
       align: "center",
     });
@@ -35,8 +40,7 @@ export const pdfFile = () => {
       .text("การสอบแข่งขันเพื่อบรรจุและแต่งตั้งบุคคลเข้ารับราชการ", {
         align: "center",
       })
-      .moveDown(y);
-
+      .moveDown(md);
     doc
       .text(
         "ตำแหน่ง เจ้าพนักงานตรวจสอบทรัพย์สินปฏิบัติการ เลขประจำตัวสอบ 100001 ถึง 100030",
@@ -44,13 +48,15 @@ export const pdfFile = () => {
           align: "center",
         },
       )
-      .moveDown(y);
+      .moveDown(md);
 
     doc
       .text("สอบวันอาทิตย์ที่ 22 มีนาคม 2569 เวลา 09:00 - 12:00 น.", {
         align: "center",
       })
-      .moveDown(y);
+      .moveDown(md);
+
+    const y = doc.y;
 
     const text1 = "สถานที่สอบ มหาวิทยาลัยสวนดุสิต ";
     const text2 = "ตึก/อาคาร 10 ชั้น 4 ห้อง 10406";
@@ -61,11 +67,12 @@ export const pdfFile = () => {
 
     const startX = (pageWidth - totalWidth) / 2;
 
-    console.log(doc.page.margins.left, doc.page.margins.right);
-    doc.text(text1, startX, 130);
-    doc.text(text2, startX + doc.widthOfString(text1), 130, {
+    doc.text(text1, startX, y);
+    doc.text(text2, startX + doc.widthOfString(text1), y, {
       underline: true,
     });
+
+    doc.y = y + 20;
   };
 
   const drawTableHeader = (y) => {
@@ -80,6 +87,7 @@ export const pdfFile = () => {
 
     return y + 40;
   };
+
   drawHeader();
 
   let y = drawTableHeader(160);
@@ -97,7 +105,7 @@ export const pdfFile = () => {
       doc.font(FONT_REGULAR);
     }
     doc.fontSize(10);
-
+2
     doc.text(String(applicant.seatNo), 100, y);
     doc.text(applicant.examNo, 210, y);
 
