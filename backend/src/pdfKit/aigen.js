@@ -1,5 +1,6 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
+import { findAll } from "../models/applicant.model.js";
 
 export const pdfFile = async () => {
   const doc = new PDFDocument({
@@ -9,17 +10,66 @@ export const pdfFile = async () => {
 
   doc.pipe(fs.createWriteStream("./src/pdfKit/aigen.pdf"));
 
+  const FONT_LIGHT = "./src/fonts/Sarabun-Light.ttf";
   const FONT_REGULAR = "./src/fonts/Sarabun-Regular.ttf";
   const FONT_BOLD = "./src/fonts/Sarabun-SemiBold.ttf";
+  const applicant = await findAll();
 
-
-  const applicants = Array.from({ length: 30 }, (_, i) => ({
-    seatNo: i + 1,
-    examNo: String(100001 + i),
-    firstName: `นายอิษฎา`,
-    lastName: `สุวรรณโต`,
+  const test = Array.from({ length: 30 }, (_, i) => ({
+    ID: "6501" + i,
+    Prefix: "นาย",
+    FirstName: "ทรงศักดิ์ก่อเกื้อบุญมากมีลาภบุญมีมีบุญควรหา",
+    LastName: "สุวรรณโตกโลกธาตุฌาณวิญญาณ",
   }));
 
+  const PAGE_BOTTOM = 740;
+  const SEAT_NO = 100;
+  const APPLICANT_NUMBER = 220;
+  const PREFIX = 300;
+  const FIRST_NAME = 300;
+  const LAST_NAME = 470;
+
+  const pw = doc.page.width;
+  const ph = doc.page.height;
+  const mid = doc.page.width / 2;
+  function wof(x) {
+    return doc.widthOfString(x) / 2;
+  }
+  doc
+    .moveTo(pw / 2, 0)
+    .lineTo(pw / 2, ph)
+    .stroke();
+  doc.text("O", mid - wof("O"), 0);
+  doc.addPage();
+  function Line() {
+    doc
+      .moveTo(SEAT_NO, 0)
+      .lineTo(SEAT_NO, doc.page.height)
+      .strokeColor("red")
+      .stroke();
+    doc
+      .moveTo(APPLICANT_NUMBER, 0)
+      .lineTo(APPLICANT_NUMBER, doc.page.height)
+      .strokeColor("red")
+      .stroke();
+    doc
+      .moveTo(PREFIX, 0)
+      .lineTo(PREFIX, doc.page.height)
+      .strokeColor("red")
+      .stroke();
+    doc
+      .moveTo(FIRST_NAME, 0)
+      .lineTo(FIRST_NAME, doc.page.height)
+      .strokeColor("red")
+      .stroke();
+    doc
+      .moveTo(LAST_NAME, 0)
+      .lineTo(LAST_NAME, doc.page.height)
+      .strokeColor("red")
+      .stroke();
+  }
+  Line();
+  doc.strokeColor("black");
   const drawHeader = () => {
     doc.font(FONT_BOLD);
     doc.fontSize(16);
@@ -72,13 +122,13 @@ export const pdfFile = async () => {
   };
 
   const drawTableHeader = (y) => {
+    doc.fontSize(10);
     doc.font(FONT_BOLD);
-    doc.fontSize(11);
 
     doc.moveTo(40, y).lineWidth(0.1).lineTo(555, y).stroke();
 
-    doc.text("ลำดับที่นั่งสอบ", 70, y + 8);
-    doc.text("เลขประจำตัวสอบ", 190, y + 8);
+    doc.text("ลำดับที่นั่งสอบ", SEAT_NO - wof("ลำดับที่นั่งสอบ"), y + 8);
+    doc.text("เลขประจำตัวสอบ", APPLICANT_NUMBER - wof("เลขประจำตัวสอบ"), y + 8);
     doc.text("ชื่อ-นามสกุล", 360, y + 8);
 
     return y + 40;
@@ -88,29 +138,44 @@ export const pdfFile = async () => {
 
   let y = drawTableHeader(160);
 
-  doc.font(FONT_REGULAR);
-
-  applicants.forEach((applicant, index) => {
-    // 740
-    if (y > 740) {
+  doc.fontSize(10);
+  test.forEach((t, index) => {
+    doc.font(FONT_LIGHT);
+    if (y > PAGE_BOTTOM) {
       doc.addPage();
       drawHeader();
 
       y = drawTableHeader(160);
 
-      doc.font(FONT_REGULAR);
+      doc.font(FONT_LIGHT);
     }
-    doc.fontSize(10);
-
-    doc.text(String(applicant.seatNo), 100, y);
-    doc.text(applicant.examNo, 210, y);
-
-    doc.text(applicant.firstName, 310, y);
-
-    doc.text(applicant.lastName, 450, y);
+    const seatNo = String(index + 1);
+    doc.text(seatNo, SEAT_NO - wof(seatNo), y);
+    doc.text(t.ID, APPLICANT_NUMBER - wof(t.ID), y);
+    doc.text(t.Prefix, PREFIX, y, { continued: true });
+    doc.text(t.FirstName, FIRST_NAME, y, { continued: false });
+    doc.text(t.LastName, LAST_NAME, y);
 
     y += 22;
   });
+  // applicant.forEach((a, index) => {
+  //   doc.font(FONT_LIGHT);
+  //   if (y > PAGE_BOTTOM) {
+  //     doc.addPage();
+  //     drawHeader();
+
+  //     y = drawTableHeader(160);
+
+  //     doc.font(FONT_LIGHT);
+  //   }
+  //   doc.text(index + 1, SEAT_NO, y);
+  //   doc.text(a.ApplicantNumber, APPLICANT_NUMBER, y);
+  //   doc.text(a.Prefix, PREFIX, y, { continued: true });
+  //   doc.text(a.FirstName, FIRST_NAME, y, { continued: false });
+  //   doc.text(a.LastName, LAST_NAME, y);
+
+  //   y += 22;
+  // });
 
   doc.end();
 };
