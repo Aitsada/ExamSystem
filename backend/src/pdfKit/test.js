@@ -23,14 +23,15 @@ export const pdfFileTest = async () => {
   const applicantsModel = await findAll();
 
   applicantsModel.forEach((a, index) => {
-    if (y > 740 ) {
-      doc.addPage()
-      y = 50
+    if (y > 740) {
+      doc.addPage();
+      y = 50;
     }
+    doc.text(index, 50, y);
     doc.text(a.ApplicantNumber, 100, y);
-    doc.text(a.Prefix, 200, y);
-    doc.text(a.FirstName, 200, y);
-    doc.text(a.LastName, 250, y);
+    doc.text(a.Prefix, 250, y, { continued: true });
+    doc.text(a.FirstName, 250, y, { continued: false });
+    doc.text(a.LastName, 400, y);
 
     y += 20;
   });

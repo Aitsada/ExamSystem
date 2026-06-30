@@ -1,6 +1,5 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
-import { findAll } from "../models/applicant.model.js";
 
 export const pdfFile = async () => {
   const doc = new PDFDocument({
@@ -13,9 +12,6 @@ export const pdfFile = async () => {
   const FONT_REGULAR = "./src/fonts/Sarabun-Regular.ttf";
   const FONT_BOLD = "./src/fonts/Sarabun-SemiBold.ttf";
 
-  const applicantsModel = await findAll();
-
-  const result = applicantsModel.forEach((a, index) => console.log(a.ID, "⭕️", index));
 
   const applicants = Array.from({ length: 30 }, (_, i) => ({
     seatNo: i + 1,
@@ -105,7 +101,7 @@ export const pdfFile = async () => {
       doc.font(FONT_REGULAR);
     }
     doc.fontSize(10);
-2
+
     doc.text(String(applicant.seatNo), 100, y);
     doc.text(applicant.examNo, 210, y);
 
