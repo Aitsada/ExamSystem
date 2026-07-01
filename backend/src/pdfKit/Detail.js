@@ -32,7 +32,7 @@ export const detailPdf = () => {
   doc.font(FONT_LIGHT);
   doc.fontSize(11);
 
-  const applicants = Array.from({ length: 30 }, (_, i) => ({
+  const applicants = Array.from({ length: 60 }, (_, i) => ({
     position: "เจ้าพนักงานตรวจสอบทรัพย์สินปฏิบัติการ",
     AppID: "",
     Prefix: "นาย",
@@ -54,27 +54,46 @@ export const detailPdf = () => {
     }
     const col = pageIndex % 2;
     const row = Math.floor(pageIndex / 2);
-
     const x = col === 0 ? LEFT_X : RIGHT_X;
     const y = START_Y + row * BLOCK_HEIGHT;
 
     doc.text(position, x, y, { continued: true });
-    doc.text(a.position);
+    doc.font(FONT_BOLD);
 
+    const isSmall = doc.widthOfString(a.position) > 180;
+    if (isSmall) {
+      doc.fontSize(9);
+      doc.text(a.position, x, y + 2);
+    } else {
+      doc.fontSize(11);
+      doc.text(a.position);
+    }
+
+    doc.fontSize(11);
+    doc.font(FONT_LIGHT);
     doc.text(AppID, x, y + 18, { continued: true });
-    doc.text(index + 1);
+    doc.font(FONT_BOLD);
+    doc.text("65010" + (index + 1));
 
+    doc.font(FONT_LIGHT);
     doc.text(name, x, y + 36, { continued: true });
+    doc.font(FONT_BOLD);
     doc.text(a.Prefix, { continued: true });
-    doc.text(a.FirstName, { continued: true });
+    doc.text(a.FirstName + " ", { continued: true });
     doc.text(a.LastName);
 
+    doc.font(FONT_LIGHT);
     doc.text(customerID, x, y + 54, { continued: true });
+    doc.font(FONT_BOLD);
     doc.text(a.customerID);
 
+    doc.font(FONT_LIGHT);
     doc.text(room, x, y + 72, { continued: true });
+    doc.font(FONT_BOLD);
     doc.text(a.room, x, y + 72, { continued: true });
+    doc.font(FONT_LIGHT);
     doc.text(building, x, y + 72, { continued: true });
+    doc.font(FONT_BOLD);
     doc.text(a.building);
   });
   doc.end();

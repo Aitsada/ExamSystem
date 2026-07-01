@@ -5,6 +5,8 @@ import router from "./index.route.js";
 import { pdfFile } from "./pdfKit/aigen.js";
 import { pdfFileTest } from "./pdfKit/test.js";
 import { detailPdf } from "./pdfKit/Detail.js";
+import { signedDocument } from "./pdfKit/signedDocument.js";
+
 process.env.TZ = process.env.TZ || "Asia/Bangkok";
 
 const app = express();
@@ -16,6 +18,7 @@ app.use(express.json());
 pdfFile();
 pdfFileTest();
 detailPdf();
+signedDocument();
 
 app.get("/health", (req, res) => {
   res.send("Server is running");
