@@ -54,7 +54,6 @@ export const detailPdf = () => {
     }
     const col = pageIndex % 2;
     const row = Math.floor(pageIndex / 2);
-    console.log(row);
 
     const x = col === 0 ? LEFT_X : RIGHT_X;
     const y = START_Y + row * BLOCK_HEIGHT;

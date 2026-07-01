@@ -15,23 +15,25 @@ export const pdfFile = async () => {
   const FONT_BOLD = "./src/fonts/Sarabun-SemiBold.ttf";
   const applicant = await findAll();
 
-  const test = Array.from({ length: 30 }, (_, i) => ({
+  const test = Array.from({ length: 125 }, (_, i) => ({
     ID: "6501" + i,
     Prefix: "นาย",
-    FirstName: "ทรงศักดิ์ก่อเกื้อบุญมากมีลาภบุญมีมีบุญควรหา",
-    LastName: "สุวรรณโตกโลกธาตุฌาณวิญญาณ",
+    FirstName: "OOOOOOOOOOOOOOOOOO",
+    LastName: "OOOOOOOOOOOOOO",
   }));
 
-  const PAGE_BOTTOM = 740;
+  const PAGE_BOTTOM = 730;
   const SEAT_NO = 100;
   const APPLICANT_NUMBER = 220;
   const PREFIX = 300;
   const FIRST_NAME = 300;
   const LAST_NAME = 470;
 
+  // layout config
   const pw = doc.page.width;
   const ph = doc.page.height;
   const mid = doc.page.width / 2;
+
   function wof(x) {
     return doc.widthOfString(x) / 2;
   }
@@ -69,83 +71,106 @@ export const pdfFile = async () => {
       .stroke();
   }
   Line();
+  function wos(x) {
+    String(x);
+    return doc.widthOfString(x) / 2;
+  }
+  function middle(x) {
+    return mid - wos(x);
+  }
   doc.strokeColor("black");
   const drawHeader = () => {
+    const y = 30;
     doc.font(FONT_BOLD);
     doc.fontSize(16);
     const md = 0.4;
-    doc.text("ห้องสอบที่ 31", {
-      align: "center",
-    });
+    const roomText = "ห้องสอบที่ ";
+    const roomNumber_Data = "31";
+    const roomLine = roomText + roomNumber_Data;
+    doc.text(roomLine, middle(roomLine), y);
 
     doc.moveDown(1);
     doc.font(FONT_REGULAR);
-    doc.fontSize(11);
+    doc.fontSize(10);
 
-    doc
-      .text("การสอบแข่งขันเพื่อบรรจุและแต่งตั้งบุคคลเข้ารับราชการ", {
-        align: "center",
-      })
-      .moveDown(md);
-    doc
-      .text(
-        "ตำแหน่ง เจ้าพนักงานตรวจสอบทรัพย์สินปฏิบัติการ เลขประจำตัวสอบ 100001 ถึง 100030",
-        {
-          align: "center",
-        },
-      )
-      .moveDown(md);
+    const examText = "การสอบแข่งขันเพื่อบรรจุและแต่งตั้งบุคคลเข้ารับราชการ";
+    doc.text(examText, middle(examText), y + 45);
 
-    doc
-      .text("สอบวันอาทิตย์ที่ 22 มีนาคม 2569 เวลา 09:00 - 12:00 น.", {
-        align: "center",
-      })
-      .moveDown(md);
+    const posionText = "ตำแหน่ง ";
+    const posionName_Data = "เจ้าพนักงานตรวจสอบทรัพย์สินปฏิบัติการ";
+    const AppIDtext_Data = "เลขประจำตัวสอบ ";
+    const startAppId_Data = "100001";
+    const endAppId_Data = "100030";
+    const postionline =
+      posionText +
+      posionName_Data +
+      " " +
+      AppIDtext_Data +
+      startAppId_Data +
+      " ถึง " +
+      endAppId_Data;
+    doc.text(postionline, middle(postionline), y + 45 + 20);
+    const dateText = "สอบวัน ";
+    const date_Data = "อาทิตย์ที่ 22 มีนาคม 2569";
+    const timeText = "เวลา ";
+    const time_Data = "09:00 - 12:00 น.";
+    const dateline = dateText + date_Data + " " + timeText + time_Data;
+    doc.text(dateline, middle(dateline), y + 45 + 20 + 20);
 
-    const y = doc.y;
+    const placeText = "สถานที่สอบ ";
+    const place_Data = "มหาวิทยาลัยสวนดุสิต";
+    const buildindText = "ตึก/อาคาร ";
+    const building_Data = "10";
+    const floorText = "ชั้น ";
+    const floor_Data = "4";
+    const roomText2 = "ห้อง ";
+    const room_Data2 = "10406";
+    const placeline =
+      placeText +
+      place_Data +
+      " " +
+      buildindText +
+      building_Data +
+      " " +
+      floorText +
+      floor_Data +
+      " " +
+      roomText2 +
+      room_Data2;
 
-    const text1 = "สถานที่สอบ มหาวิทยาลัยสวนดุสิต ";
-    const text2 = "ตึก/อาคาร 10 ชั้น 4 ห้อง 10406";
-
-    const totalWidth = doc.widthOfString(text1) + doc.widthOfString(text2);
-
-    const pageWidth = doc.page.width;
-
-    const startX = (pageWidth - totalWidth) / 2;
-
-    doc.text(text1, startX, y);
-    doc.text(text2, startX + doc.widthOfString(text1), y, {
-      underline: true,
-    });
-
-    doc.y = y + 20;
+    doc.text(placeline, middle(placeline), y + 45 + 20 + 20 + 20);
   };
 
+  console.log(doc.widthOfString("OOOOOOOOOOOOOOOOOO"));
   const drawTableHeader = (y) => {
     doc.fontSize(10);
     doc.font(FONT_BOLD);
 
     doc.moveTo(40, y).lineWidth(0.1).lineTo(555, y).stroke();
 
-    doc.text("ลำดับที่นั่งสอบ", SEAT_NO - wof("ลำดับที่นั่งสอบ"), y + 8);
-    doc.text("เลขประจำตัวสอบ", APPLICANT_NUMBER - wof("เลขประจำตัวสอบ"), y + 8);
-    doc.text("ชื่อ-นามสกุล", 360, y + 8);
+    doc.text("ลำดับที่นั่งสอบ", SEAT_NO - wof("ลำดับที่นั่งสอบ"), y + 10);
+    doc.text(
+      "เลขประจำตัวสอบ",
+      APPLICANT_NUMBER - wof("เลขประจำตัวสอบ"),
+      y + 10,
+    );
+    doc.text("ชื่อ-นามสกุล", 360, y + 10);
 
     return y + 40;
   };
 
   drawHeader();
 
-  let y = drawTableHeader(160);
+  let y = drawTableHeader(150);
 
   doc.fontSize(10);
   test.forEach((t, index) => {
     doc.font(FONT_LIGHT);
-    if (y > PAGE_BOTTOM) {
+    if (index % 25 === 0 && index !== 0) {
       doc.addPage();
       drawHeader();
 
-      y = drawTableHeader(160);
+      y = drawTableHeader(150);
 
       doc.font(FONT_LIGHT);
     }
@@ -153,7 +178,7 @@ export const pdfFile = async () => {
     doc.text(seatNo, SEAT_NO - wof(seatNo), y);
     doc.text(t.ID, APPLICANT_NUMBER - wof(t.ID), y);
     doc.text(t.Prefix, PREFIX, y, { continued: true });
-    doc.text(t.FirstName, FIRST_NAME, y, { continued: false });
+    doc.text(t.FirstName, FIRST_NAME, y, { continued: false, width: 150 });
     doc.text(t.LastName, LAST_NAME, y);
 
     y += 22;
