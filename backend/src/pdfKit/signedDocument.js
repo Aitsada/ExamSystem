@@ -109,7 +109,9 @@ export const signedDocument = () => {
     doc.text("5. ", 75, y, { continued: true });
     doc.text(guidelinesText_5, 75, y);
 
+    const x = 20;
     y = 295;
+
     const number = "ลำดับที่";
     const appID = "เลขประจำตัวสอบ";
     const customerID = "เลขประจำตัวประชาชน";
@@ -118,14 +120,14 @@ export const signedDocument = () => {
     const examNumber2 = "แบบทดสอบ";
     const sign = "ลายมือชื่อ";
     const sign2 = "(ตัวบรรจง)";
-    doc.text(number, 35 - wos(number), y);
-    doc.text(appID, 95 - wos(appID), y);
-    doc.text(customerID, 195 - wos(customerID), y);
-    doc.text(fullname, 325 - wos(fullname), y);
-    doc.text(examNumber, 445 - wos(examNumber), y - 10);
-    doc.text(examNumber2, 445 - wos(examNumber2), y + 10);
-    doc.text(sign, 532.64 - wos(sign), y - 10);
-    doc.text(sign2, 532.64 - wos(sign2), y + 10);
+    doc.text(number, x + findRange(6) / 2 - wos(number), y);
+    doc.text(appID, x + findRange(26) / 2 - wos(appID), y);
+    doc.text(customerID, x + findRange(58) / 2 - wos(customerID), y);
+    doc.text(fullname, x + findRange(100) / 2 - wos(fullname), y);
+    doc.text(examNumber, x + findRange(143) / 2 - wos(examNumber), y - 10);
+    doc.text(examNumber2, x + findRange(143) / 2 - wos(examNumber2), y + 10);
+    doc.text(sign, x + findRange(181) / 2 - wos(sign), y - 10);
+    doc.text(sign2, x + findRange(181) / 2 - wos(sign2), y + 10);
 
     // Create Table
     doc.lineWidth(0.1);
@@ -134,36 +136,35 @@ export const signedDocument = () => {
     const h = 40;
     doc.rect(20, 280, pw - 40, h).stroke();
 
-    const x = 20;
     y = 350;
     doc
-      .moveTo(x + findRange(6), 320)
-      .lineTo(x + findRange(6), 280)
+      .moveTo(x + findRange(6), 280)
+      .lineTo(x + findRange(6), 320)
       .stroke();
     y += 20;
     doc
-      .moveTo(x + findRange(6), y)
-      .lineTo(x + findRange(20), y)
+      .moveTo(x + findRange(20), 280)
+      .lineTo(x + findRange(20), 320)
       .stroke();
     y += 20;
     doc
-      .moveTo(x + findRange(20), y)
-      .lineTo(x + findRange(38), y)
+      .moveTo(x + findRange(38), 280)
+      .lineTo(x + findRange(38), 320)
       .stroke();
     y += 20;
     doc
-      .moveTo(x + findRange(38), y)
-      .lineTo(x + findRange(62), y)
+      .moveTo(x + findRange(62), 280)
+      .lineTo(x + findRange(62), 320)
       .stroke();
     y += 20;
     doc
-      .moveTo(x + findRange(62), y)
-      .lineTo(x + findRange(81), y)
+      .moveTo(x + findRange(81), 280)
+      .lineTo(x + findRange(81), 320)
       .stroke();
     y += 20;
     doc
-      .moveTo(x + findRange(81), y)
-      .lineTo(x + findRange(100), y)
+      .moveTo(x + findRange(100), 280)
+      .lineTo(x + findRange(100), 320)
       .stroke();
     y += 20;
   };
@@ -171,8 +172,7 @@ export const signedDocument = () => {
   function findRange(x) {
     return (doc.page.width - 40) * (x / 100);
   }
-  console.log(findRange(10));
-  const applicantData = Array.from({ length: 20 }, (_, i) => ({
+  const applicantData = Array.from({ length: 60 }, (_, i) => ({
     no: i + 1,
     appID: "10001",
     customerID: "1219800371284",
@@ -181,7 +181,6 @@ export const signedDocument = () => {
     lastName: "สุวรรณโต",
   }));
 
-  const drawTableS = (y) => {};
   const drawTable = (y) => {
     doc.lineWidth(0.1);
 
@@ -305,35 +304,96 @@ export const signedDocument = () => {
   };
 
   const drawApplicants = (y) => {
+    let h = 0;
     applicantData.forEach((a, i) => {
-      const number = String(i + 1);
+      const x = 20;
       if ((i % 18 === 0) & (i != 0)) {
         doc.addPage();
         drawHeader();
-
         y = 325;
-        doc.text(number, 35 - wos(number), y);
+        dataTable(20, h);
+        doc.text(a.no, x + findRange(6) / 2 - wos(String(a.no)), y);
+        doc.text(a.appID, x + findRange(26) / 2 - wos(a.appID), y);
+        doc.text(a.customerID, x + findRange(58) / 2 - wos(a.customerID), y);
         y += 25;
+        h += 25;
       } else {
-        doc.text(number, 35 - wos(number), y);
+        dataTable(20, h);
+        doc.text(a.no, x + findRange(6) / 2 - wos(String(a.no)), y);
+        doc.text(a.appID, x + findRange(26) / 2 - wos(a.appID), y);
+        doc.text(a.customerID, x + findRange(58) / 2 - wos(a.customerID), y);
         y += 25;
+        h += 25;
       }
     });
   };
 
+  const dataTable = (x, h) => {
+    doc
+      .moveTo(x, 320 + h)
+      .lineTo(x, 345 + h)
+      .stroke();
+    doc
+      .moveTo(x + findRange(6), 320 + h)
+      .lineTo(x + findRange(6), 345 + h)
+      .stroke();
+    doc
+      .moveTo(x + findRange(20), 320 + h)
+      .lineTo(x + findRange(20), 345 + h)
+      .stroke();
+    doc
+      .moveTo(x + findRange(38), 320 + h)
+      .lineTo(x + findRange(38), 345 + h)
+      .stroke();
+    doc
+      .moveTo(x + findRange(62), 320 + h)
+      .lineTo(x + findRange(62), 345 + h)
+      .stroke();
+    doc
+      .moveTo(x + findRange(81), 320 + h)
+      .lineTo(x + findRange(81), 345 + h)
+      .stroke();
+    doc
+      .moveTo(x + findRange(100), 320 + h)
+      .lineTo(x + findRange(100), 345 + h)
+      .stroke();
+    doc
+      .moveTo(x + findRange(0), 345 + h)
+      .lineTo(x + findRange(100), 345 + h)
+      .stroke();
+  };
   const lineTest = () => {
     doc.strokeColor("red");
-    doc.moveTo(35, 0).lineTo(35, ph).stroke();
+    const x = 20;
+    doc
+      .moveTo(x + findRange(6) / 2, 0)
+      .lineTo(x + findRange(6) / 2, ph)
+      .stroke();
 
-    doc.moveTo(95, 0).lineTo(95, ph).stroke();
+    doc
+      .moveTo(x + findRange(26) / 2, 0)
+      .lineTo(x + findRange(26) / 2, ph)
+      .stroke();
 
-    doc.moveTo(195, 0).lineTo(195, ph).stroke();
+    doc
+      .moveTo(x + findRange(58) / 2, 0)
+      .lineTo(x + findRange(58) / 2, ph)
+      .stroke();
 
-    doc.moveTo(325, 0).lineTo(325, ph).stroke();
+    doc
+      .moveTo(x + findRange(100) / 2, 0)
+      .lineTo(x + findRange(100) / 2, ph)
+      .stroke();
 
-    doc.moveTo(445, 0).lineTo(445, ph).stroke();
+    doc
+      .moveTo(x + findRange(143) / 2, 0)
+      .lineTo(x + findRange(143) / 2, ph)
+      .stroke();
 
-    doc.moveTo(532.64, 0).lineTo(532.64, ph).stroke();
+    doc
+      .moveTo(x + findRange(181) / 2, 0)
+      .lineTo(x + findRange(181) / 2, ph)
+      .stroke();
 
     // Center title
     doc.strokeColor("green");
