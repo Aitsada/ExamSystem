@@ -20,15 +20,15 @@ export const pdfFile = async () => {
     Prefix: "นาย",
     // FirstName: "OOOOOOOOOOOOOOOOOO",
     // LastName: "OOOOOOOOOOOOOO",
-    FirstName: "นายสิริประภัสสรวรรณรัตน์",
+    FirstName: "สิริประภัสสรวรรณรัตน์",
     LastName: " พิชญ์พงศ์สิริโชติ",
   }));
 
   const PAGE_BOTTOM = 730;
   const SEAT_NO = 100;
   const APPLICANT_NUMBER = 220;
-  const PREFIX = 300;
-  const FIRST_NAME = 300;
+  const PREFIX = 320;
+  const FIRST_NAME = 320;
   const LAST_NAME = 470;
 
   // layout config
