@@ -177,8 +177,8 @@ export const signedDocument = () => {
     appID: "10001",
     customerID: "1219800371284",
     prefix: "นาย",
-    firstName: "อิษฎา",
-    lastName: "สุวรรณโต",
+    firstName: "สิริประภัสสรวรรณรัตน์",
+    lastName: "พิชญ์พงศ์สิริโชติ",
   }));
 
   const drawTable = (y) => {
@@ -303,25 +303,35 @@ export const signedDocument = () => {
       .stroke();
   };
 
+  console.log(11 % 10 >= 1);
   const drawApplicants = (y) => {
     let h = 0;
     applicantData.forEach((a, i) => {
       const x = 20;
       if ((i % 18 === 0) & (i != 0)) {
-        doc.addPage();
-        drawHeader();
-        y = 325;
-        dataTable(20, h);
-        doc.text(a.no, x + findRange(6) / 2 - wos(String(a.no)), y);
-        doc.text(a.appID, x + findRange(26) / 2 - wos(a.appID), y);
-        doc.text(a.customerID, x + findRange(58) / 2 - wos(a.customerID), y);
-        y += 25;
-        h += 25;
+        if (i % 10 > 1) {
+          h = 0;
+          doc.addPage();
+          drawHeader();
+          y = 325;
+          dataTable(20, h);
+          doc.text(a.no, x + findRange(6) / 2 - wos(String(a.no)), y);
+          doc.text(a.appID, x + findRange(26) / 2 - wos(a.appID), y);
+          doc.text(a.customerID, x + findRange(58) / 2 - wos(a.customerID), y);
+          y += 25;
+          h += 25;
+        }
       } else {
+        doc.fontSize(9.5);
         dataTable(20, h);
         doc.text(a.no, x + findRange(6) / 2 - wos(String(a.no)), y);
         doc.text(a.appID, x + findRange(26) / 2 - wos(a.appID), y);
         doc.text(a.customerID, x + findRange(58) / 2 - wos(a.customerID), y);
+        doc.text(a.prefix, x + findRange(39), y, {
+          continued: true,
+        });
+        doc.text(a.firstName, x + findRange(39), y);
+        doc.text(a.lastName, x + findRange(60), y);
         y += 25;
         h += 25;
       }
@@ -458,7 +468,5 @@ export const signedDocument = () => {
   lineTest();
   drawHeader();
   drawApplicants(325);
-  doc.addPage();
-  bottomPage();
   doc.end();
 };

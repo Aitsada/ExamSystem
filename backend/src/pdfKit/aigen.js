@@ -21,7 +21,7 @@ export const pdfFile = async () => {
     // FirstName: "OOOOOOOOOOOOOOOOOO",
     // LastName: "OOOOOOOOOOOOOO",
     FirstName: "สิริประภัสสรวรรณรัตน์",
-    LastName: " พิชญ์พงศ์สิริโชติ",
+    LastName: "พิชญ์พงศ์สิริโชติ",
   }));
 
   const PAGE_BOTTOM = 730;
