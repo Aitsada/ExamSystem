@@ -4,7 +4,7 @@ import fs from "fs";
 export const signedDocument = () => {
   const doc = new PDFDocument({
     size: "A4",
-    margins: 20,
+    margins: 15,
   });
 
   doc.pipe(fs.createWriteStream("./src/pdfKit/signedDocument.pdf"));
@@ -25,9 +25,10 @@ export const signedDocument = () => {
   }
 
   doc.font(FONT_LIGHT);
+  const ml = doc.page.margins.left;
+  const mr = doc.page.margins.right;
 
   //   header
-
   const drawHeader = () => {
     let y = 30;
 
@@ -40,15 +41,15 @@ export const signedDocument = () => {
     doc.fontSize(10);
     y += 23;
     const positionText = "ตำแหน่ง ";
-    doc.text(positionText, 20, y);
+    doc.text(positionText, ml, y);
 
     y += 23;
     const dateText = "สอบวัน ";
-    doc.text(dateText, 20, y);
+    doc.text(dateText, ml, y);
 
     y += 23;
     const placeText = "สถานที่สอบ ";
-    doc.text(placeText, 20, y);
+    doc.text(placeText, ml, y);
 
     y += 23;
     const examRoomLeaderText = "ชื่อหัวหน้าห้องสอบ";
@@ -58,7 +59,7 @@ export const signedDocument = () => {
       "......................................................................." +
       examSupervisorText +
       ".......................................................................";
-    doc.text(examSupervisorLine, 20, y);
+    doc.text(examSupervisorLine, ml, y);
 
     y += 23;
     const examAmountText = "จำนวนผู้เข้าสอบ";
@@ -70,13 +71,14 @@ export const signedDocument = () => {
       examAbsentText +
       "..............." +
       "คน ";
-    doc.text(examLine, 20, y);
+    doc.text(examLine, ml, y);
 
     y += 25;
+
     doc
-      .lineWidth(0.1)
-      .moveTo(20, y)
-      .lineTo(pw - 20, y)
+      .lineWidth(1)
+      .moveTo(ml, y)
+      .lineTo(pw - ml, y)
       .stroke();
 
     const guidelinesText = "ข้อปฏิบัติ";
@@ -91,7 +93,7 @@ export const signedDocument = () => {
       "เจ้าหน้าที่คุมสอบเซ็นชื่อรับรองการตรวจสอบไว้ท้ายใบเซ็นชื่อ";
 
     y += 10;
-    doc.text(guidelinesText, 20, y);
+    doc.text(guidelinesText, ml, y);
     doc.font(FONT_LIGHT);
 
     doc.text("1. ", 75, y, { continued: true });
@@ -109,7 +111,7 @@ export const signedDocument = () => {
     doc.text("5. ", 75, y, { continued: true });
     doc.text(guidelinesText_5, 75, y);
 
-    const x = 20;
+    const x = ml;
     y = 295;
 
     const number = "ลำดับที่";
@@ -122,19 +124,19 @@ export const signedDocument = () => {
     const sign2 = "(ตัวบรรจง)";
     doc.text(number, x + findRange(6) / 2 - wos(number), y);
     doc.text(appID, x + findRange(26) / 2 - wos(appID), y);
-    doc.text(customerID, x + findRange(58) / 2 - wos(customerID), y);
+    doc.text(customerID, x + findRange(57) / 2 - wos(customerID), y);
     doc.text(fullname, x + findRange(100) / 2 - wos(fullname), y);
-    doc.text(examNumber, x + findRange(143) / 2 - wos(examNumber), y - 10);
-    doc.text(examNumber2, x + findRange(143) / 2 - wos(examNumber2), y + 10);
-    doc.text(sign, x + findRange(181) / 2 - wos(sign), y - 10);
-    doc.text(sign2, x + findRange(181) / 2 - wos(sign2), y + 10);
+    doc.text(examNumber, x + findRange(145) / 2 - wos(examNumber), y - 10);
+    doc.text(examNumber2, x + findRange(145) / 2 - wos(examNumber2), y + 10);
+    doc.text(sign, x + findRange(182) / 2 - wos(sign), y - 10);
+    doc.text(sign2, x + findRange(182) / 2 - wos(sign2), y + 10);
 
-    // Create Table
+    // Create Head Table
     doc.lineWidth(0.1);
 
     const w = pw - 40;
     const h = 40;
-    doc.rect(20, 280, pw - 40, h).stroke();
+    doc.rect(ml, 280, pw - ml - mr, h).stroke();
 
     y = 350;
     doc
@@ -148,18 +150,18 @@ export const signedDocument = () => {
       .stroke();
     y += 20;
     doc
-      .moveTo(x + findRange(38), 280)
-      .lineTo(x + findRange(38), 320)
+      .moveTo(x + findRange(37), 280)
+      .lineTo(x + findRange(37), 320)
       .stroke();
     y += 20;
     doc
-      .moveTo(x + findRange(62), 280)
-      .lineTo(x + findRange(62), 320)
+      .moveTo(x + findRange(63), 280)
+      .lineTo(x + findRange(63), 320)
       .stroke();
     y += 20;
     doc
-      .moveTo(x + findRange(81), 280)
-      .lineTo(x + findRange(81), 320)
+      .moveTo(x + findRange(82), 280)
+      .lineTo(x + findRange(82), 320)
       .stroke();
     y += 20;
     doc
@@ -170,15 +172,17 @@ export const signedDocument = () => {
   };
 
   function findRange(x) {
-    return (doc.page.width - 40) * (x / 100);
+    return (doc.page.width - ml - mr) * (x / 100);
   }
-  const applicantData = Array.from({ length: 60 }, (_, i) => ({
+  const applicantData = Array.from({ length: 10 }, (_, i) => ({
     no: i + 1,
     appID: "10001",
     customerID: "1219800371284",
     prefix: "นาย",
-    firstName: "สิริประภัสสรวรรณรัตน์",
-    lastName: "พิชญ์พงศ์สิริโชติ",
+    firstName: "ภาณุพงศ์",
+    lastName: "กิจเรืองโรจน์",
+    // firstName: "สิริประภัสสรวรรณรัตน์",
+    // lastName: "พิชญ์พงศ์สิริโชติ",
   }));
 
   const drawTable = (y) => {
@@ -307,33 +311,42 @@ export const signedDocument = () => {
   const drawApplicants = (y) => {
     let h = 0;
     applicantData.forEach((a, i) => {
-      const x = 20;
       if ((i % 18 === 0) & (i != 0)) {
         if (i % 10 > 1) {
           h = 0;
           doc.addPage();
           drawHeader();
           y = 325;
-          dataTable(20, h);
-          doc.text(a.no, x + findRange(6) / 2 - wos(String(a.no)), y);
-          doc.text(a.appID, x + findRange(26) / 2 - wos(a.appID), y);
-          doc.text(a.customerID, x + findRange(58) / 2 - wos(a.customerID), y);
+          doc.fontSize(9.5);
+          dataTable(ml, h);
+          doc.text(a.no, ml + findRange(6) / 2 - wos(String(a.no)), y);
+          doc.text(a.appID, ml + findRange(26) / 2 - wos(a.appID), y);
+          doc.text(a.customerID, ml + findRange(57) / 2 - wos(a.customerID), y);
+          doc.text(a.prefix, ml + findRange(38), y, {
+            continued: true,
+          });
+          doc.text(a.firstName, ml + findRange(38), y);
+          doc.text(a.lastName, ml + findRange(52), y);
           y += 25;
           h += 25;
         }
       } else {
         doc.fontSize(9.5);
-        dataTable(20, h);
-        doc.text(a.no, x + findRange(6) / 2 - wos(String(a.no)), y);
-        doc.text(a.appID, x + findRange(26) / 2 - wos(a.appID), y);
-        doc.text(a.customerID, x + findRange(58) / 2 - wos(a.customerID), y);
-        doc.text(a.prefix, x + findRange(39), y, {
+        dataTable(ml, h);
+        doc.text(a.no, ml + findRange(6) / 2 - wos(String(a.no)), y);
+        doc.text(a.appID, ml + findRange(26) / 2 - wos(a.appID), y);
+        doc.text(a.customerID, ml + findRange(57) / 2 - wos(a.customerID), y);
+        doc.text(a.prefix, ml + findRange(38), y, {
           continued: true,
         });
-        doc.text(a.firstName, x + findRange(39), y);
-        doc.text(a.lastName, x + findRange(60), y);
+        doc.text(a.firstName, ml + findRange(38), y);
+        doc.text(a.lastName, ml + findRange(52), y);
         y += 25;
         h += 25;
+        console.log(y);
+        if ((y > 470) & (y < 575)) {
+          bottomPage();
+        }
       }
     });
   };
@@ -352,21 +365,22 @@ export const signedDocument = () => {
       .lineTo(x + findRange(20), 345 + h)
       .stroke();
     doc
-      .moveTo(x + findRange(38), 320 + h)
-      .lineTo(x + findRange(38), 345 + h)
+      .moveTo(x + findRange(37), 320 + h)
+      .lineTo(x + findRange(37), 345 + h)
       .stroke();
     doc
-      .moveTo(x + findRange(62), 320 + h)
-      .lineTo(x + findRange(62), 345 + h)
+      .moveTo(x + findRange(63), 320 + h)
+      .lineTo(x + findRange(63), 345 + h)
       .stroke();
     doc
-      .moveTo(x + findRange(81), 320 + h)
-      .lineTo(x + findRange(81), 345 + h)
+      .moveTo(x + findRange(82), 320 + h)
+      .lineTo(x + findRange(82), 345 + h)
       .stroke();
     doc
       .moveTo(x + findRange(100), 320 + h)
       .lineTo(x + findRange(100), 345 + h)
       .stroke();
+    // bottom line
     doc
       .moveTo(x + findRange(0), 345 + h)
       .lineTo(x + findRange(100), 345 + h)
@@ -374,7 +388,7 @@ export const signedDocument = () => {
   };
   const lineTest = () => {
     doc.strokeColor("red");
-    const x = 20;
+    const x = ml;
     doc
       .moveTo(x + findRange(6) / 2, 0)
       .lineTo(x + findRange(6) / 2, ph)
@@ -386,39 +400,39 @@ export const signedDocument = () => {
       .stroke();
 
     doc
-      .moveTo(x + findRange(58) / 2, 0)
-      .lineTo(x + findRange(58) / 2, ph)
+      .moveTo(x + findRange(57) / 2, 0)
+      .lineTo(x + findRange(57) / 2, ph)
+      .stroke();
+
+    // doc
+    //   .moveTo(x + findRange(100) / 2, 0)
+    //   .lineTo(x + findRange(100) / 2, ph)
+    //   .stroke();
+
+    doc
+      .moveTo(x + findRange(145) / 2, 0)
+      .lineTo(x + findRange(145) / 2, ph)
       .stroke();
 
     doc
-      .moveTo(x + findRange(100) / 2, 0)
-      .lineTo(x + findRange(100) / 2, ph)
+      .moveTo(x + findRange(182) / 2, 0)
+      .lineTo(x + findRange(182) / 2, ph)
       .stroke();
 
-    doc
-      .moveTo(x + findRange(143) / 2, 0)
-      .lineTo(x + findRange(143) / 2, ph)
-      .stroke();
+    // // Center title
+    // doc.strokeColor("green");
+    // doc
+    //   .moveTo(mid - 70, 0)
+    //   .lineTo(mid - 70, ph)
+    //   .stroke();
 
-    doc
-      .moveTo(x + findRange(181) / 2, 0)
-      .lineTo(x + findRange(181) / 2, ph)
-      .stroke();
+    // doc
+    //   .moveTo(mid + 70, 0)
+    //   .lineTo(mid + 70, ph)
+    //   .stroke();
 
-    // Center title
-    doc.strokeColor("green");
-    doc
-      .moveTo(mid - 70, 0)
-      .lineTo(mid - 70, ph)
-      .stroke();
-
-    doc
-      .moveTo(mid + 70, 0)
-      .lineTo(mid + 70, ph)
-      .stroke();
-
-    doc.strokeColor("blue");
-    doc.moveTo(mid, 0).lineTo(mid, ph).stroke();
+    // doc.strokeColor("blue");
+    // doc.moveTo(mid, 0).lineTo(mid, ph).stroke();
 
     doc.strokeColor("black");
   };
@@ -430,10 +444,10 @@ export const signedDocument = () => {
     const text2 = "มีปัญหา";
     const text3 = "ยุติการสอบ";
     doc.fontSize(9.5);
-    doc.text(text, 20, 50);
+    doc.text(text, ml, 50);
 
-    doc.rect(20, 50 + 23, 8, 8).stroke();
-    doc.text(text1, 20 + 13, 50 + 20);
+    doc.rect(ml, 50 + 23, 8, 8).stroke();
+    doc.text(text1, ml + 13, 50 + 20);
 
     const amount = "จำนวน ........... ราย";
     const appId1 =
@@ -443,17 +457,17 @@ export const signedDocument = () => {
 
     const dotSpace =
       "......................................................................................................................................................................................................................................................";
-    doc.rect(20, 50 + 23 + 20, 8, 8).stroke();
-    doc.text(text2, 20 + 13, 50 + 40, { continued: true });
-    doc.text(amount, 20 + 13 + 3, 50 + 40, { continued: true });
-    doc.text(appId1, 20 + 13 + 6, 50 + 40);
+    doc.rect(ml, 50 + 23 + 20, 8, 8).stroke();
+    doc.text(text2, ml + 13, 50 + 40, { continued: true });
+    doc.text(amount, ml + 13 + 3, 50 + 40, { continued: true });
+    doc.text(appId1, ml + 13 + 6, 50 + 40);
 
-    doc.rect(20, 50 + 23 + 40, 8, 8).stroke();
-    doc.text(text3, 20 + 13, 50 + 60, { continued: true });
-    doc.text(amount, 20 + 13 + 3, 50 + 60, { continued: true });
-    doc.text(appId2, 20 + 13 + 6, 50 + 60);
-    doc.text(dotSpace, 20, 50 + 80);
-    doc.text(dotSpace, 20, 50 + 100);
+    doc.rect(ml, 50 + 23 + 40, 8, 8).stroke();
+    doc.text(text3, ml + 13, 50 + 60, { continued: true });
+    doc.text(amount, ml + 13 + 3, 50 + 60, { continued: true });
+    doc.text(appId2, ml + 13 + 6, 50 + 60);
+    doc.text(dotSpace, ml, 50 + 80);
+    doc.text(dotSpace, ml, 50 + 100);
 
     const supervisor1 =
       "ลงชื่อผู้ตรวจสอบ..............................................................................";
@@ -468,5 +482,7 @@ export const signedDocument = () => {
   lineTest();
   drawHeader();
   drawApplicants(325);
+  doc.addPage();
+  bottomPage();
   doc.end();
 };
