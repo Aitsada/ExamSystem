@@ -6,6 +6,7 @@ import { pdfFile } from "./pdfKit/aigen.js";
 import { pdfFileTest } from "./pdfKit/test.js";
 import { detailPdf } from "./pdfKit/Detail.js";
 import { signedDocument } from "./pdfKit/signedDocument.js";
+import { roomLayout } from "./pdfKit/roomLayout.js";
 
 process.env.TZ = process.env.TZ || "Asia/Bangkok";
 
@@ -19,7 +20,7 @@ pdfFile();
 pdfFileTest();
 detailPdf();
 signedDocument();
-
+roomLayout();
 app.get("/health", (req, res) => {
   res.send("Server is running");
 });

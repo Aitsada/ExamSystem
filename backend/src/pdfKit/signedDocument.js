@@ -1,7 +1,8 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
+import { findByPositionID } from "../models/applicant.model.js";
 
-export const signedDocument = () => {
+export const signedDocument = async () => {
   const doc = new PDFDocument({
     size: "A4",
     margins: 15,
@@ -41,15 +42,26 @@ export const signedDocument = () => {
     doc.fontSize(10);
     y += 23;
     const positionText = "ตำแหน่ง ";
-    doc.text(positionText, ml, y);
+    const position_Date = "เจ้าพนักงานตรวจสอบทรัพย์สินปฏิบัติการ";
+    doc.text(positionText, ml, y, { continued: true });
+    doc.text(position_Date, ml, y);
 
     y += 23;
     const dateText = "สอบวัน ";
-    doc.text(dateText, ml, y);
+    const date_Data = "อาทิตย์ที่ 22 มีนาคม 2569 เวลา 09:00 - 12:00 น.";
+    doc.text(dateText, ml, y, { continued: true });
+    doc.text(date_Data, ml, y);
 
     y += 23;
     const placeText = "สถานที่สอบ ";
-    doc.text(placeText, ml, y);
+    const place_Data = "มหาวิทยาลัยสวนดุสิต";
+    const buiding_Data = "ตึก/อาคาร 10";
+    const floor_Data = "ชั้น 4";
+    const room_Data = "ห้องสอบที่ 31 ห้อง 10406";
+    const collect_Data = buiding_Data + floor_Data + room_Data;
+    doc.text(placeText, ml, y, { continued: true });
+    doc.text(place_Data, ml, y, { continued: true });
+    doc.text(collect_Data, ml + 3, y, { underline: true });
 
     y += 23;
     const examRoomLeaderText = "ชื่อหัวหน้าห้องสอบ";
@@ -174,7 +186,9 @@ export const signedDocument = () => {
   function findRange(x) {
     return (doc.page.width - ml - mr) * (x / 100);
   }
-  const applicantData = Array.from({ length: 10 }, (_, i) => ({
+
+  const app_result = await findByPositionID(3);
+  const applicantData = Array.from({ length: 22 }, (_, i) => ({
     no: i + 1,
     appID: "10001",
     customerID: "1219800371284",
@@ -307,10 +321,9 @@ export const signedDocument = () => {
       .stroke();
   };
 
-  console.log(11 % 10 >= 1);
   const drawApplicants = (y) => {
     let h = 0;
-    applicantData.forEach((a, i) => {
+    app_result.forEach((a, i) => {
       if ((i % 18 === 0) & (i != 0)) {
         if (i % 10 > 1) {
           h = 0;
@@ -319,36 +332,55 @@ export const signedDocument = () => {
           y = 325;
           doc.fontSize(9.5);
           dataTable(ml, h);
-          doc.text(a.no, ml + findRange(6) / 2 - wos(String(a.no)), y);
-          doc.text(a.appID, ml + findRange(26) / 2 - wos(a.appID), y);
-          doc.text(a.customerID, ml + findRange(57) / 2 - wos(a.customerID), y);
-          doc.text(a.prefix, ml + findRange(38), y, {
+          doc.text(a.ID, ml + findRange(6) / 2 - wos(String(a.ID)), y);
+          doc.text(
+            a.ApplicantNumber,
+            ml + findRange(26) / 2 - wos(a.ApplicantNumber),
+            y,
+          );
+          doc.text(
+            a.CitizenNumber,
+            ml + findRange(57) / 2 - wos(a.CitizenNumber),
+            y,
+          );
+          doc.text(a.Prefix, ml + findRange(38), y, {
             continued: true,
           });
-          doc.text(a.firstName, ml + findRange(38), y);
-          doc.text(a.lastName, ml + findRange(52), y);
+          doc.text(a.FirstName, ml + findRange(38), y);
+          doc.text(a.LastName, ml + findRange(52), y);
           y += 25;
           h += 25;
         }
       } else {
         doc.fontSize(9.5);
         dataTable(ml, h);
-        doc.text(a.no, ml + findRange(6) / 2 - wos(String(a.no)), y);
-        doc.text(a.appID, ml + findRange(26) / 2 - wos(a.appID), y);
-        doc.text(a.customerID, ml + findRange(57) / 2 - wos(a.customerID), y);
-        doc.text(a.prefix, ml + findRange(38), y, {
+        doc.text(a.ID, ml + findRange(6) / 2 - wos(String(a.ID)), y);
+        doc.text(
+          a.ApplicantNumber,
+          ml + findRange(26) / 2 - wos(a.ApplicantNumber),
+          y,
+        );
+        doc.text(
+          a.CitizenNumber,
+          ml + findRange(57) / 2 - wos(a.CitizenNumber),
+          y,
+        );
+        doc.text(a.Prefix, ml + findRange(38), y, {
           continued: true,
         });
-        doc.text(a.firstName, ml + findRange(38), y);
-        doc.text(a.lastName, ml + findRange(52), y);
+        doc.text(a.FirstName, ml + findRange(38), y);
+        doc.text(a.LastName, ml + findRange(52), y);
         y += 25;
         h += 25;
-        console.log(y);
-        if ((y > 470) & (y < 575)) {
-          bottomPage();
-        }
       }
     });
+
+    if (y <= 575) {
+      bottomPage(y + 20);
+    } else {
+      doc.addPage();
+      bottomPage();
+    }
   };
 
   const dataTable = (x, h) => {
@@ -437,17 +469,17 @@ export const signedDocument = () => {
     doc.strokeColor("black");
   };
 
-  const bottomPage = () => {
+  const bottomPage = (y = 50) => {
     const text =
       "ข้าพเจ้าได้ตรวจสอบใบหน้าและเลขประจําตัวประชาชนของผู้สอบทุกคนแล้ว ปรากฎว่า";
     const text1 = "เหมือนกับบัตรประจําตัวประชาชน";
     const text2 = "มีปัญหา";
     const text3 = "ยุติการสอบ";
     doc.fontSize(9.5);
-    doc.text(text, ml, 50);
+    doc.text(text, ml, y);
 
-    doc.rect(ml, 50 + 23, 8, 8).stroke();
-    doc.text(text1, ml + 13, 50 + 20);
+    doc.rect(ml, y + 23, 8, 8).stroke();
+    doc.text(text1, ml + 13, y + 20);
 
     const amount = "จำนวน ........... ราย";
     const appId1 =
@@ -457,32 +489,34 @@ export const signedDocument = () => {
 
     const dotSpace =
       "......................................................................................................................................................................................................................................................";
-    doc.rect(ml, 50 + 23 + 20, 8, 8).stroke();
-    doc.text(text2, ml + 13, 50 + 40, { continued: true });
-    doc.text(amount, ml + 13 + 3, 50 + 40, { continued: true });
-    doc.text(appId1, ml + 13 + 6, 50 + 40);
+    doc.rect(ml, y + 23 + 20, 8, 8).stroke();
+    doc.text(text2, ml + 13, y + 40, { continued: true });
+    doc.text(amount, ml + 13 + 3, y + 40, { continued: true });
+    doc.text(appId1, ml + 13 + 6, y + 40);
 
-    doc.rect(ml, 50 + 23 + 40, 8, 8).stroke();
-    doc.text(text3, ml + 13, 50 + 60, { continued: true });
-    doc.text(amount, ml + 13 + 3, 50 + 60, { continued: true });
-    doc.text(appId2, ml + 13 + 6, 50 + 60);
-    doc.text(dotSpace, ml, 50 + 80);
-    doc.text(dotSpace, ml, 50 + 100);
+    doc.rect(ml, y + 23 + 40, 8, 8).stroke();
+    doc.text(text3, ml + 13, y + 60, { continued: true });
+    doc.text(amount, ml + 13 + 3, y + 60, { continued: true });
+    doc.text(appId2, ml + 13 + 6, y + 60);
+    doc.text(dotSpace, ml, y + 80);
+    doc.text(dotSpace, ml, y + 100);
 
     const supervisor1 =
       "ลงชื่อผู้ตรวจสอบ..............................................................................";
-    doc.text(supervisor1, 230, 50 + 140, { continued: true });
+    doc.text(supervisor1, 230, y + 140, { continued: true });
     const supervisor2 = "(เจ้าหน้าที่คุมสอบ)";
-    doc.text(supervisor2, 230, 50 + 140);
+    doc.text(supervisor2, 230, y + 140);
     const fullnameSupervisor =
       "(.................................................................)";
-    doc.text(fullnameSupervisor, 310, 50 + 160);
+    doc.text(fullnameSupervisor, 310, y + 160);
   };
 
   lineTest();
   drawHeader();
   drawApplicants(325);
-  doc.addPage();
-  bottomPage();
+  // if (applicantData.length > 10) {
+  //   doc.addPage();
+  //   bottomPage();
+  // }
   doc.end();
 };
