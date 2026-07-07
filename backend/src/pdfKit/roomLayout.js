@@ -1,7 +1,25 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
 
-export const roomLayout = async () => {
+export const roomLayout = async (data) => {
+  const {
+    roomNo,
+    roomName,
+    floorName,
+    buildingName,
+    rows,
+    columns,
+    facilityName,
+    dateTime,
+  } = data;
+
+  const applicants = []
+    .concat(data.applicantNumbers || data["applicantNumbers[]"] || [])
+    .filter((applicantNumber) => applicantNumber);
+  const applicantCount = applicants.length;
+  const columnCount = Number(columns) || 0;
+  const rowCount = Number(rows) || 0;
+
   const doc = new PDFDocument({
     size: "A4",
     layout: "landscape",
@@ -33,20 +51,27 @@ export const roomLayout = async () => {
   doc.font(FONT_BOLD);
   doc.fontSize(11);
   const seatLayoutText = "ผังที่นั่งสอบ";
-  const seatLayout_Data = "มหาวิทยาลัยสวนดุสิต";
+  const seatLayout_Data = facilityName;
   const seatLayoutOneLine = seatLayoutText + " " + seatLayout_Data;
   doc.text(seatLayoutOneLine, center(seatLayoutOneLine), y);
   y += 25;
 
-  const dateText = "สอบวัน";
-  const date_Data = "อาทิตย์ที่ 22 มีนาคม 2569 เวลา 09:00 - 12:00 น.";
-  const dateOneLine = dateText + date_Data;
-  doc.text(dateOneLine, center(dateOneLine), y);
+  const date_Data = dateTime;
+  doc.text(date_Data, center(date_Data), y);
   y += 25;
-
-  const roomText = "ห้องสอบ ที่";
-  const room_Data = "31 (10406) ชั้น 4 ตึก/อาคาร 10";
-  const roomOneLine = roomText + " " + room_Data;
+  const room_No = roomNo;
+  const floor_Name = floorName;
+  const building_Name = buildingName;
+  const roomOneLine =
+    "ห้องสอบที่ " +
+    room_No +
+    "(" +
+    roomName +
+    ")" +
+    " ชั้น " +
+    floor_Name +
+    " ตึก/" +
+    building_Name;
   doc.text(roomOneLine, ml + 50, y);
   y += 25;
 
@@ -62,18 +87,14 @@ export const roomLayout = async () => {
 
   //   Table
 
-  const applicants = 25;
-  const column = 6;
-  const row = 5;
-
   let columnX = 150;
-  for (let i = 1; i <= column; i++) {
+  for (let i = 1; i <= columnCount; i++) {
     doc.text(i, ml + columnX - wos(String(i)), y);
     columnX += 105;
   }
   y += 25;
 
-  for (let i = 1; i <= row; i++) {
+  for (let i = 1; i <= rowCount; i++) {
     doc.text(i, ml + 70 - wos(String(i)), y);
     y += 25;
   }
@@ -81,7 +102,7 @@ export const roomLayout = async () => {
   doc.font(FONT_BOLD);
   doc.fontSize(11);
   const amountText = "จำนวน";
-  const appAmount_Data = String(applicants);
+  const appAmount_Data = String(applicantCount);
   const amountOneLine = amountText + " " + appAmount_Data + " " + "คน";
   doc.text(amountOneLine, center(amountOneLine), y);
   function appFrame(x, y) {
@@ -95,13 +116,15 @@ export const roomLayout = async () => {
   columnX = 150;
   let a = 100;
   let b = 153;
-  for (let i = 1; i <= applicants; i++) {
+  applicants.forEach((app, i) => {
+    i += 1;
+    const applicantNumber = String(app);
     for (let j = i; j <= i; j++) {
       appFrame(a, b);
-      doc.text("650" + i, ml + columnX - wos("650" + i), y);
+      doc.text(applicantNumber, ml + columnX - wos(applicantNumber), y);
       columnX += 105;
       a += 105;
-      if (j % column === 0) {
+      if (j % columnCount === 0 && j > 0) {
         columnX = 150;
         y += 25;
 
@@ -109,7 +132,7 @@ export const roomLayout = async () => {
         b += 25;
       }
     }
-  }
+  });
 
   doc.end();
 };

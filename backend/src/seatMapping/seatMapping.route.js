@@ -11,4 +11,6 @@ router.get('/seatMapping/room-counts', seatMappingController.findRoomMappingCoun
 router.get('/seatMapping/position-room-counts', seatMappingController.findPositionRoomMappingCounts);
 router.post('/seatMapping/map', seatMappingController.mapPositionToRooms);
 
+router.get('/seatMapping/roomLayout', seatMappingController.roomLayout);
+
 export default router;

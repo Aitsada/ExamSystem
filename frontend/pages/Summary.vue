@@ -1,5 +1,5 @@
 <template>
-  <v-row style="justify-content: center;" no-gutters>
+  <v-row style="justify-content: center" no-gutters>
     <v-col cols="10">
       <v-container class="admin-page admin-page-wide summary-page">
         <v-row class="summary-header">
@@ -58,12 +58,12 @@
                 </td>
               </tr>
               <tr
-                v-for="(item) in summaryRows"
+                v-for="item in summaryRows"
                 v-else
                 :key="`${item.PositionID}-${item.RoomID}`"
               >
                 <td>{{ item.PositionID }}</td>
-                <td>{{ item.PositionName || '-' }}</td>
+                <td>{{ item.PositionName || "-" }}</td>
                 <td>{{ applicantNumberText(item) }}</td>
                 <td>{{ buildingText(item) }}</td>
                 <td>{{ roomText(item) }}</td>
@@ -71,7 +71,15 @@
                 <td />
                 <td />
                 <td />
-                <td />
+                <td>
+                  <v-btn
+                    color="primary"
+                    small
+                    @click="roomLayout(item)"
+                  >
+                    สร้างไฟล์
+                  </v-btn>
+                </td>
               </tr>
             </tbody>
           </template>
@@ -104,13 +112,52 @@ export default {
       if (!start.date) {
         return this.meta.ExamName || 'สอบ'
       }
-      return `สอบ${this.formatThaiDate(start.date)} เวลา ${start.time || '-'} - ${end.time || '-'} น.`
+      return `สอบ${this.formatThaiDate(start.date)} เวลา ${
+        start.time || '-'
+      } - ${end.time || '-'} น.`
     }
   },
   mounted () {
     this.fetchSummary()
   },
   methods: {
+    textExamDateTime () {
+      const start = this.parseDateTime(this.meta.StartDateTime)
+      const end = this.parseDateTime(this.meta.EndDateTime)
+
+      if (!start.date) {
+        return this.meta.ExamName || 'สอบ'
+      }
+      return `สอบ${this.formatThaiDate(start.date)} เวลา ${
+        start.time || '-'
+      } - ${end.time || '-'} น.`
+    },
+    // RoomLayout
+    async roomLayout (item) {
+      try {
+        await this.$axios.$get(this.$apiUrl('/api/seatMapping/roomLayout'), {
+          params: {
+            roomID: item.RoomID,
+            roomNo: item.RoomNo,
+            roomName: item.RoomName,
+            floorName: item.FloorName,
+            buildingName: item.BuildingName,
+            applicantNumbers: item.ApplicantNumbers,
+            facilityName: this.facilityName,
+            dateTime: this.textExamDateTime()
+          }
+        })
+        this.$swal.fire({
+          icon: 'success',
+          text: 'สร้างไฟล์ผังห้องสำเร็จ'
+        })
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `สร้างไฟล์ผังห้องไม่สำเร็จ ${err.message}`
+        })
+      }
+    },
     async fetchSummary () {
       const ExamID = this.$route.query.ExamID
       const FacilityID = this.$route.query.FacilityID
@@ -120,16 +167,18 @@ export default {
 
       this.loading = true
       try {
-        const res = await this.$axios.$get(this.$apiUrl('/api/seatMapping/summary'), {
-          params: {
-            ExamID,
-            FacilityID
+        const res = await this.$axios.$get(
+          this.$apiUrl('/api/seatMapping/summary'),
+          {
+            params: {
+              ExamID,
+              FacilityID
+            }
           }
-        })
+        )
         const data = res.data || {}
         this.meta = data.meta || {}
         this.summaryRows = data.rows || []
-        console.log('summaryRows : ', this.summaryRows)
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
@@ -169,7 +218,9 @@ export default {
         return this.formatBangkokDateTime(new Date(text))
       }
 
-      const sqlDateTime = text.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/)
+      const sqlDateTime = text.match(
+        /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/
+      )
       if (sqlDateTime) {
         const [, year, month, day, hour, minute] = sqlDateTime
         return {
@@ -185,7 +236,7 @@ export default {
         return { date: '', time: '' }
       }
 
-      const bangkokTime = new Date(dateTime.getTime() + (7 * 60 * 60 * 1000))
+      const bangkokTime = new Date(dateTime.getTime() + 7 * 60 * 60 * 1000)
       const year = bangkokTime.getUTCFullYear()
       const month = String(bangkokTime.getUTCMonth() + 1).padStart(2, '0')
       const day = String(bangkokTime.getUTCDate()).padStart(2, '0')
@@ -200,7 +251,15 @@ export default {
     formatThaiDate (date) {
       const [year, month, day] = date.split('-').map(Number)
       const thaiDate = new Date(year, month - 1, day)
-      const weekdays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์']
+      const weekdays = [
+        'อาทิตย์',
+        'จันทร์',
+        'อังคาร',
+        'พุธ',
+        'พฤหัสบดี',
+        'ศุกร์',
+        'เสาร์'
+      ]
       const months = [
         'มกราคม',
         'กุมภาพันธ์',
@@ -216,7 +275,9 @@ export default {
         'ธันวาคม'
       ]
 
-      return `วัน${weekdays[thaiDate.getDay()]}ที่ ${day} ${months[month - 1]} ${year + 543}`
+      return `วัน${weekdays[thaiDate.getDay()]}ที่ ${day} ${
+        months[month - 1]
+      } ${year + 543}`
     }
   }
 }

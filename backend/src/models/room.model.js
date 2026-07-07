@@ -4,6 +4,13 @@ export async function findAll() {
   const [rows] = await db.query("SELECT * FROM Room");
   return rows;
 }
+export async function findByRoomId(id) {
+  const [rows] = await db.query(
+    "SELECT `Rows`, `Columns` FROM Room WHERE ID = ?",
+    [id],
+  );
+  return rows;
+}
 
 export async function findById(FloorID, RoomID) {
   const [result] = await db.query(
