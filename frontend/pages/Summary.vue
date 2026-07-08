@@ -68,9 +68,15 @@
                 <td>{{ buildingText(item) }}</td>
                 <td>{{ roomText(item) }}</td>
                 <td>{{ item.ApplicantCount || 0 }}</td>
-                <td />
-                <td />
-                <td />
+                <td>
+                  <v-btn
+                    color="primary"
+                    small
+                    @click="listOfName(item)"
+                  >
+                    Go
+                  </v-btn>
+                </td>
                 <td>
                   <v-btn
                     color="primary"
@@ -78,6 +84,24 @@
                     @click="roomLayout(item)"
                   >
                     สร้างไฟล์
+                  </v-btn>
+                </td>
+                <td>
+                  <v-btn
+                    color="primary"
+                    small
+                    @click="roomLayout(item)"
+                  >
+                    สร้างไฟล์
+                  </v-btn>
+                </td>
+                <td>
+                  <v-btn
+                    color="primary"
+                    small
+                    @click="roomLayout(item)"
+                  >
+                    Go
                   </v-btn>
                 </td>
               </tr>
@@ -132,7 +156,25 @@ export default {
         start.time || '-'
       } - ${end.time || '-'} น.`
     },
-    // RoomLayout
+    // List Of Name
+    async listOfName (item) {
+      await this.$axios.$get(this.$apiUrl('/api/seatMapping/listOfName'), {
+        params: {
+          roomID: item.RoomID,
+          roomNo: item.RoomNo,
+          positionID: item.PositionID,
+          positionName: item.PositionName,
+          appStart: item.ApplicantNumberStart,
+          appEnd: item.ApplicantNumberEnd,
+          dateTime: this.textExamDateTime(),
+          buildingName: item.BuildingName,
+          floorName: item.FloorName,
+          roomName: item.RoomName,
+          applicantNumbers: item.ApplicantNumbers
+        }
+      })
+    },
+    // Room Layout
     async roomLayout (item) {
       try {
         await this.$axios.$get(this.$apiUrl('/api/seatMapping/roomLayout'), {
@@ -179,6 +221,7 @@ export default {
         const data = res.data || {}
         this.meta = data.meta || {}
         this.summaryRows = data.rows || []
+        console.log(this.summaryRows)
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
