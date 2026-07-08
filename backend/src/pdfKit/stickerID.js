@@ -1,13 +1,25 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
 
-export const detailPdf = () => {
+export const stickerIdPDF = (data) => {
+  const {
+    roomNo,
+    roomName,
+    floorName,
+    buildingName,
+    positionName,
+    applicantNumber,
+  } = data;
+
+  const applicants = []
+    .concat(data.applicants || [])
+    .filter((applicant) => applicant);
   const doc = new PDFDocument({
     size: "A4",
     margins: 20,
   });
 
-  doc.pipe(fs.createWriteStream("./src/pdfKit/detail.pdf"));
+  doc.pipe(fs.createWriteStream("./src/pdfKit/stickerID.pdf"));
 
   const FONT_LIGHT = "./src/fonts/Sarabun-Light.ttf";
   const FONT_REGULAR = "./src/fonts/Sarabun-Regular.ttf";
@@ -26,22 +38,22 @@ export const detailPdf = () => {
   const name = "ชื่อ ";
   const customerID = "เลขประจำตัวสอบ ";
   const room = "ห้องสอบที่ ";
-  const building = "ตึก/อาคาร ";
+  const building = " ตึก/";
 
   doc.moveTo(mid, 0).lineTo(mid, h).stroke();
   doc.font(FONT_LIGHT);
   doc.fontSize(11);
 
-  const applicants = Array.from({ length: 60 }, (_, i) => ({
-    position: "เจ้าพนักงานตรวจสอบทรัพย์สินปฏิบัติการ",
-    AppID: "",
-    Prefix: "นาย",
-    FirstName: "อิษฎา",
-    LastName: "สุวรรณโต",
-    customerID: "1219800345942",
-    room: "31 (10406) แถวที่ 1 ชั้น 4 ",
-    building: "10",
-  }));
+  // const applicants = Array.from({ length: 60 }, (_, i) => ({
+  //   position: "เจ้าพนักงานตรวจสอบทรัพย์สินปฏิบัติการ",
+  //   AppID: "",
+  //   Prefix: "นาย",
+  //   FirstName: "อิษฎา",
+  //   LastName: "สุวรรณโต",
+  //   customerID: "1219800345942",
+  //   room: "31 (10406) แถวที่ 1 ชั้น 4 ",
+  //   building: "10",
+  // }));
   const START_Y = 30;
   const BLOCK_HEIGHT = 120;
   const MAX_BLOCK_PER_PAGE = 6;
@@ -57,23 +69,24 @@ export const detailPdf = () => {
     const x = col === 0 ? LEFT_X : RIGHT_X;
     const y = START_Y + row * BLOCK_HEIGHT;
 
+    doc.font(FONT_REGULAR);
     doc.text(position, x, y, { continued: true });
     doc.font(FONT_BOLD);
+    console.log("test");
 
-    const isSmall = doc.widthOfString(a.position) > 180;
+    const isSmall = doc.widthOfString(positionName) > 180;
     if (isSmall) {
       doc.fontSize(9);
-      doc.text(a.position, x, y + 2);
+      doc.text(positionName, x, y + 2);
     } else {
       doc.fontSize(11);
-      doc.text(a.position);
+      doc.text(positionName);
     }
-
     doc.fontSize(11);
     doc.font(FONT_LIGHT);
     doc.text(AppID, x, y + 18, { continued: true });
     doc.font(FONT_BOLD);
-    doc.text("65010" + (index + 1));
+    doc.text();
 
     doc.font(FONT_LIGHT);
     doc.text(name, x, y + 36, { continued: true });
@@ -85,16 +98,20 @@ export const detailPdf = () => {
     doc.font(FONT_LIGHT);
     doc.text(customerID, x, y + 54, { continued: true });
     doc.font(FONT_BOLD);
-    doc.text(a.customerID);
+    doc.text(a.ApplicantNumber);
 
     doc.font(FONT_LIGHT);
     doc.text(room, x, y + 72, { continued: true });
     doc.font(FONT_BOLD);
-    doc.text(a.room, x, y + 72, { continued: true });
+    doc.text(String(roomNo), x, y + 72, { continued: true });
+    doc.text(' (', x, y + 72, { continued: true });
+    doc.text(roomName, x, y + 72, { continued: true });
+    doc.text(') ', x, y + 72, { continued: true });
     doc.font(FONT_LIGHT);
     doc.text(building, x, y + 72, { continued: true });
     doc.font(FONT_BOLD);
-    doc.text(a.building);
+    doc.text(buildingName);
   });
+
   doc.end();
 };

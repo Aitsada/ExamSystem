@@ -1,6 +1,8 @@
 import * as seatMappingService from "./seatMapping.service.js";
-import { roomLayout as roomLayoutPDF } from "../pdfKit/roomLayout.js";
 import { findByRoomId } from "../models/room.model.js";
+import { roomLayout as roomLayoutPDF } from "../pdfKit/roomLayout.js";
+import { listOfName as listOfNamePDF } from "../pdfKit/listOfName.js";
+import { stickerIdPDF } from "../pdfKit/stickerID.js";
 
 export async function findAll(req, res) {
   try {
@@ -72,8 +74,8 @@ export async function mapPositionToRooms(req, res) {
 
 export async function roomLayout(req, res) {
   try {
-    const query = req.query;
-    const roomID = Number(query.roomID);
+    const body = req.body;
+    const roomID = Number(body.roomID);
     const room = await findByRoomId(roomID);
 
     if (!room.length) {
@@ -85,7 +87,7 @@ export async function roomLayout(req, res) {
 
     const rows = room[0].Rows;
     const columns = room[0].Columns;
-    const result = { ...query, rows, columns };
+    const result = { ...body, rows, columns };
 
     await roomLayoutPDF(result);
     return res.status(200).json({
@@ -94,4 +96,18 @@ export async function roomLayout(req, res) {
   } catch (error) {
     return res.status(500).json({ status: "error", message: error.message });
   }
+}
+
+export async function stickerID(req, res) {
+  const body = req.body;
+  // console.log(body);
+  const result = await stickerIdPDF(body);
+  return res.json({ status: "success", data: body });
+}
+
+export async function listOfName(req, res) {
+  const body = req.body;
+  // console.log(body);
+  const result = await listOfNamePDF(body);
+  return res.json({ data: body });
 }

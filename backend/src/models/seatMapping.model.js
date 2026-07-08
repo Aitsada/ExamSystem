@@ -73,6 +73,10 @@ export async function findSummaryRows(ExamID, FacilityID) {
        Position.ID AS PositionID,
        Position.Name AS PositionName,
        Applicant.ApplicantNumber,
+       Applicant.CitizenNumber,
+       Applicant.Prefix,
+       Applicant.FirstName,
+       Applicant.LastName,
        Building.Name AS BuildingName,
        Floor.Number AS FloorNumber,
        Floor.Name AS FloorName,
@@ -181,9 +185,9 @@ export async function createSeat(SeatRowID, Name, conn = db) {
 }
 
 export async function findRoomMappingCounts(RoomIDs = []) {
-  const normalizedRoomIDs = RoomIDs
-    .map((RoomID) => Number(RoomID))
-    .filter((RoomID) => Number.isInteger(RoomID) && RoomID > 0);
+  const normalizedRoomIDs = RoomIDs.map((RoomID) => Number(RoomID)).filter(
+    (RoomID) => Number.isInteger(RoomID) && RoomID > 0,
+  );
   const where = normalizedRoomIDs.length
     ? `WHERE SeatRow.RoomID IN (${normalizedRoomIDs.map(() => "?").join(",")})`
     : "";
@@ -201,9 +205,9 @@ export async function findRoomMappingCounts(RoomIDs = []) {
 }
 
 export async function findPositionRoomMappingCounts(RoomIDs = []) {
-  const normalizedRoomIDs = RoomIDs
-    .map((RoomID) => Number(RoomID))
-    .filter((RoomID) => Number.isInteger(RoomID) && RoomID > 0);
+  const normalizedRoomIDs = RoomIDs.map((RoomID) => Number(RoomID)).filter(
+    (RoomID) => Number.isInteger(RoomID) && RoomID > 0,
+  );
   const where = normalizedRoomIDs.length
     ? `WHERE SeatRow.RoomID IN (${normalizedRoomIDs.map(() => "?").join(",")})`
     : "";
@@ -221,7 +225,11 @@ export async function findPositionRoomMappingCounts(RoomIDs = []) {
   return result;
 }
 
-export async function deleteByApplicantIDsOrSeatIDs(ApplicantIDs, SeatIDs, conn = db) {
+export async function deleteByApplicantIDsOrSeatIDs(
+  ApplicantIDs,
+  SeatIDs,
+  conn = db,
+) {
   if (!ApplicantIDs.length && !SeatIDs.length) {
     return { affectedRows: 0 };
   }
@@ -259,6 +267,9 @@ export async function createMany(mappings, conn = db) {
 }
 
 export async function Create(SeatID, ApplicantID) {
-  const [result] = await db.query("INSERT INTO SeatMapping (SeatID, ApplicantID) VALUES (?, ?)", [SeatID, ApplicantID]);
+  const [result] = await db.query(
+    "INSERT INTO SeatMapping (SeatID, ApplicantID) VALUES (?, ?)",
+    [SeatID, ApplicantID],
+  );
   return result;
 }

@@ -387,11 +387,11 @@ export default {
       return `${buildingName} ชั้น ${floorNumber}`
     },
     roomSeatCount (room) {
-      const rows = Number(room.Rows) || 0
-      const columns = Number(room.Columns) || 0
-      return rows * columns
+      const seatNumber = room.TemplateID
+      return seatNumber
     },
     roomApplicantCount (room) {
+      console.log(room)
       return this.roomMappingCounts[room.ID] || 0
     },
     roomAvailableSeatCount (room) {

@@ -83,16 +83,16 @@
                     small
                     @click="roomLayout(item)"
                   >
-                    สร้างไฟล์
+                    Go
                   </v-btn>
                 </td>
                 <td>
                   <v-btn
                     color="primary"
                     small
-                    @click="roomLayout(item)"
+                    @click="stickerID(item)"
                   >
-                    สร้างไฟล์
+                    Go
                   </v-btn>
                 </td>
                 <td>
@@ -156,38 +156,60 @@ export default {
         start.time || '-'
       } - ${end.time || '-'} น.`
     },
-    // List Of Name
+    // >>>>> List Of Name <<<<<
     async listOfName (item) {
-      await this.$axios.$get(this.$apiUrl('/api/seatMapping/listOfName'), {
-        params: {
-          roomID: item.RoomID,
-          roomNo: item.RoomNo,
-          positionID: item.PositionID,
-          positionName: item.PositionName,
-          appStart: item.ApplicantNumberStart,
-          appEnd: item.ApplicantNumberEnd,
-          dateTime: this.textExamDateTime(),
-          buildingName: item.BuildingName,
-          floorName: item.FloorName,
-          roomName: item.RoomName,
-          applicantNumbers: item.ApplicantNumbers
-        }
+      await this.$axios.$post(this.$apiUrl('/api/seatMapping/listOfName'), {
+        roomID: item.RoomID,
+        roomNo: item.RoomNo,
+        positionID: item.PositionID,
+        positionName: item.PositionName,
+        appStart: item.ApplicantNumberStart,
+        appEnd: item.ApplicantNumberEnd,
+        dateTime: this.textExamDateTime(),
+        facilityName: this.facilityName,
+        buildingName: item.BuildingName,
+        floorName: item.FloorName,
+        roomName: item.RoomName,
+        applicantNumbers: item.ApplicantNumbers,
+        applicants: item.Applicants
       })
     },
-    // Room Layout
+    // >>>>> Sticker ID <<<<<
+    async stickerID (item) {
+      try {
+        await this.$axios.$post(this.$apiUrl('/api/seatMapping/stickerID'), {
+          roomID: item.RoomID,
+          roomNo: item.RoomNo,
+          roomName: item.RoomName,
+          floorName: item.FloorName,
+          buildingName: item.BuildingName,
+          positionName: item.PositionName,
+          applicantNumbers: item.ApplicantNumbers,
+          applicants: item.Applicants
+        })
+        this.$swal.fire({
+          icon: 'success',
+          text: 'สร้างไฟล์ผังห้องสำเร็จ'
+        })
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `สร้างไฟล์ผังห้องไม่สำเร็จ ${err.message}`
+        })
+      }
+    },
+    // >>>>> Room Layout <<<<<
     async roomLayout (item) {
       try {
-        await this.$axios.$get(this.$apiUrl('/api/seatMapping/roomLayout'), {
-          params: {
-            roomID: item.RoomID,
-            roomNo: item.RoomNo,
-            roomName: item.RoomName,
-            floorName: item.FloorName,
-            buildingName: item.BuildingName,
-            applicantNumbers: item.ApplicantNumbers,
-            facilityName: this.facilityName,
-            dateTime: this.textExamDateTime()
-          }
+        await this.$axios.$post(this.$apiUrl('/api/seatMapping/roomLayout'), {
+          roomID: item.RoomID,
+          roomNo: item.RoomNo,
+          roomName: item.RoomName,
+          floorName: item.FloorName,
+          buildingName: item.BuildingName,
+          applicantNumbers: item.ApplicantNumbers,
+          facilityName: this.facilityName,
+          dateTime: this.textExamDateTime()
         })
         this.$swal.fire({
           icon: 'success',

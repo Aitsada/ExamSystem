@@ -2,9 +2,7 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import router from "./index.route.js";
-import { pdfFile } from "./pdfKit/aigen.js";
 import { pdfFileTest } from "./pdfKit/test.js";
-import { detailPdf } from "./pdfKit/Detail.js";
 import { signedDocument } from "./pdfKit/signedDocument.js";
 
 process.env.TZ = process.env.TZ || "Asia/Bangkok";
@@ -15,9 +13,7 @@ const port = 8005;
 app.use(cors());
 app.use(express.json());
 
-pdfFile();
 pdfFileTest();
-detailPdf();
 signedDocument();
 app.get("/health", (req, res) => {
   res.send("Server is running");

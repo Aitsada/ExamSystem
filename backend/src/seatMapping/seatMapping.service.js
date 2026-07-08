@@ -35,12 +35,20 @@ export async function findSummary(ExamID, FacilityID) {
         RoomName: item.RoomName,
         RoomNo: item.RoomNo,
         ApplicantNumbers: [],
+        Applicants: [],
       };
       rowMap.set(key, summaryRow);
       groupedRows.push(summaryRow);
     }
 
     rowMap.get(key).ApplicantNumbers.push(item.ApplicantNumber);
+    rowMap.get(key).Applicants.push({
+      ApplicantNumber: item.ApplicantNumber,
+      Prefix: item.Prefix,
+      FirstName: item.FirstName,
+      LastName: item.LastName,
+      CitizenNumber: item.CitizenNumber,
+    });
   });
 
   return {

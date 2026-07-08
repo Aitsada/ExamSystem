@@ -85,12 +85,27 @@ export const roomLayout = async (data) => {
   const rowText = "แถวที่";
   doc.text(rowText, ml + 70 - wos(rowText), y);
 
-  //   Table
+  //  >>>>> Table <<<<<
+  let axisX = 0;
+  let axisY = 0;
+  let space = 5;
+  const ratio = 100 / columnCount;
 
+  const marginLeft = ml + 100;
+  const widthOfPage = pw * 0.1;
   let columnX = 150;
   for (let i = 1; i <= columnCount; i++) {
-    doc.text(i, ml + columnX - wos(String(i)), y);
-    columnX += 105;
+    doc.text(
+      i,
+      marginLeft +
+        table(axisX) +
+        table(ratio) -
+        table(ratio) / 2 -
+        wos(String(i)) +
+        space / 2,
+      y,
+    );
+    axisX += ratio;
   }
   y += 25;
 
@@ -116,23 +131,49 @@ export const roomLayout = async (data) => {
   columnX = 150;
   let a = 100;
   let b = 153;
+  axisX = 0;
   applicants.forEach((app, i) => {
     i += 1;
     const applicantNumber = String(app);
     for (let j = i; j <= i; j++) {
-      appFrame(a, b);
-      doc.text(applicantNumber, ml + columnX - wos(applicantNumber), y);
-      columnX += 105;
-      a += 105;
-      if (j % columnCount === 0 && j > 0) {
-        columnX = 150;
-        y += 25;
+      doc
+        .rect(
+          marginLeft + table(axisX) + space,
+          y + axisY,
+          table(ratio) - space,
+          15,
+        )
+        .stroke();
+      doc.text(
+        applicantNumber,
+        marginLeft +
+          table(axisX) +
+          table(ratio) / 2 -
+          wos(applicantNumber) +
+          space / 2,
+        y,
+      );
+      y += 25;
+      b += 25;
+      if (j % rowCount === 0 && j > 0) {
+        axisY = 0;
+        axisX += ratio;
+        columnX += 105;
+        y = 155;
 
-        a = 100;
-        b += 25;
+        a += 105;
+        b = 153;
       }
     }
   });
 
+  function table(x) {
+    const frame = pw - marginLeft - widthOfPage;
+    const range = frame * (x / 100);
+    return range;
+  }
+
+  doc.strokeColor("red");
+  doc.moveTo(mid, 0).lineTo(mid, ph).stroke();
   doc.end();
 };
