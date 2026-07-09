@@ -33,16 +33,64 @@
                   จำนวน
                 </th>
                 <th class="text-left file-col">
-                  ไฟล์ประกาศ
+                  <span class="file-header">
+                    ไฟล์ประกาศ
+                    <v-btn
+                      icon
+                      x-small
+                      :disabled="!summaryRows.length || !!bulkDownloading"
+                      @click.stop="downloadColumn('listOfName')"
+                    >
+                      <v-icon small>
+                        mdi-download
+                      </v-icon>
+                    </v-btn>
+                  </span>
                 </th>
                 <th class="text-left file-col">
-                  ใบเซ็นชื่อ
+                  <span class="file-header">
+                    ใบเซ็นชื่อ
+                    <v-btn
+                      icon
+                      x-small
+                      :disabled="!summaryRows.length || !!bulkDownloading"
+                      @click.stop="downloadColumn('signedDocument')"
+                    >
+                      <v-icon small>
+                        mdi-download
+                      </v-icon>
+                    </v-btn>
+                  </span>
                 </th>
                 <th class="text-left file-col">
-                  ป้ายติดโต๊ะ
+                  <span class="file-header">
+                    ป้ายติดโต๊ะ
+                    <v-btn
+                      icon
+                      x-small
+                      :disabled="!summaryRows.length || !!bulkDownloading"
+                      @click.stop="downloadColumn('stickerID')"
+                    >
+                      <v-icon small>
+                        mdi-download
+                      </v-icon>
+                    </v-btn>
+                  </span>
                 </th>
                 <th class="text-left file-col">
-                  ผังห้อง
+                  <span class="file-header">
+                    ผังห้อง
+                    <v-btn
+                      icon
+                      x-small
+                      :disabled="!summaryRows.length || !!bulkDownloading"
+                      @click.stop="downloadColumn('roomLayout')"
+                    >
+                      <v-icon small>
+                        mdi-download
+                      </v-icon>
+                    </v-btn>
+                  </span>
                 </th>
               </tr>
             </thead>
@@ -135,6 +183,7 @@ export default {
   data () {
     return {
       loading: false,
+      bulkDownloading: null,
       meta: {},
       summaryRows: []
     }
@@ -174,7 +223,14 @@ export default {
     },
     // >>>>> List Of Name <<<<<
     async listOfName (item) {
-      await this.downloadPdf('/api/seatMapping/listOfName', {
+      await this.downloadPdf(
+        '/api/seatMapping/listOfName',
+        this.listOfNamePayload(item),
+        this.pdfFilename('listOfName', item)
+      )
+    },
+    listOfNamePayload (item) {
+      return {
         roomNo: item.RoomNo,
         positionName: item.PositionName,
         appStart: item.ApplicantNumberStart,
@@ -186,11 +242,18 @@ export default {
         roomName: item.RoomName,
         applicantNumbers: item.ApplicantNumbers,
         applicants: item.Applicants
-      }, `listOfName-${item.RoomNo || item.RoomName || 'room'}.pdf`)
+      }
     },
     // >>>>> Signed Document <<<<<
     async signedDocument (item) {
-      await this.downloadPdf('/api/seatMapping/signedDocument', {
+      await this.downloadPdf(
+        '/api/seatMapping/signedDocument',
+        this.signedDocumentPayload(item),
+        this.pdfFilename('signedDocument', item)
+      )
+    },
+    signedDocumentPayload (item) {
+      return {
         positionName: item.PositionName,
         dateTime: this.textExamDateTime(),
         facilityName: this.facilityName,
@@ -199,19 +262,12 @@ export default {
         roomNo: item.RoomNo,
         roomName: item.RoomName,
         applicants: item.Applicants
-      }, `signedDocument-${item.RoomNo || item.RoomName || 'room'}.pdf`)
+      }
     },
     // >>>>> Sticker ID <<<<<
     async stickerID (item) {
       try {
-        await this.downloadPdf('/api/seatMapping/stickerID', {
-          roomNo: item.RoomNo,
-          roomName: item.RoomName,
-          buildingName: item.BuildingName,
-          positionName: item.PositionName,
-          applicantNumbers: item.ApplicantNumbers,
-          applicants: item.Applicants
-        }, `stickerID-${item.RoomNo || item.RoomName || 'room'}.pdf`)
+        await this.downloadPdf('/api/seatMapping/stickerID', this.stickerIDPayload(item), this.pdfFilename('stickerID', item))
         this.$swal.fire({
           icon: 'success',
           text: 'StickerID success'
@@ -223,19 +279,24 @@ export default {
         })
       }
     },
+    stickerIDPayload (item) {
+      return {
+        roomNo: item.RoomNo,
+        roomName: item.RoomName,
+        buildingName: item.BuildingName,
+        positionName: item.PositionName,
+        applicantNumbers: item.ApplicantNumbers,
+        applicants: item.Applicants
+      }
+    },
     // >>>>> Room Layout <<<<<
     async roomLayout (item) {
       try {
-        await this.downloadPdf('/api/seatMapping/roomLayout', {
-          roomID: item.RoomID,
-          roomNo: item.RoomNo,
-          roomName: item.RoomName,
-          floorNumber: item.FloorNumber,
-          buildingName: item.BuildingName,
-          applicantNumbers: item.ApplicantNumbers,
-          facilityName: this.facilityName,
-          dateTime: this.textExamDateTime()
-        }, `roomLayout-${item.RoomNo || item.RoomName || 'room'}.pdf`)
+        await this.downloadPdf(
+          '/api/seatMapping/roomLayout',
+          this.roomLayoutPayload(item),
+          this.pdfFilename('roomLayout', item)
+        )
         this.$swal.fire({
           icon: 'success',
           text: 'Room Layout Success'
@@ -246,6 +307,62 @@ export default {
           text: `Room Layout failed ${err.message}`
         })
       }
+    },
+    roomLayoutPayload (item) {
+      return {
+        roomID: item.RoomID,
+        roomNo: item.RoomNo,
+        roomName: item.RoomName,
+        floorNumber: item.FloorNumber,
+        buildingName: item.BuildingName,
+        applicantNumbers: item.ApplicantNumbers,
+        facilityName: this.facilityName,
+        dateTime: this.textExamDateTime()
+      }
+    },
+    async downloadColumn (type) {
+      this.bulkDownloading = type
+      try {
+        for (const item of this.summaryRows) {
+          await this.downloadPdf(
+            this.pdfEndpoint(type),
+            this.pdfPayload(type, item),
+            this.pdfFilename(type, item)
+          )
+          await this.wait(200)
+        }
+        this.$swal.fire({
+          icon: 'success',
+          text: 'ดาวน์โหลดไฟล์เรียบร้อยแล้ว'
+        })
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `ดาวน์โหลดไฟล์ไม่สำเร็จ ${err.message}`
+        })
+      } finally {
+        this.bulkDownloading = null
+      }
+    },
+    pdfEndpoint (type) {
+      return {
+        listOfName: '/api/seatMapping/listOfName',
+        signedDocument: '/api/seatMapping/signedDocument',
+        stickerID: '/api/seatMapping/stickerID',
+        roomLayout: '/api/seatMapping/roomLayout'
+      }[type]
+    },
+    pdfPayload (type, item) {
+      return {
+        listOfName: this.listOfNamePayload,
+        signedDocument: this.signedDocumentPayload,
+        stickerID: this.stickerIDPayload,
+        roomLayout: this.roomLayoutPayload
+      }[type](item)
+    },
+    pdfFilename (type, item) {
+      const roomName = item.RoomName || item.RoomNo || 'room'
+      return `${type}-${roomName}.pdf`
     },
     async downloadPdf (url, payload, filename) {
       const blob = await this.$axios.$post(this.$apiUrl(url), payload, {
@@ -259,6 +376,9 @@ export default {
       link.click()
       document.body.removeChild(link)
       window.URL.revokeObjectURL(downloadUrl)
+    },
+    wait (ms) {
+      return new Promise(resolve => setTimeout(resolve, ms))
     },
     async fetchSummary () {
       const ExamID = this.$route.query.ExamID
@@ -423,6 +543,19 @@ export default {
 .summary-table ::v-deep th {
   font-weight: 700;
   white-space: normal;
+}
+
+.file-header {
+  align-items: center;
+  display: inline-flex;
+  gap: 4px;
+  justify-content: center;
+  width: 100%;
+}
+
+.summary-table ::v-deep thead .v-btn--icon.v-size--x-small {
+  height: 20px;
+  width: 20px;
 }
 
 .order-col {
