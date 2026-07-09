@@ -1,11 +1,10 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
 
-export const stickerIdPDF = (data) => {
+export const stickerIdPDF = async (data) => {
   const {
     roomNo,
     roomName,
-    floorName,
     buildingName,
     positionName,
     applicantNumber,
@@ -19,7 +18,8 @@ export const stickerIdPDF = (data) => {
     margins: 20,
   });
 
-  doc.pipe(fs.createWriteStream("./src/pdfKit/stickerID.pdf"));
+  const stream = fs.createWriteStream("./src/pdfKit/stickerID.pdf");
+  doc.pipe(stream);
 
   const FONT_LIGHT = "./src/fonts/Sarabun-Light.ttf";
   const FONT_REGULAR = "./src/fonts/Sarabun-Regular.ttf";
@@ -36,11 +36,11 @@ export const stickerIdPDF = (data) => {
   const position = "ตำแหน่ง ";
   const AppID = "เลขประจำตัวสอบ ";
   const name = "ชื่อ ";
-  const customerID = "เลขประจำตัวสอบ ";
+  const citizenNumber = "เลชประจำตัวประชาชน ";
   const room = "ห้องสอบที่ ";
-  const building = " ตึก/";
+  const building = " ตึก/อาคาร ";
 
-  doc.moveTo(mid, 0).lineTo(mid, h).stroke();
+  // doc.moveTo(mid, 0).lineTo(mid, h).stroke();
   doc.font(FONT_LIGHT);
   doc.fontSize(11);
 
@@ -50,7 +50,7 @@ export const stickerIdPDF = (data) => {
   //   Prefix: "นาย",
   //   FirstName: "อิษฎา",
   //   LastName: "สุวรรณโต",
-  //   customerID: "1219800345942",
+  //   citizenNumber: "1219800345942",
   //   room: "31 (10406) แถวที่ 1 ชั้น 4 ",
   //   building: "10",
   // }));
@@ -72,7 +72,6 @@ export const stickerIdPDF = (data) => {
     doc.font(FONT_REGULAR);
     doc.text(position, x, y, { continued: true });
     doc.font(FONT_BOLD);
-    console.log("test");
 
     const isSmall = doc.widthOfString(positionName) > 180;
     if (isSmall) {
@@ -86,7 +85,7 @@ export const stickerIdPDF = (data) => {
     doc.font(FONT_LIGHT);
     doc.text(AppID, x, y + 18, { continued: true });
     doc.font(FONT_BOLD);
-    doc.text();
+    doc.text(a.ApplicantNumber);
 
     doc.font(FONT_LIGHT);
     doc.text(name, x, y + 36, { continued: true });
@@ -96,9 +95,9 @@ export const stickerIdPDF = (data) => {
     doc.text(a.LastName);
 
     doc.font(FONT_LIGHT);
-    doc.text(customerID, x, y + 54, { continued: true });
+    doc.text(citizenNumber, x, y + 54, { continued: true });
     doc.font(FONT_BOLD);
-    doc.text(a.ApplicantNumber);
+    doc.text(a.CitizenNumber);
 
     doc.font(FONT_LIGHT);
     doc.text(room, x, y + 72, { continued: true });
@@ -114,4 +113,8 @@ export const stickerIdPDF = (data) => {
   });
 
   doc.end();
+  await new Promise((resolve, reject) => {
+    stream.on("finish", resolve);
+    stream.on("error", reject);
+  });
 };

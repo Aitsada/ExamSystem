@@ -1,6 +1,7 @@
 import * as seatMappingService from "./seatMapping.service.js";
 import { findByRoomId } from "../models/room.model.js";
 import { roomLayout as roomLayoutPDF } from "../pdfKit/roomLayout.js";
+import { signedDocument as signedDocumentPDF } from "../pdfKit/signedDocument.js";
 import { listOfName as listOfNamePDF } from "../pdfKit/listOfName.js";
 import { stickerIdPDF } from "../pdfKit/stickerID.js";
 
@@ -77,7 +78,6 @@ export async function roomLayout(req, res) {
     const body = req.body;
     const roomID = Number(body.roomID);
     const room = await findByRoomId(roomID);
-
     if (!room.length) {
       return res.status(404).json({
         status: "error",
@@ -90,24 +90,38 @@ export async function roomLayout(req, res) {
     const result = { ...body, rows, columns };
 
     await roomLayoutPDF(result);
-    return res.status(200).json({
-      status: "success",
-    });
+    return res.download("./src/pdfKit/roomLayout.pdf", "roomLayout.pdf");
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
+}
+
+export async function signedDocument(req, res) {
+  try {
+    const body = req.body;
+    await signedDocumentPDF(body);
+    return res.download("./src/pdfKit/signedDocument.pdf", "signedDocument.pdf");
   } catch (error) {
     return res.status(500).json({ status: "error", message: error.message });
   }
 }
 
 export async function stickerID(req, res) {
-  const body = req.body;
-  // console.log(body);
-  const result = await stickerIdPDF(body);
-  return res.json({ status: "success", data: body });
+  try {
+    const body = req.body;
+    await stickerIdPDF(body);
+    return res.download("./src/pdfKit/stickerID.pdf", "stickerID.pdf");
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
 }
 
 export async function listOfName(req, res) {
-  const body = req.body;
-  // console.log(body);
-  const result = await listOfNamePDF(body);
-  return res.json({ data: body });
+  try {
+    const body = req.body;
+    await listOfNamePDF(body);
+    return res.download("./src/pdfKit/listOfName.pdf", "listOfName.pdf");
+  } catch (error) {
+    return res.status(500).json({ status: "error", message: error.message });
+  }
 }

@@ -77,7 +77,7 @@ export async function findSummaryRows(ExamID, FacilityID) {
        Applicant.Prefix,
        Applicant.FirstName,
        Applicant.LastName,
-       Building.Name AS BuildingName,
+       Building.Alias AS BuildingName,
        Floor.Number AS FloorNumber,
        Floor.Name AS FloorName,
        Room.ID AS RoomID,
@@ -124,13 +124,26 @@ export async function findAvailableSeatsByRoomIDs(RoomIDs, conn = db) {
 
   const roomPlaceholders = RoomIDs.map(() => "?").join(",");
   const [result] = await conn.query(
-    `SELECT Seat.*
-     FROM Seat
-     INNER JOIN SeatRow ON Seat.SeatRowID = SeatRow.ID
-     LEFT JOIN SeatMapping ON Seat.ID = SeatMapping.SeatID
-     WHERE SeatRow.RoomID IN (${roomPlaceholders})
+    `SELECT RankedSeat.*
+     FROM (
+       SELECT
+         Seat.*,
+         SeatRow.RoomID,
+         SeatRow.Name AS SeatRowName,
+         COALESCE(NULLIF(Room.TemplateID, 0), Room.\`Rows\` * Room.\`Columns\`) AS SeatLimit,
+         ROW_NUMBER() OVER (
+           PARTITION BY SeatRow.RoomID
+           ORDER BY SeatRow.Name, LENGTH(Seat.Name), Seat.Name
+         ) AS SeatNumber
+       FROM Seat
+       INNER JOIN SeatRow ON Seat.SeatRowID = SeatRow.ID
+       INNER JOIN Room ON SeatRow.RoomID = Room.ID
+       WHERE SeatRow.RoomID IN (${roomPlaceholders})
+     ) AS RankedSeat
+     LEFT JOIN SeatMapping ON RankedSeat.ID = SeatMapping.SeatID
+     WHERE RankedSeat.SeatNumber <= RankedSeat.SeatLimit
        AND SeatMapping.ID IS NULL
-     ORDER BY FIELD(SeatRow.RoomID, ${roomPlaceholders}), SeatRow.Name, LENGTH(Seat.Name), Seat.Name`,
+     ORDER BY FIELD(RankedSeat.RoomID, ${roomPlaceholders}), RankedSeat.SeatRowName, LENGTH(RankedSeat.Name), RankedSeat.Name`,
     [...RoomIDs, ...RoomIDs],
   );
   return result;

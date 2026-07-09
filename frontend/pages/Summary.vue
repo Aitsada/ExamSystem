@@ -68,40 +68,56 @@
                 <td>{{ buildingText(item) }}</td>
                 <td>{{ roomText(item) }}</td>
                 <td>{{ item.ApplicantCount || 0 }}</td>
-                <td>
+                <td style="text-align: center;">
                   <v-btn
-                    color="primary"
+                    icon
                     small
                     @click="listOfName(item)"
                   >
-                    Go
+                    <img
+                      src="@/assets/icons/pdf1.png"
+                      width="20"
+                      height="20"
+                    >
                   </v-btn>
                 </td>
-                <td>
+                <td style="text-align: center;">
                   <v-btn
-                    color="primary"
+                    icon
                     small
-                    @click="roomLayout(item)"
+                    @click="signedDocument(item)"
                   >
-                    Go
+                    <img
+                      src="@/assets/icons/pdf1.png"
+                      width="20"
+                      height="20"
+                    >
                   </v-btn>
                 </td>
-                <td>
+                <td style="text-align: center;">
                   <v-btn
-                    color="primary"
+                    icon
                     small
                     @click="stickerID(item)"
                   >
-                    Go
+                    <img
+                      src="@/assets/icons/pdf1.png"
+                      width="20"
+                      height="20"
+                    >
                   </v-btn>
                 </td>
-                <td>
+                <td style="text-align: center;">
                   <v-btn
-                    color="primary"
+                    icon
                     small
                     @click="roomLayout(item)"
                   >
-                    Go
+                    <img
+                      src="@/assets/icons/pdf1.png"
+                      width="20"
+                      height="20"
+                    >
                   </v-btn>
                 </td>
               </tr>
@@ -158,69 +174,91 @@ export default {
     },
     // >>>>> List Of Name <<<<<
     async listOfName (item) {
-      await this.$axios.$post(this.$apiUrl('/api/seatMapping/listOfName'), {
-        roomID: item.RoomID,
+      await this.downloadPdf('/api/seatMapping/listOfName', {
         roomNo: item.RoomNo,
-        positionID: item.PositionID,
         positionName: item.PositionName,
         appStart: item.ApplicantNumberStart,
         appEnd: item.ApplicantNumberEnd,
         dateTime: this.textExamDateTime(),
         facilityName: this.facilityName,
         buildingName: item.BuildingName,
-        floorName: item.FloorName,
+        floorNumber: item.FloorNumber,
         roomName: item.RoomName,
         applicantNumbers: item.ApplicantNumbers,
         applicants: item.Applicants
-      })
+      }, `listOfName-${item.RoomNo || item.RoomName || 'room'}.pdf`)
+    },
+    // >>>>> Signed Document <<<<<
+    async signedDocument (item) {
+      await this.downloadPdf('/api/seatMapping/signedDocument', {
+        positionName: item.PositionName,
+        dateTime: this.textExamDateTime(),
+        facilityName: this.facilityName,
+        buildingName: item.BuildingName,
+        floorNumber: item.FloorNumber,
+        roomNo: item.RoomNo,
+        roomName: item.RoomName,
+        applicants: item.Applicants
+      }, `signedDocument-${item.RoomNo || item.RoomName || 'room'}.pdf`)
     },
     // >>>>> Sticker ID <<<<<
     async stickerID (item) {
       try {
-        await this.$axios.$post(this.$apiUrl('/api/seatMapping/stickerID'), {
-          roomID: item.RoomID,
+        await this.downloadPdf('/api/seatMapping/stickerID', {
           roomNo: item.RoomNo,
           roomName: item.RoomName,
-          floorName: item.FloorName,
           buildingName: item.BuildingName,
           positionName: item.PositionName,
           applicantNumbers: item.ApplicantNumbers,
           applicants: item.Applicants
-        })
+        }, `stickerID-${item.RoomNo || item.RoomName || 'room'}.pdf`)
         this.$swal.fire({
           icon: 'success',
-          text: 'สร้างไฟล์ผังห้องสำเร็จ'
+          text: 'StickerID success'
         })
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
-          text: `สร้างไฟล์ผังห้องไม่สำเร็จ ${err.message}`
+          text: `StickerID failed ${err.message}`
         })
       }
     },
     // >>>>> Room Layout <<<<<
     async roomLayout (item) {
       try {
-        await this.$axios.$post(this.$apiUrl('/api/seatMapping/roomLayout'), {
+        await this.downloadPdf('/api/seatMapping/roomLayout', {
           roomID: item.RoomID,
           roomNo: item.RoomNo,
           roomName: item.RoomName,
-          floorName: item.FloorName,
+          floorNumber: item.FloorNumber,
           buildingName: item.BuildingName,
           applicantNumbers: item.ApplicantNumbers,
           facilityName: this.facilityName,
           dateTime: this.textExamDateTime()
-        })
+        }, `roomLayout-${item.RoomNo || item.RoomName || 'room'}.pdf`)
         this.$swal.fire({
           icon: 'success',
-          text: 'สร้างไฟล์ผังห้องสำเร็จ'
+          text: 'Room Layout Success'
         })
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
-          text: `สร้างไฟล์ผังห้องไม่สำเร็จ ${err.message}`
+          text: `Room Layout failed ${err.message}`
         })
       }
+    },
+    async downloadPdf (url, payload, filename) {
+      const blob = await this.$axios.$post(this.$apiUrl(url), payload, {
+        responseType: 'blob'
+      })
+      const downloadUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(downloadUrl)
     },
     async fetchSummary () {
       const ExamID = this.$route.query.ExamID
@@ -243,7 +281,6 @@ export default {
         const data = res.data || {}
         this.meta = data.meta || {}
         this.summaryRows = data.rows || []
-        console.log(this.summaryRows)
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
@@ -365,12 +402,22 @@ export default {
   margin-bottom: 4px;
 }
 
-.summary-table ::v-deep th,
-.summary-table ::v-deep td {
-  font-size: 13px;
-  height: 38px;
-  padding: 6px 8px;
-  vertical-align: top;
+.summary-table ::v-deep thead tr th,
+.summary-table ::v-deep tbody tr td {
+  font-size: 13px !important;
+  height: 34px !important;
+  line-height: 1.2;
+  padding: 2px 6px !important;
+  vertical-align: middle;
+}
+
+.summary-table ::v-deep tbody tr td .v-btn--icon.v-size--small {
+  height: 22px;
+  width: 22px;
+}
+
+.summary-table ::v-deep tbody tr td img {
+  display: block;
 }
 
 .summary-table ::v-deep th {

@@ -4,16 +4,14 @@ import { findAll } from "../models/applicant.model.js";
 
 export const listOfName = async (data) => {
   const {
-    roomID,
     roomNo,
-    positionID,
     positionName,
     appStart,
     appEnd,
     dateTime,
     facilityName,
     buildingName,
-    floorName,
+    floorNumber,
     roomName,
   } = data;
 
@@ -26,7 +24,8 @@ export const listOfName = async (data) => {
     margin: 30,
   });
 
-  doc.pipe(fs.createWriteStream("./src/pdfKit/listOfName.pdf"));
+  const stream = fs.createWriteStream("./src/pdfKit/listOfName.pdf");
+  doc.pipe(stream);
 
   const FONT_LIGHT = "./src/fonts/Sarabun-Light.ttf";
   const FONT_REGULAR = "./src/fonts/Sarabun-Regular.ttf";
@@ -47,11 +46,14 @@ export const listOfName = async (data) => {
   function s(x) {
     return doc.widthOfString(x) / 2;
   }
-  doc
+  function Line() {
+
+    doc
     .moveTo(pw / 2, 0)
     .lineTo(pw / 2, ph)
     .stroke();
-  function Line() {
+    
+    
     doc.strokeColor("red").lineWidth(0.1);
     doc.moveTo(SEAT_NO, 0).lineTo(SEAT_NO, doc.page.height).stroke();
     doc
@@ -65,7 +67,7 @@ export const listOfName = async (data) => {
       .lineTo((PREFIX + LAST_NAME) / 2, doc.page.height)
       .stroke();
   }
-  Line();
+
   function wos(x) {
     String(x);
     return doc.widthOfString(x) / 2;
@@ -105,13 +107,13 @@ export const listOfName = async (data) => {
 
     const place_Data = facilityName;
     const building_Data = buildingName;
-    const floor_Data = floorName;
+    const floor_Data = floorNumber;
     const room_Data2 = roomName;
     const placeline =
       "สถานที่สอบ " +
       place_Data +
       " " +
-      " ตึก/" +
+      " ตึก/อาคาร " +
       building_Data +
       " " +
       "ชั้น " +
@@ -171,4 +173,8 @@ export const listOfName = async (data) => {
     y += 22;
   });
   doc.end();
+  await new Promise((resolve, reject) => {
+    stream.on("finish", resolve);
+    stream.on("error", reject);
+  });
 };

@@ -2,10 +2,11 @@ import PDFDocument from "pdfkit";
 import fs from "fs";
 
 export const roomLayout = async (data) => {
+  console.log("test")
   const {
     roomNo,
     roomName,
-    floorName,
+    floorNumber,
     buildingName,
     rows,
     columns,
@@ -25,7 +26,8 @@ export const roomLayout = async (data) => {
     layout: "landscape",
     margin: 30,
   });
-  doc.pipe(fs.createWriteStream("./src/pdfKit/roomLayout.pdf"));
+  const stream = fs.createWriteStream("./src/pdfKit/roomLayout.pdf");
+  doc.pipe(stream);
 
   const FONT_LIGHT = "./src/fonts/Sarabun-Light.ttf";
   const FONT_REGULAR = "./src/fonts/Sarabun-Regular.ttf";
@@ -60,21 +62,21 @@ export const roomLayout = async (data) => {
   doc.text(date_Data, center(date_Data), y);
   y += 25;
   const room_No = roomNo;
-  const floor_Name = floorName;
+  const floor_Number = floorNumber;
   const building_Name = buildingName;
   const roomOneLine =
     "ห้องสอบที่ " +
     room_No +
-    "(" +
+    " (" +
     roomName +
     ")" +
     " ชั้น " +
-    floor_Name +
-    " ตึก/" +
+    floor_Number +
+    " ตึก/อาคาร " +
     building_Name;
   doc.text(roomOneLine, ml + 50, y);
   y += 25;
-
+  
   const headerText = "หน้าห้องสอบ";
   doc.text(headerText, center(headerText), y);
   y += 25;
@@ -174,6 +176,10 @@ export const roomLayout = async (data) => {
   }
 
   doc.strokeColor("red");
-  doc.moveTo(mid, 0).lineTo(mid, ph).stroke();
+  // doc.moveTo(mid, 0).lineTo(mid, ph).stroke();
   doc.end();
+  await new Promise((resolve, reject) => {
+    stream.on("finish", resolve);
+    stream.on("error", reject);
+  });
 };

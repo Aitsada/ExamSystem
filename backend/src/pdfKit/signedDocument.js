@@ -1,14 +1,25 @@
 import PDFDocument from "pdfkit";
 import fs from "fs";
-import { findByPositionID } from "../models/applicant.model.js";
 
-export const signedDocument = async () => {
+export const signedDocument = async (data) => {
+  const {
+    positionName,
+    dateTime,
+    facilityName,
+    buildingName,
+    floorNumber,
+    roomNo,
+    roomName,
+  } = data;
+  const applicants = [].concat(data.applicants).filter((a) => a);
+  console.log(applicants);
   const doc = new PDFDocument({
     size: "A4",
     margins: 15,
   });
 
-  doc.pipe(fs.createWriteStream("./src/pdfKit/signedDocument.pdf"));
+  const stream = fs.createWriteStream("./src/pdfKit/signedDocument.pdf");
+  doc.pipe(stream);
   const FONT_LIGHT = "./src/fonts/Sarabun-Light.ttf";
   const FONT_REGULAR = "./src/fonts/Sarabun-Regular.ttf";
   const FONT_BOLD = "./src/fonts/Sarabun-SemiBold.ttf";
@@ -42,48 +53,47 @@ export const signedDocument = async () => {
     doc.fontSize(10);
     y += 23;
     const positionText = "ตำแหน่ง ";
-    const position_Date = "เจ้าพนักงานตรวจสอบทรัพย์สินปฏิบัติการ";
     doc.text(positionText, ml, y, { continued: true });
-    doc.text(position_Date, ml, y);
+    doc.text(positionName, ml, y);
 
     y += 23;
     const dateText = "สอบวัน ";
-    const date_Data = "อาทิตย์ที่ 22 มีนาคม 2569 เวลา 09:00 - 12:00 น.";
     doc.text(dateText, ml, y, { continued: true });
-    doc.text(date_Data, ml, y);
+    doc.text(dateTime, ml, y);
 
     y += 23;
     const placeText = "สถานที่สอบ ";
-    const place_Data = "มหาวิทยาลัยสวนดุสิต";
-    const buiding_Data = "ตึก/อาคาร 10";
-    const floor_Data = "ชั้น 4";
-    const room_Data = "ห้องสอบที่ 31 ห้อง 10406";
-    const collect_Data = buiding_Data + floor_Data + room_Data;
+    const collect_Data =
+      " ตึก/อาคาร " +
+      buildingName +
+      " ชั้น " +
+      floorNumber +
+      " ห้องสอบที่ " +
+      roomNo +
+      " ห้อง " +
+      roomName;
     doc.text(placeText, ml, y, { continued: true });
-    doc.text(place_Data, ml, y, { continued: true });
+    doc.text(facilityName, ml, y, { continued: true });
     doc.text(collect_Data, ml + 3, y, { underline: true });
 
     y += 23;
     const examRoomLeaderText = "ชื่อหัวหน้าห้องสอบ";
     const examSupervisorText = "ชื่อเจ้าหน้าที่คุมสอบ";
-    const examSupervisorLine =
-      examRoomLeaderText +
-      "......................................................................." +
-      examSupervisorText +
+    const space1 =
       ".......................................................................";
-    doc.text(examSupervisorLine, ml, y);
+    doc.text(examRoomLeaderText, ml, y, { continued: true });
+    doc.text(space1, ml, y, { continued: true });
+    doc.text(examSupervisorText, ml, y, { continued: true });
+    doc.text(space1, ml, y);
 
     y += 23;
     const examAmountText = "จำนวนผู้เข้าสอบ";
     const examAbsentText = "จำนวนผู้ขาดสอบ";
-    const examLine =
-      examAmountText +
-      "..............." +
-      "คน " +
-      examAbsentText +
-      "..............." +
-      "คน ";
-    doc.text(examLine, ml, y);
+    const space2 = "...............คน";
+    doc.text(examAmountText, ml, y, { continued: true });
+    doc.text(space2, ml, y, { continued: true });
+    doc.text(examAbsentText, ml + 2, y, { continued: true });
+    doc.text(space2, ml, y);
 
     y += 25;
 
@@ -186,18 +196,6 @@ export const signedDocument = async () => {
   function findRange(x) {
     return (doc.page.width - ml - mr) * (x / 100);
   }
-
-  const app_result = await findByPositionID(3);
-  const applicantData = Array.from({ length: 22 }, (_, i) => ({
-    no: i + 1,
-    appID: "10001",
-    customerID: "1219800371284",
-    prefix: "นาย",
-    firstName: "ภาณุพงศ์",
-    lastName: "กิจเรืองโรจน์",
-    // firstName: "สิริประภัสสรวรรณรัตน์",
-    // lastName: "พิชญ์พงศ์สิริโชติ",
-  }));
 
   const drawTable = (y) => {
     doc.lineWidth(0.1);
@@ -323,16 +321,17 @@ export const signedDocument = async () => {
 
   const drawApplicants = (y) => {
     let h = 0;
-    app_result.forEach((a, i) => {
-      if ((i % 18 === 0) & (i != 0)) {
-        if (i % 10 > 1) {
+    applicants.forEach((a, index) => {
+      const numbers = index + 1;
+      if ((index % 18 === 0) & (index != 0)) {
+        if (index % 10 > 1) {
           h = 0;
           doc.addPage();
           drawHeader();
           y = 325;
           doc.fontSize(9.5);
           dataTable(ml, h);
-          doc.text(a.ID, ml + findRange(6) / 2 - wos(String(a.ID)), y);
+          doc.text(numbers, ml + findRange(6) / 2 - wos(String(numbers)), y);
           doc.text(
             a.ApplicantNumber,
             ml + findRange(26) / 2 - wos(a.ApplicantNumber),
@@ -354,7 +353,7 @@ export const signedDocument = async () => {
       } else {
         doc.fontSize(9.5);
         dataTable(ml, h);
-        doc.text(a.ID, ml + findRange(6) / 2 - wos(String(a.ID)), y);
+        doc.text(numbers, ml + findRange(6) / 2 - wos(String(numbers)), y);
         doc.text(
           a.ApplicantNumber,
           ml + findRange(26) / 2 - wos(a.ApplicantNumber),
@@ -481,7 +480,7 @@ export const signedDocument = async () => {
     doc.rect(ml, y + 23, 8, 8).stroke();
     doc.text(text1, ml + 13, y + 20);
 
-    const amount = "จำนวน ........... ราย";
+    const amount = "จำนวน ...........ราย";
     const appId1 =
       "เลขประจำตัวสอบ...................................................................................................................................................................";
     const appId2 =
@@ -511,7 +510,7 @@ export const signedDocument = async () => {
     doc.text(fullnameSupervisor, 310, y + 160);
   };
 
-  lineTest();
+  // lineTest();
   drawHeader();
   drawApplicants(325);
   // if (applicantData.length > 10) {
@@ -519,4 +518,8 @@ export const signedDocument = async () => {
   //   bottomPage();
   // }
   doc.end();
+  await new Promise((resolve, reject) => {
+    stream.on("finish", resolve);
+    stream.on("error", reject);
+  });
 };

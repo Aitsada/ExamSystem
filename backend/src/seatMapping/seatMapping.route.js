@@ -12,6 +12,7 @@ router.get('/seatMapping/position-room-counts', seatMappingController.findPositi
 router.post('/seatMapping/map', seatMappingController.mapPositionToRooms);
 
 router.post('/seatMapping/listOfName', seatMappingController.listOfName);
+router.post('/seatMapping/signedDocument', seatMappingController.signedDocument);
 router.post('/seatMapping/stickerID', seatMappingController.stickerID);
 router.post('/seatMapping/roomLayout', seatMappingController.roomLayout);
 
