@@ -43,17 +43,6 @@ export const stickerIdPDF = async (data) => {
   // doc.moveTo(mid, 0).lineTo(mid, h).stroke();
   doc.font(FONT_LIGHT);
   doc.fontSize(11);
-
-  // const applicants = Array.from({ length: 60 }, (_, i) => ({
-  //   position: "เจ้าพนักงานตรวจสอบทรัพย์สินปฏิบัติการ",
-  //   AppID: "",
-  //   Prefix: "นาย",
-  //   FirstName: "อิษฎา",
-  //   LastName: "สุวรรณโต",
-  //   citizenNumber: "1219800345942",
-  //   room: "31 (10406) แถวที่ 1 ชั้น 4 ",
-  //   building: "10",
-  // }));
   const START_Y = 30;
   const BLOCK_HEIGHT = 120;
   const MAX_BLOCK_PER_PAGE = 6;

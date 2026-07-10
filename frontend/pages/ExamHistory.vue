@@ -75,6 +75,9 @@
                     outlined
                     class="btn-action"
                     prepend-icon="mdi-delete-outline"
+                    :disabled="!!deletingKey"
+                    :loading="deletingKey === historyKey(item)"
+                    @click="deleteHistory(item)"
                   >
                     ลบ
                   </v-btn>
@@ -93,6 +96,7 @@ export default {
   data () {
     return {
       loading: false,
+      deletingKey: null,
       data: [],
       statusMap: {
         0: 'None',
@@ -119,6 +123,47 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    async deleteHistory (item) {
+      const confirm = await this.$swal.fire({
+        icon: 'warning',
+        title: 'ลบข้อมูลรอบสอบ',
+        showCancelButton: true,
+        confirmButtonColor: '#D32F2F',
+        cancelButtonColor: '#757575',
+        confirmButtonText: 'ลบ',
+        cancelButtonText: 'ยกเลิก'
+      })
+
+      if (!confirm.isConfirmed) {
+        return
+      }
+
+      this.deletingKey = this.historyKey(item)
+      try {
+        const res = await this.$axios.$delete(this.$apiUrl('/api/seatMapping/history'), {
+          params: {
+            ExamID: item.ExamID,
+            FacilityID: item.FacilityID
+          }
+        })
+        const deleted = res.data?.deleted || 0
+        await this.fetchHistory()
+        this.$swal.fire({
+          icon: 'success',
+          text: `ลบข้อมูลการจัดที่นั่งสอบ ${deleted} รายการเรียบร้อยแล้ว`
+        })
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `ลบข้อมูลรอบสอบไม่สำเร็จ ${err.message}`
+        })
+      } finally {
+        this.deletingKey = null
+      }
+    },
+    historyKey (item) {
+      return `${item.ExamID}-${item.FacilityID}`
     },
     getStatusName (statusID) {
       return this.statusMap[Number(statusID)] || '-'

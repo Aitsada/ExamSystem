@@ -2,7 +2,6 @@ import PDFDocument from "pdfkit";
 import fs from "fs";
 
 export const roomLayout = async (data) => {
-  console.log("test")
   const {
     roomNo,
     roomName,
@@ -76,7 +75,7 @@ export const roomLayout = async (data) => {
     building_Name;
   doc.text(roomOneLine, ml + 50, y);
   y += 25;
-  
+
   const headerText = "หน้าห้องสอบ";
   doc.text(headerText, center(headerText), y);
   y += 25;
@@ -131,13 +130,10 @@ export const roomLayout = async (data) => {
   doc.font(FONT_LIGHT);
   y = 155;
   columnX = 150;
-  let a = 100;
-  let b = 153;
   axisX = 0;
-  applicants.forEach((app, i) => {
-    i += 1;
-    const applicantNumber = String(app);
-    for (let j = i; j <= i; j++) {
+  const sumSeat = rows * columns;
+  function frameOfAppID() {
+    for (let i = 1; i <= sumSeat; i++) {
       doc
         .rect(
           marginLeft + table(axisX) + space,
@@ -146,6 +142,20 @@ export const roomLayout = async (data) => {
           15,
         )
         .stroke();
+      y += 25;
+      if (i % rows === 0) {
+        y = 155;
+        axisX += ratio;
+      }
+    }
+  }
+  frameOfAppID();
+  
+  axisX = 0;
+  applicants.forEach((app, i) => {
+    i += 1;
+    const applicantNumber = String(app);
+    for (let j = i; j <= i; j++) {
       doc.text(
         applicantNumber,
         marginLeft +
@@ -156,15 +166,11 @@ export const roomLayout = async (data) => {
         y,
       );
       y += 25;
-      b += 25;
       if (j % rowCount === 0 && j > 0) {
         axisY = 0;
         axisX += ratio;
         columnX += 105;
         y = 155;
-
-        a += 105;
-        b = 153;
       }
     }
   });
@@ -176,7 +182,6 @@ export const roomLayout = async (data) => {
   }
 
   doc.strokeColor("red");
-  // doc.moveTo(mid, 0).lineTo(mid, ph).stroke();
   doc.end();
   await new Promise((resolve, reject) => {
     stream.on("finish", resolve);

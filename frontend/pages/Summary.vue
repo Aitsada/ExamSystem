@@ -223,11 +223,18 @@ export default {
     },
     // >>>>> List Of Name <<<<<
     async listOfName (item) {
-      await this.downloadPdf(
-        '/api/seatMapping/listOfName',
-        this.listOfNamePayload(item),
-        this.pdfFilename('listOfName', item)
-      )
+      try {
+        await this.downloadPdf(
+          '/api/seatMapping/listOfName',
+          this.listOfNamePayload(item),
+          this.pdfFilename('listOfName', item)
+        )
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `StickerID failed ${err.message}`
+        })
+      }
     },
     listOfNamePayload (item) {
       return {
@@ -246,11 +253,18 @@ export default {
     },
     // >>>>> Signed Document <<<<<
     async signedDocument (item) {
-      await this.downloadPdf(
-        '/api/seatMapping/signedDocument',
-        this.signedDocumentPayload(item),
-        this.pdfFilename('signedDocument', item)
-      )
+      try {
+        await this.downloadPdf(
+          '/api/seatMapping/signedDocument',
+          this.signedDocumentPayload(item),
+          this.pdfFilename('signedDocument', item)
+        )
+      } catch (err) {
+        this.$swal.fire({
+          icon: 'error',
+          text: `StickerID failed ${err.message}`
+        })
+      }
     },
     signedDocumentPayload (item) {
       return {
@@ -268,10 +282,6 @@ export default {
     async stickerID (item) {
       try {
         await this.downloadPdf('/api/seatMapping/stickerID', this.stickerIDPayload(item), this.pdfFilename('stickerID', item))
-        this.$swal.fire({
-          icon: 'success',
-          text: 'StickerID success'
-        })
       } catch (err) {
         this.$swal.fire({
           icon: 'error',
@@ -297,10 +307,6 @@ export default {
           this.roomLayoutPayload(item),
           this.pdfFilename('roomLayout', item)
         )
-        this.$swal.fire({
-          icon: 'success',
-          text: 'Room Layout Success'
-        })
       } catch (err) {
         this.$swal.fire({
           icon: 'error',

@@ -9,6 +9,23 @@ export async function findHistory() {
   return await seatMappingModel.findHistory();
 }
 
+export async function deleteHistory(ExamID, FacilityID) {
+  const normalizedExamID = Number(ExamID);
+  const normalizedFacilityID = Number(FacilityID);
+
+  if (!Number.isInteger(normalizedExamID) || normalizedExamID <= 0) {
+    throw new Error("ExamID is invalid");
+  }
+  if (!Number.isInteger(normalizedFacilityID) || normalizedFacilityID <= 0) {
+    throw new Error("FacilityID is invalid");
+  }
+
+  return await seatMappingModel.deleteHistory(
+    normalizedExamID,
+    normalizedFacilityID,
+  );
+}
+
 export async function findSummary(ExamID, FacilityID) {
   if (!ExamID) {
     throw new Error("ExamID is required");

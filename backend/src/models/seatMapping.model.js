@@ -46,6 +46,24 @@ export async function findHistory() {
   return result;
 }
 
+export async function deleteHistory(ExamID, FacilityID) {
+  const [result] = await db.query(
+    `DELETE SeatMapping
+     FROM SeatMapping
+     INNER JOIN Applicant ON SeatMapping.ApplicantID = Applicant.ID
+     INNER JOIN Position ON Applicant.PositionID = Position.ID
+     INNER JOIN Seat ON SeatMapping.SeatID = Seat.ID
+     INNER JOIN SeatRow ON Seat.SeatRowID = SeatRow.ID
+     INNER JOIN Room ON SeatRow.RoomID = Room.ID
+     INNER JOIN Floor ON Room.FloorID = Floor.ID
+     INNER JOIN Building ON Floor.BuildingID = Building.ID
+     WHERE Position.ExamID = ?
+       AND Building.FacilityID = ?`,
+    [ExamID, FacilityID],
+  );
+  return result;
+}
+
 export async function findSummaryMeta(ExamID, FacilityID) {
   const [result] = await db.query(
     `SELECT

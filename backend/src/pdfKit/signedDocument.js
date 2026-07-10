@@ -12,7 +12,6 @@ export const signedDocument = async (data) => {
     roomName,
   } = data;
   const applicants = [].concat(data.applicants).filter((a) => a);
-  console.log(applicants);
   const doc = new PDFDocument({
     size: "A4",
     margins: 15,
@@ -417,6 +416,7 @@ export const signedDocument = async (data) => {
       .lineTo(x + findRange(100), 345 + h)
       .stroke();
   };
+  
   const lineTest = () => {
     doc.strokeColor("red");
     const x = ml;
@@ -449,25 +449,9 @@ export const signedDocument = async (data) => {
       .moveTo(x + findRange(182) / 2, 0)
       .lineTo(x + findRange(182) / 2, ph)
       .stroke();
-
-    // // Center title
-    // doc.strokeColor("green");
-    // doc
-    //   .moveTo(mid - 70, 0)
-    //   .lineTo(mid - 70, ph)
-    //   .stroke();
-
-    // doc
-    //   .moveTo(mid + 70, 0)
-    //   .lineTo(mid + 70, ph)
-    //   .stroke();
-
-    // doc.strokeColor("blue");
-    // doc.moveTo(mid, 0).lineTo(mid, ph).stroke();
-
     doc.strokeColor("black");
   };
-
+  
   const bottomPage = (y = 50) => {
     const text =
       "ข้าพเจ้าได้ตรวจสอบใบหน้าและเลขประจําตัวประชาชนของผู้สอบทุกคนแล้ว ปรากฎว่า";
@@ -510,13 +494,8 @@ export const signedDocument = async (data) => {
     doc.text(fullnameSupervisor, 310, y + 160);
   };
 
-  // lineTest();
   drawHeader();
   drawApplicants(325);
-  // if (applicantData.length > 10) {
-  //   doc.addPage();
-  //   bottomPage();
-  // }
   doc.end();
   await new Promise((resolve, reject) => {
     stream.on("finish", resolve);

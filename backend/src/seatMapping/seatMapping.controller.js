@@ -23,6 +23,21 @@ export async function findHistory(req, res) {
   }
 }
 
+export async function deleteHistory(req, res) {
+  try {
+    const { ExamID, FacilityID } = req.query;
+    const result = await seatMappingService.deleteHistory(ExamID, FacilityID);
+    res.status(200).json({
+      status: "success",
+      data: {
+        deleted: result.affectedRows,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+}
+
 export async function findSummary(req, res) {
   try {
     const { ExamID, FacilityID } = req.query;
