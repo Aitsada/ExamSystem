@@ -119,7 +119,7 @@
                   </v-col>
                   <v-col cols="12" sm="2" md="1" class="time-col">
                     <v-select
-                      v-model="selectTimeStart"
+                      v-model="selectedStartTime"
                       :items="timeOptions"
                       outlined
                       dense
@@ -132,8 +132,8 @@
                   </v-col>
                   <v-col cols="12" sm="2" md="1" class="time-col">
                     <v-select
-                      v-model="selectTimeEnd"
-                      :items="timeOptions"
+                      v-model="selectedEndTime"
+                      :items="endTimeOptions"
                       outlined
                       dense
                       hide-details="auto"
@@ -219,8 +219,8 @@ export default {
       selectExams: [],
       selectedExams: null,
       timeOptions,
-      selectTimeStart: timeOptions[0],
-      selectTimeEnd: timeOptions[timeOptions.length - 1],
+      selectedStartTime: timeOptions[0],
+      selectedEndTime: timeOptions[timeOptions.length - 1],
       date: getCurrentDate(),
       menu: false
     }
@@ -232,8 +232,8 @@ export default {
         this.selectedOrganizations &&
         this.selectedExams &&
         this.date &&
-        this.selectTimeStart &&
-        this.selectTimeEnd
+        this.selectedStartTime &&
+        this.selectedEndTime
       )
     },
     dateText () {
@@ -247,10 +247,19 @@ export default {
           FacilityID: this.selectedFacilities,
           OrganizationID: this.selectedOrganizations,
           ExamDate: this.date,
-          StartTime: this.selectTimeStart,
-          EndTime: this.selectTimeEnd
+          StartTime: this.selectedStartTime,
+          EndTime: this.selectedEndTime
         }
       }
+    },
+    endTimeOptions () {
+      const startIndex = this.timeOptions.indexOf(this.selectedStartTime)
+
+      if (startIndex === -1) {
+        return this.timeOptions
+      }
+
+      return this.timeOptions.slice(startIndex)
     }
   },
   watch: {
@@ -262,6 +271,11 @@ export default {
     selectedExams (newValue) {
       if (newValue) {
         this.setDateAndTimeFromExam(newValue)
+      }
+    },
+    selectedStartTime (newValue) {
+      if (this.selectedEndTime < newValue) {
+        this.selectedEndTime = newValue
       }
     }
   },
@@ -327,10 +341,10 @@ export default {
         this.date = start.date
       }
       if (start.time) {
-        this.selectTimeStart = start.time
+        this.selectedStartTime = start.time
       }
       if (end.time) {
-        this.selectTimeEnd = end.time
+        this.selectedEndTime = end.time
       }
     },
     formatBangkokDateTime (dateTime) {

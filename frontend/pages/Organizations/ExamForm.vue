@@ -83,7 +83,7 @@
                 <v-col cols="6" md="2">
                   <v-select
                     v-model="selectedEndTime"
-                    :items="timeOptions"
+                    :items="endTimeOptions"
                     dense
                     outlined
                     hide-details
@@ -274,6 +274,49 @@
   </v-row>
 </template>
 <script>
+const getCurrentDate = () => {
+  return (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
+}
+const timeOptions = ['08:00',
+  '08:15',
+  '08:30',
+  '08:45',
+  '09:00',
+  '09:15',
+  '09:30',
+  '09:45',
+  '10:00',
+  '10:15',
+  '10:30',
+  '10:45',
+  '11:00',
+  '11:15',
+  '11:30',
+  '11:45',
+  '12:00',
+  '12:15',
+  '12:30',
+  '12:45',
+  '13:00',
+  '13:15',
+  '13:30',
+  '13:45',
+  '14:00',
+  '14:15',
+  '14:30',
+  '14:45',
+  '15:00',
+  '15:15',
+  '15:30',
+  '15:45',
+  '16:00',
+  '16:15',
+  '16:30',
+  '16:45',
+  '17:00',
+  '17:15',
+  '17:30']
+
 export default {
   name: 'ExamForm',
   data () {
@@ -287,49 +330,10 @@ export default {
         { text: 'Canceled', value: 2 },
         { text: 'Completed', value: 3 }
       ],
-      timeOptions: ['08:00',
-        '08:15',
-        '08:30',
-        '08:45',
-        '09:00',
-        '09:15',
-        '09:30',
-        '09:45',
-        '10:00',
-        '10:15',
-        '10:30',
-        '10:45',
-        '11:00',
-        '11:15',
-        '11:30',
-        '11:45',
-        '12:00',
-        '12:15',
-        '12:30',
-        '12:45',
-        '13:00',
-        '13:15',
-        '13:30',
-        '13:45',
-        '14:00',
-        '14:15',
-        '14:30',
-        '14:45',
-        '15:00',
-        '15:15',
-        '15:30',
-        '15:45',
-        '16:00',
-        '16:15',
-        '16:30',
-        '16:45',
-        '17:00',
-        '17:15',
-        '17:30'],
+      timeOptions,
       selectedStartTime: '08:00',
       selectedEndTime: '17:00',
-      date: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      menu: false,
+      date: getCurrentDate(),
       modal: false,
       menu2: false,
       newPositionValue: '__new_position__',
@@ -370,6 +374,34 @@ export default {
         return false
       }
       return !this.isNewPosition || !!this.newPositionName
+    },
+    endTimeOptions () {
+      const startIndex = this.timeOptions.indexOf(this.selectedStartTime)
+
+      if (startIndex === -1) {
+        return this.timeOptions
+      }
+
+      return this.timeOptions.slice(startIndex)
+    }
+  },
+  watch: {
+    '$route.query.ExamID': {
+      immediate: true,
+      async handler (id) {
+        if (!id) { return }
+
+        this.exam.ID = id
+        this.isEditMode = true
+
+        await this.fetchExamDataByID(id)
+        await this.fetchPositionByExamID(id)
+      }
+    },
+    selectedStartTime (newValue) {
+      if (this.selectedEndTime < newValue) {
+        this.selectedEndTime = newValue
+      }
     }
   },
   async mounted () {
@@ -378,11 +410,6 @@ export default {
     this.exam.ID = examId || ''
     this.organ.ID = organId || ''
     await this.fetchOrganDataByID(organId)
-    if (examId) {
-      this.isEditMode = true
-      await this.fetchExamDataByID(examId)
-      await this.fetchPositionByExamID(examId)
-    }
   },
   methods: {
     backBtn () {
@@ -700,4 +727,4 @@ export default {
     }
   }
 }
-</script>
+</script >
